@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+       
         <!-- Responsive design -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       
         <title> Login </title>
 
         <!-- Bootstrap CDN link -->
@@ -14,6 +16,8 @@
 
     <body>
         <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
+            <h2> Veuillez saisir vos coordonnées </h2>
+            <br>
             <form>
                 <div class="form-group">
                     <label for="inputRaisonSociale"> Raison sociale </label>
@@ -25,13 +29,13 @@
                     <input type="text" class="form-control" id="inputSiren">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group mb-4">
                     <label for="inputResponsableLegale"> Responsable légale </label>
                     <input type="text" class="form-control" id="inputResponsableLegale" placeholder="Nom et prénom" required>
                 </div>
-
+                
                 <span>  Vous êtes : </span>
-                <div class="form-check form-check-inline">  
+                <div class="form-check form-check-inline ml-3">  
                     <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
                     <label class="form-check-label" for="inlineRadio1"> Client </label>
                 </div>
@@ -58,12 +62,12 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="inputZip"> Code postale </label>
+                    <label for="inputZip"> Code postal </label>
                     <input type="text" class="form-control" id="inputZip" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="exampleInputEmail1"> Addresse mail </label>
+                    <label for="exampleInputEmail1"> Email </label>
                     <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                 </div>
 
@@ -73,7 +77,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 40px;">
-                    <button type="submit" class="btn btn-success" style="padding:10 20px; margin-right:30px;"> Valider </button>
+                    <button type="submit" class="btn btn-success" style="padding:6px 16px; margin-right:30px;"> Valider </button>
                     <a href="connexion.html"> <button type="button" class="btn btn-danger" style="padding:10 20px;"> Annuler </button> </a>
                 </div>
             </form>
