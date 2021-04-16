@@ -1,0 +1,9 @@
+#eyeIcon {
+    vertical-align:bottom; 
+    cursor:pointer;
+}
+
+#bouton_valider {
+    margin-right:30px; 
+    padding:6px 16px; 
+}

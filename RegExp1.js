@@ -18,4 +18,6 @@ function verif()
         window.alert("L'adresse email n'est pas valide !");
     }
 }
+
+
     

@@ -8,7 +8,7 @@ document.getElementById("bouton_valider").addEventListener("click", checkForm);
 function checkForm()
 {
     var filtreString = new RegExp(/^[A-Za-z]+$/);
-    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9_.-]+$/);
+    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9_.,*&ç-]+$/);
     var filtreSiren = new RegExp(/^[0-9]{9}$/);
     var filtreZipCode = new RegExp(/^[0-9]{5}$/);
     var filtreEmail = new RegExp(/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
@@ -28,15 +28,15 @@ function checkForm()
     var controlSiren = filtreSiren.test(Siren);
     var controlResponsableLegale = filtreString.test(ResponsableLegale);
     var controlAddress = filtreAlphanumeric.test(Address);
-    var controlCity = filtreString.test(City);
-    var controlState = filtreString.test(State);
+    var controlCity = filtreAlphanumeric.test(City);
+    var controlState = filtreAlphanumeric.test(State);
     var controlZipCode = filtreZipCode.test(ZipCode);
     var controlEmail = filtreEmail.test(Email);
 
 
     if (controlRaisonSociale===false)
     {
-        window.alert("Entrez un nom correct !");
+        window.alert("Entrez un nom correct de la Raison Sociale !");
     }
 
     if (controlSiren===false)
@@ -46,12 +46,12 @@ function checkForm()
 
     if (controlResponsableLegale===false)
     {
-        window.alert("Entrez un nom correct !");
+        window.alert("Entrez un nom et prénom valide !");
     }
 
     if (controlAddress===false)
     {
-        window.alert("Entrez une addresse valide !");
+        window.alert("Entrez une adresse valide !");
     }
 
     if (controlCity===false)
@@ -74,4 +74,6 @@ function checkForm()
         window.alert("Entrez un email correct !");
     }
 }
+
+
 

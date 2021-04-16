@@ -1,8 +1,6 @@
-DROP DATABASE IF EXIST iqaten;
+CREATE DATABASE IF NOT EXISTS iqaten;
 
-CREATE DATABASE iqaten;
-
-USE DATABASE iqaten;
+USE iqaten;
 
 CREATE TABLE Client(
    client_id INT,
