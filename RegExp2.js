@@ -7,8 +7,8 @@ document.getElementById("bouton_valider").addEventListener("click", checkForm);
 
 function checkForm()
 {
-    var filtreString = new RegExp(/^[A-Za-z]+$/);
-    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9_.,*&ç-]+$/);
+    var filtreString = new RegExp(/^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$/);  // aprés a-z on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
+    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§$£@*',.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
     var filtreSiren = new RegExp(/^[0-9]{9}$/);
     var filtreZipCode = new RegExp(/^[0-9]{5}$/);
     var filtreEmail = new RegExp(/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
@@ -23,56 +23,67 @@ function checkForm()
     var ZipCode = document.querySelector("#ZipCode").value;
     var Email = document.querySelector("#email").value;
 
-
     var controlRaisonSociale = filtreAlphanumeric.test(RaisonSociale);
     var controlSiren = filtreSiren.test(Siren);
     var controlResponsableLegale = filtreString.test(ResponsableLegale);
     var controlAddress = filtreAlphanumeric.test(Address);
-    var controlCity = filtreAlphanumeric.test(City);
-    var controlState = filtreAlphanumeric.test(State);
+    var controlCity = filtreString.test(City);
+    var controlState = filtreString.test(State);
     var controlZipCode = filtreZipCode.test(ZipCode);
     var controlEmail = filtreEmail.test(Email);
 
 
-    if (controlRaisonSociale===false)
+    if (controlRaisonSociale==false)
     {
-        window.alert("Entrez un nom correct de la Raison Sociale !");
+        window.alert("Entrez un nom correct de la Raison Sociale!");
+    }
+    
+    if (controlSiren==false)
+    {
+        window.alert("Entrez un numéro Siren valide!");
     }
 
-    if (controlSiren===false)
-    {
-        window.alert("Entrez un numéro Siren valide !");
-    }
-
-    if (controlResponsableLegale===false)
+    if (controlResponsableLegale==false)
     {
         window.alert("Entrez un nom et prénom valide !");
     }
 
-    if (controlAddress===false)
+    if (controlAddress==false)
     {
         window.alert("Entrez une adresse valide !");
     }
 
-    if (controlCity===false)
+    if (controlCity==false)
     {
         window.alert("Entrez une ville correcte !");
     }
 
-    if (controlState===false)
+    if (controlState==false)
     {
         window.alert("Entrez un pays correct !");
     }
 
-    if (controlZipCode===false)
+    if (controlZipCode==false)
     {
         window.alert("Entrez un code postal correct !");
     }
 
-    if (controlEmail===false)
+    if (controlEmail==false)
     {
         window.alert("Entrez un email correct !");
     }
+
+
+
+    // On vérifie si les mots de passe saisi par l'utilisateur sont idéntiques:
+    var Code = document.querySelector("#code").value;
+    var Code2 = document.querySelector("#confirmer").value;
+    
+    if (Code !== Code2)
+    {
+        window.alert("Le mot de passe n'est pas identique!");
+    }
+    
 }
 
 

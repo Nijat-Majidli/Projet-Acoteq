@@ -7,7 +7,7 @@
         <!-- Responsive design -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
        
-        <title> Login </title>
+        <title> Inscription </title>
 
         <!-- Bootstrap CDN link -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -21,62 +21,67 @@
         <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
             <h2> Veuillez saisir vos coordonnées </h2>
             <br>
-            <form>
+            <form action="script_inscription.php" method="POST">
                 <div class="form-group">
-                    <label for="RaisonSociale"> Raison sociale </label>
-                    <input type="text" class="form-control" id="RaisonSociale" required>
+                    <label for="RaisonSociale"> Raison sociale <sup>*</sup> </label> 
+                    <input type="text" class="form-control" id="RaisonSociale" name="RS" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="siren"> N° SIREN </label>
-                    <input type="text" class="form-control" id="siren" required>
+                    <label for="siren"> N° SIREN <sup>*</sup> </label>
+                    <input type="text" class="form-control" id="siren" name="numSiren" required>
                 </div>
 
                 <div class="form-group mb-4">
-                    <label for="ResponsableLegale"> Responsable légale </label>
-                    <input type="text" class="form-control" id="ResponsableLegale" placeholder="Nom et prénom" required>
+                    <label for="ResponsableLegale"> Responsable légale <sup>*</sup> </label>
+                    <input type="text" class="form-control" id="ResponsableLegale" name="RL" placeholder="Nom et prénom" required>
                 </div>
                 
                 <span>  Vous êtes : </span>
                 <div class="form-check form-check-inline ml-3">  
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" required>
-                    <label class="form-check-label" for="inlineRadio1"> Client </label>
+                    <input class="form-check-input" type="radio" name="userType" id="client" value="Client" required checked>
+                    <label class="form-check-label" for="client"> Client </label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" required>
-                    <label class="form-check-label" for="inlineRadio2"> Fournisseur </label>
+                    <input class="form-check-input" type="radio" name="userType" id="fournisseur" value="Fournisseur" required>
+                    <label class="form-check-label" for="fournisseur"> Fournisseur </label>
                 </div>
 
                 <br><br>
 
                 <div class="form-group">
-                  <label for="address"> Adresse </label>
-                  <input type="text" class="form-control" id="address" required>
+                  <label for="address"> Adresse <sup>*</sup> </label>
+                  <input type="text" class="form-control" id="address" name="adr" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ZipCode"> Code postal <sup>*</sup> </label>
+                    <input type="text" class="form-control" id="ZipCode" name="codePostal" required>
                 </div>
                   
                 <div class="form-group">
-                    <label for="city"> Ville </label>
-                    <input type="text" class="form-control" id="city" required>
+                    <label for="city"> Ville <sup>*</sup> </label>
+                    <input type="text" class="form-control" id="city" name="ville" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="state"> Pays </label>
-                    <input type="text" class="form-control" id="state" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="ZipCode"> Code postal </label>
-                    <input type="text" class="form-control" id="ZipCode"required>
+                    <label for="state"> Pays <sup>*</sup> </label>
+                    <input type="text" class="form-control" id="state" name="pays" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="email"> Email </label>
-                    <input type="email" class="form-control" id="email"required>
+                    <label for="email"> Email <sup>*</sup> </label>
+                    <input type="email" class="form-control" id="email" name="mail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="code"> Mot de passe <sup>*</sup> </label>
+                    <input type="password" class="form-control" id="code" name="mdp" required>
                 </div>
 
                 <div class="form-group mb-5">
-                    <label for="code"> Mot de passe </label>
-                    <input type="password" class="form-control" id="code"required>
+                    <label for="confirmer"> Confirmer le mot de passe <sup>*</sup> </label>
+                    <input type="password"  class="form-control"  id="confirmer"  name="mdp2" required>
                 </div>
 
                 <div style="text-align: center; margin-top: 40px;">
