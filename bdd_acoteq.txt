@@ -15,7 +15,7 @@ CREATE TABLE Client(
    client_password VARCHAR(255) NOT NULL,
    client_date_inscription DATETIME NOT NULL,
    client_connexion DATETIME NOT NULL
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE Demande(
    demande_id INT,
@@ -26,7 +26,7 @@ CREATE TABLE Demande(
    client_id INT NOT NULL,
    PRIMARY KEY(demande_id),
    FOREIGN KEY(client_id) REFERENCES Client(client_id)
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE Fournisseur(
    fournisseur_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -41,7 +41,7 @@ CREATE TABLE Fournisseur(
    fournisseur_password VARCHAR(255) NOT NULL,
    fournisseur_date_inscription DATETIME NOT NULL,
    fournisseur_connexion DATETIME NOT NULL
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE Reponse(
    reponse_id INT,
@@ -54,4 +54,4 @@ CREATE TABLE Reponse(
    PRIMARY KEY(reponse_id),
    FOREIGN KEY(demande_id) REFERENCES Demande(demande_id),
    FOREIGN KEY(fournisseur_id) REFERENCES Fournisseur(fournisseur_id)
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

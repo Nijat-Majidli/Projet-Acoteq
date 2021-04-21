@@ -33,7 +33,60 @@
         }
     }
 
-    
+
+    /* Vérification avec l'expréssion RegExp la validité de format de tout les données saisi par utilisateur 
+    en utilisant la fonction <<preg_match()>> qui renvoie True or False:
+    */
+    if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§£@*',.$;-]+$#", $user_RS))
+    {
+        echo "<h4> Entrez un nom correct de la Raison Sociale ! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }  
+    else if (!preg_match("#^[0-9]{9}$#", $user_numSiren))
+    {
+        echo "<h4> Entrez un numéro Siren valide ! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }  
+    else if (!preg_match("#^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$#", $user_RL))
+    {
+        echo "<h4> Entrez un nom et prénom valide ! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }  
+    else if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§£@*',.$;-]+$#", $user_adr))
+    {
+        echo "<h4> Entrez une adresse valide ! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }  
+    else if (!preg_match("#^[0-9]{5}$#", $user_codePostal))
+    {
+        echo "<h4> Entrez un code postal correct ! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }  
+    else if (!preg_match("#^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$#", $user_ville))
+    {
+        echo "<h4> Entrez une ville correcte ! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }
+    else if (!preg_match("#^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$#", $user_pays))
+    {
+        echo "<h4> Entrez un pays correct ! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }
+    else if (!preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $user_email))
+    {
+        echo "<h4> L'adresse mail n'a pas bon format! </h4>";
+        header("refresh:2; url=inscription.html");
+        exit;
+    }
+
+
     /* Un mot de passe ne doit jamais être stocké en clair : il doit être crypté à l'aide d'un algorithme de cryptage afin que 
     sa valeur ne puisse être lue. La fonction <<password_hash()>> permet d’utiliser des algorithmes de cryptage en PHP.  
     D'abord on vérifie la validité du mot de passe:     */
@@ -50,7 +103,7 @@
     }
 
 
-    /* Vérification si adresse mail saisi par utilisateur déjà existe dans la base de données ou non ?
+    /* Vérification si l'adresse mail saisi par utilisateur déjà existe dans la base de données ou non ?
     Pour cela d'abord on va se connecter à la base de données:     */
     require ("connection_bdd.php");
 
@@ -70,7 +123,7 @@
 
             if ($row->client_email == $user_email || $row->fournisseur_email == $user_email)
             {
-                echo "<h4> Cette adresse mail déjà existe. Choisissez une autre! </h4>";
+                echo "<h4> Cette adresse mail n'est pas disponible. Choisissez une autre! </h4>";
                 header("refresh:2; url=inscription.html");
                 exit;
             }   
@@ -78,8 +131,8 @@
     }        
     
 
-    // Construction de la requête préparée INSERT pour la table client
-    // On insere pas la valeurs pour la colonne "login_fail" car dans base de données on a bien défini que cette colonne accepte la valeur 0
+    /* Construction de la requête préparée INSERT pour la table client
+    On insere pas la valeurs pour la colonne "login_fail" car dans base de données on a bien défini que cette colonne accepte la valeur 0 */
     if($_POST['userType']=='Client')
     {
         $requete = $db->prepare("INSERT INTO client (client_raison_sociale, client_siren, client_responsable_legale, client_adresse, 
@@ -87,99 +140,34 @@
         VALUES (:client_raison_sociale, :client_siren, :client_responsable_legale, :client_adresse, :client_ville, :client_pays, 
         :client_code_postal, :client_email, :client_password, :client_date_inscription, :client_connexion)");
 
+        // Association des valeurs aux marqueurs via méthode "bindValue()"
+        $requete->bindValue(':client_raison_sociale', $user_RS, PDO::PARAM_STR);
+        $requete->bindValue(':client_siren', $user_numSiren, PDO::PARAM_INT);
+        $requete->bindValue(':client_responsable_legale', $user_RL, PDO::PARAM_STR);
+        $requete->bindValue(':client_adresse', $user_adr, PDO::PARAM_STR);
+        $requete->bindValue(':client_ville', $user_ville, PDO::PARAM_STR);
+        $requete->bindValue(':client_pays', $user_pays, PDO::PARAM_STR);
+        $requete->bindValue(':client_code_postal', $user_codePostal, PDO::PARAM_INT);
+        $requete->bindValue(':client_email', $user_email, PDO::PARAM_STR);
+        $requete->bindValue(':client_password', $user_mdp, PDO::PARAM_STR);
+    
+        // On utilise l'objet DateTime() pour montrer la date d'inscription et l'heure du dernier connexion du client
+        $time = new DateTime();   
+        $date = $time->format("Y/m/d H:i:s"); 
 
-    $user_RS 
-    $user_numSiren
-    $user_RL 
-    $user_adr 
-    $user_codePostal
-    $user_ville 
-    $user_pays 
-    $user_email 
+        $requete->bindValue(':client_date_inscription', $date, PDO::PARAM_STR);  
+        $requete->bindValue(':client_connexion', $date, PDO::PARAM_STR);
 
-
-
-        // Vérification la validité de format de l'adresse mail avec REGEX en utilisant la fonction <<preg_match()>> qui renvoie True or False:
-        if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§\$£@*',.-]+$#", $user_RS))
-        {
-            echo "<h4> Entrez un nom correct de la Raison Sociale! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }  
-        else if (!preg_match("#^[0-9]{9}$#", $user_numSiren))
-        {
-            echo "<h4> Entrez un numéro Siren valide! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }  
-        else if (!preg_match("#^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$#", $user_RL))
-        {
-            echo "<h4> L'adresse mail n'a pas bon format! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }  
-        else if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§\$£@*',.-]+$#", $user_adr))
-        {
-            echo "<h4> L'adresse mail n'a pas bon format! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }  
-        else if (!preg_match("#^[0-9]{5}#", $user_codePostal))
-        {
-            echo "<h4> L'adresse mail n'a pas bon format! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }  
-        else if (!preg_match("#^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$#", $user_ville))
-        {
-            echo "<h4> L'adresse mail n'a pas bon format! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }
-        else if (!preg_match("#^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$#", $user_pays))
-        {
-            echo "<h4> L'adresse mail n'a pas bon format! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }
-        else if (!preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $user_email))
-        {
-            echo "<h4> L'adresse mail n'a pas bon format! </h4>";
-            header("refresh:2; url=inscription.html");
-            exit;
-        }
-        else
-        {
-            // Association des valeurs aux marqueurs via méthode "bindValue()"
-            $requete->bindValue(':client_raison_sociale', $user_RS, PDO::PARAM_STR);
-            $requete->bindValue(':client_siren', $user_numSiren, PDO::PARAM_INT);
-            $requete->bindValue(':client_responsable_legale', $user_RL, PDO::PARAM_STR);
-            $requete->bindValue(':client_adresse', $user_adr, PDO::PARAM_STR);
-            $requete->bindValue(':client_ville', $user_ville, PDO::PARAM_STR);
-            $requete->bindValue(':client_pays', $user_pays, PDO::PARAM_STR);
-            $requete->bindValue(':client_code_postal', $user_codePostal, PDO::PARAM_INT);
-            $requete->bindValue(':client_email', $user_email, PDO::PARAM_STR);
-            $requete->bindValue(':client_password', $user_mdp, PDO::PARAM_STR);
+        // Exécution de la requête
+        $requete->execute();
         
-            // On utilise l'objet DateTime() pour montrer la date d'inscription et l'heure du dernier connexion du client
-            $time = new DateTime();   
-            $date = $time->format("Y/m/d H:i:s"); 
+        // Libèration la connection au serveur de BDD
+        $requete->closeCursor();
 
-            $requete->bindValue(':client_date_inscription', $date, PDO::PARAM_STR);  
-            $requete->bindValue(':client_connexion', $date, PDO::PARAM_STR);
-
-            // Exécution de la requête
-            $requete->execute();
-            
-            //Libèration la connection au serveur de BDD
-            $requete->closeCursor();
-
-            //Redirection vers la page acceuil.php 
-            // header("Location: connexion.html");
-            // exit;
-        } 
+        // Redirection vers la page acceuil.php 
+        // header("Location: connexion.html");
+        // exit;   
     }
-
     else
     {
         // Construction de la requête préparée INSERT pour la table fournisseur
@@ -188,50 +176,36 @@
         fournisseur_date_inscription, fournisseur_connexion) VALUES (:fournisseur_raison_sociale, :fournisseur_siren, :fournisseur_responsable_legale, 
         :fournisseur_adresse, :fournisseur_ville, :fournisseur_pays, :fournisseur_code_postal, :fournisseur_email, :fournisseur_password, 
         :fournisseur_date_inscription, :fournisseur_connexion)");
-
-
-        // Vérification la validité de format de l'adresse mail avec REGEX en utilisant la fonction <<preg_match()>> qui renvoie True or False:
-        if (preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $user_email))  
-        {
-            // Association des valeurs aux marqueurs via méthode "bindValue()"
-            $requete->bindValue(':fournisseur_raison_sociale', $user_RS, PDO::PARAM_STR);
-            $requete->bindValue(':fournisseur_siren', $user_numSiren, PDO::PARAM_INT);
-            $requete->bindValue(':fournisseur_responsable_legale', $user_RL, PDO::PARAM_STR);
-            $requete->bindValue(':fournisseur_adresse', $user_adr, PDO::PARAM_STR);
-            $requete->bindValue(':fournisseur_ville', $user_ville, PDO::PARAM_STR);
-            $requete->bindValue(':fournisseur_pays', $user_pays, PDO::PARAM_STR);
-            $requete->bindValue(':fournisseur_code_postal', $user_codePostal, PDO::PARAM_INT);
-            $requete->bindValue(':fournisseur_email', $user_email, PDO::PARAM_STR);
-            $requete->bindValue(':fournisseur_password', $user_mdp, PDO::PARAM_STR);
         
-            // On utilise l'objet DateTime() pour montrer la date d'inscription et l'heure du dernier connexion du client
-            $time = new DateTime();   
-            $date = $time->format("Y/m/d H:i:s"); 
+        // Association des valeurs aux marqueurs via méthode "bindValue()"
+        $requete->bindValue(':fournisseur_raison_sociale', $user_RS, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_siren', $user_numSiren, PDO::PARAM_INT);
+        $requete->bindValue(':fournisseur_responsable_legale', $user_RL, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_adresse', $user_adr, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_ville', $user_ville, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_pays', $user_pays, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_code_postal', $user_codePostal, PDO::PARAM_INT);
+        $requete->bindValue(':fournisseur_email', $user_email, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_password', $user_mdp, PDO::PARAM_STR);
+    
+        // On utilise l'objet DateTime() pour montrer la date d'inscription et l'heure du dernier connexion du client
+        $time = new DateTime();   
+        $date = $time->format("Y/m/d H:i:s"); 
 
-            $requete->bindValue(':fournisseur_date_inscription', $date, PDO::PARAM_STR);  
-            $requete->bindValue(':fournisseur_connexion', $date, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_date_inscription', $date, PDO::PARAM_STR);  
+        $requete->bindValue(':fournisseur_connexion', $date, PDO::PARAM_STR);
 
-            // Exécution de la requête
-            $requete->execute();
-            
-            //Libèration la connection au serveur de BDD
-            $requete->closeCursor();
+        // Exécution de la requête
+        $requete->execute();
+        
+        //Libèration la connection au serveur de BDD
+        $requete->closeCursor();
 
-            //Redirection vers la page acceuil.php 
-            // header("Location: connexion.html");
-            // exit;
-        } 
-        else
-        {
-            echo "<h4> L'adresse mail n'a pas bon format! </h4>";
-            // header("refresh:2; url=inscription.html");
-            // exit;
-        }
+        // Redirection vers la page acceuil.php 
+        header("Location: connexion.html");
+        exit;
     }
 
-
-       
-    
 
 
     

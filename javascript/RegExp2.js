@@ -8,7 +8,7 @@ document.getElementById("bouton_valider").addEventListener("click", checkForm);
 function checkForm()
 {
     var filtreString = new RegExp(/^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$/);  // aprés a-z on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
-    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§$£@*',.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
+    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§$£@*',;.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
     var filtreSiren = new RegExp(/^[0-9]{9}$/);
     var filtreZipCode = new RegExp(/^[0-9]{5}$/);
     var filtreEmail = new RegExp(/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
@@ -35,12 +35,12 @@ function checkForm()
 
     if (controlRaisonSociale==false)
     {
-        window.alert("Entrez un nom correct de la Raison Sociale!");
+        window.alert("Entrez un nom correct de la Raison Sociale !");
     }
     
     if (controlSiren==false)
     {
-        window.alert("Entrez un numéro Siren valide!");
+        window.alert("Entrez un numéro Siren valide !");
     }
 
     if (controlResponsableLegale==false)
@@ -53,6 +53,11 @@ function checkForm()
         window.alert("Entrez une adresse valide !");
     }
 
+    if (controlZipCode==false)
+    {
+        window.alert("Entrez un code postal correct !");
+    }
+
     if (controlCity==false)
     {
         window.alert("Entrez une ville correcte !");
@@ -63,16 +68,10 @@ function checkForm()
         window.alert("Entrez un pays correct !");
     }
 
-    if (controlZipCode==false)
-    {
-        window.alert("Entrez un code postal correct !");
-    }
-
     if (controlEmail==false)
     {
         window.alert("Entrez un email correct !");
     }
-
 
 
     // On vérifie si les mots de passe saisi par l'utilisateur sont idéntiques:
@@ -84,6 +83,7 @@ function checkForm()
         window.alert("Le mot de passe n'est pas identique!");
     }
     
+
 }
 
 

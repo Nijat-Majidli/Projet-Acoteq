@@ -1,0 +1,31 @@
+#eyeIcon {
+    vertical-align:bottom; 
+    cursor:pointer;
+}
+
+#bouton_valider {
+    margin-right:30px; 
+    padding:6px 16px; 
+}
+
+#liste_CP {
+    list-style: none;
+    margin: 0;
+    padding-top: 5px;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+}
+
+#liste_CP li {
+    display: block;
+    cursor: pointer;
+    padding: 3px 5px;
+    border-bottom: 1px solid #e9e9e9;
+    font-family: sans-serif;
+}
+  
+#liste_CP li:hover {
+background: #dfdfdf;
+}
+
