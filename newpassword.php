@@ -21,10 +21,10 @@
 
     <body>
         <div class="container p-4 mb-3 mt-3 col-6 bg-light text-dark">
-            <form>
-                <div class="form-group">
-                  <label for="email"> Veuillez saisir votre adresse e-mail pour recevoir votre mot de passe </label>
-                  <input type="email" class="form-control" id="email" required>
+            <form  action="#"  method="POST" autocomplete="off">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label for="email"> Veuillez saisir votre adresse e-mail pour recevoir votre mot de passe </label>
+                    <input type="email" class="form-control" id="email" required>
                 </div>
 
                 <div style="text-align: center; margin-top:40px;">

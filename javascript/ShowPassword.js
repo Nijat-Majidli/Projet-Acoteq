@@ -9,7 +9,9 @@ function showPassword(event)
 {
     var inputType = document.querySelector("#code"); 
 
-    if(event.target.src=="http://localhost/Acoteq/image/eye_closed.png")
+    console.log(event.target.src);
+
+    if(event.target.src=="http://localhost/Acoteq/image/eye_closed.png" || event.target.src=="http://127.0.0.1:5500/image/eye_closed.png")
     {
         event.target.src="image/eye_open.png";
         inputType.type="text";

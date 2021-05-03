@@ -11,7 +11,7 @@ function checkForm()
     var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§$£@*',;.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
     var filtreSiren = new RegExp(/^[0-9]{9}$/);
     var filtreZipCode = new RegExp(/^[0-9]{5}$/);
-    var filtreEmail = new RegExp(/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
+    var filtreEmail = new RegExp(/^[a-z0-9._àâæçéèêëîïôœùûüÿ-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
     
 
     var RaisonSociale = document.querySelector("#RaisonSociale").value;

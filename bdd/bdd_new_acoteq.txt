@@ -1,0 +1,73 @@
+DROP DATABASE IF EXISTS acoteq;
+
+CREATE DATABASE acoteq;
+
+USE acoteq;
+
+CREATE TABLE Users(
+   user_id INT NOT NULL AUTO_INCREMENT,   
+   user_email VARCHAR(255),
+   user_raison_sociale VARCHAR(255) NOT NULL,
+   user_siren INT NOT NULL,
+   user_responsable_legale VARCHAR(255),
+   user_role VARCHAR(255) NOT NULL,
+   user_adresse VARCHAR(255) NOT NULL,
+   user_code_postal INT NOT NULL,
+   user_ville VARCHAR(255) NOT NULL,
+   user_pays VARCHAR(255) NOT NULL,
+   user_mdp VARCHAR(255) NOT NULL,
+   user_inscription DATETIME NOT NULL,
+   user_connexion DATETIME NOT NULL,
+   login_fail INT,
+   user_blocked VARCHAR(255),
+   unblock_time BIGINT,
+   PRIMARY KEY(user_id, user_email),
+   UNIQUE(user_raison_sociale),
+   UNIQUE(user_siren)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE Client(
+   user_id INT,   
+   user_email VARCHAR(255),
+   PRIMARY KEY(user_id, user_email), 
+   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE Demande(
+   demande_id INT NOT NULL AUTO_INCREMENT,
+   demande_titre VARCHAR(255) NOT NULL,
+   demande_description VARCHAR(255) NOT NULL,
+   demande_budget INT,
+   demande_creation DATETIME NOT NULL,
+   demande_publication DATETIME,
+   demande_etat VARCHAR(255) NOT NULL,
+   user_id INT NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
+   PRIMARY KEY(demande_id),
+   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE Fournisseur(
+   user_id INT,
+   user_email VARCHAR(255),
+   PRIMARY KEY(user_id, user_email),
+   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE Reponse(
+   reponse_id INT NOT NULL AUTO_INCREMENT,
+   reponse_titre VARCHAR(50) NOT NULL,
+   reponse_description VARCHAR(255) NOT NULL,
+   reponse_date DATETIME NOT NULL,
+   reponse_tarif INT NOT NULL,
+   demande_id INT NOT NULL,
+   user_id INT NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
+   PRIMARY KEY(reponse_id),
+   FOREIGN KEY(demande_id) REFERENCES Demande(demande_id),
+   FOREIGN KEY(user_id, user_email) REFERENCES Fournisseur(user_id, user_email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

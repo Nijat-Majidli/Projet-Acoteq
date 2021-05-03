@@ -1,11 +1,10 @@
-#eyeIcon {
-    vertical-align:bottom; 
+#eyeIcon {  
     cursor:pointer;
 }
 
 #bouton_valider {
-    margin-right:30px; 
-    padding:6px 16px; 
+    margin-right: 30px; 
+    padding: 6px 16px; 
 }
 
 #liste_CP {
@@ -28,4 +27,6 @@
 #liste_CP li:hover {
 background: #dfdfdf;
 }
+
+
 

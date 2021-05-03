@@ -22,71 +22,71 @@
             <h2> Veuillez saisir vos coordonnées </h2>
             <br>
             <form action="script_inscription.php" method="POST" autocomplete="off">
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="RaisonSociale"> Raison sociale <sup>*</sup> </label> 
                     <input type="text" class="form-control" id="RaisonSociale" name="RS" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="siren"> N° SIREN <sup>*</sup> </label>
                     <input type="text" class="form-control" id="siren" name="numSiren" required>
                 </div>
 
-                <div class="form-group mb-4">
+                <div class="form-group mb-4"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="ResponsableLegale"> Responsable légale <sup>*</sup> </label>
                     <input type="text" class="form-control" id="ResponsableLegale" name="RL" placeholder="Nom et prénom" required>
                 </div>
                 
-                <span>  Vous êtes : </span>
-                <div class="form-check form-check-inline ml-3">  
-                    <input class="form-check-input" type="radio" name="userType" id="client" value="Client" checked>
-                    <label class="form-check-label" for="client"> Client </label>
+                <p>  Vous êtes : </p>
+                <div class="form-check form-check-inline ml-3"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">  
+                    <input class="form-check-input" type="radio" name="userRole" id="customer" value="client" checked>
+                    <label class="form-check-label" for="customer"> Client </label>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="userType" id="fournisseur" value="Fournisseur">
-                    <label class="form-check-label" for="fournisseur"> Fournisseur </label>
+                <div class="form-check form-check-inline"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <input class="form-check-input" type="radio" name="userRole" id="supplier" value="fournisseur">
+                    <label class="form-check-label" for="supplier"> Fournisseur </label>
                 </div>
 
                 <br><br>
 
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                   <label for="address"> Adresse <sup>*</sup> </label>
                   <input type="text" class="form-control" id="address" name="adr" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="ZipCode"> Code postal <sup>*</sup> </label>
                     <input type="text" class="form-control" id="ZipCode" name="codePostal" required>
                 </div>
 
-                <ul id="liste_CP">
+                <ul id="liste_CP"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <li data-vicopo="#city, #ZipCode" data-vicopo-click='{"#ZipCode": "ZipCode", "#city": "city"}'>
                         <strong data-vicopo-code-postal></strong>
                         <span data-vicopo-ville></span>
                     </li>
                 </ul>
                   
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="city"> Ville <sup>*</sup> </label>
                     <input type="text" class="form-control" id="city" name="ville" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="state"> Pays <sup>*</sup> </label>
                     <input type="text" class="form-control" id="state" name="pays" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="email"> Email <sup>*</sup> </label>
                     <input type="email" class="form-control" id="email" name="mail" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="code"> Mot de passe <sup>*</sup> </label>
                     <input type="password" class="form-control" id="code" name="mdp" required>
                 </div>
 
-                <div class="form-group mb-5">
+                <div class="form-group mb-5"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="confirmer"> Confirmer le mot de passe <sup>*</sup> </label>
                     <input type="password"  class="form-control"  id="confirmer"  name="mdp2" required>
                 </div>
