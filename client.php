@@ -47,20 +47,17 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item active">
-                            <a class="nav-link" href="#"> Mes infos personelles <span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href="infoPerso.php"> Mes infos personelles <span class="sr-only">(current)</span></a>
                         </li>
                         
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Demandes
+                                Mes demandes
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="demande.php"> 
-                                    Nouvelle demande 
-                                </a>
-                                <a class="dropdown-item" href="#"> 
-                                    Demandes en cours 
-                                </a>
+                                <a class="dropdown-item" href="demande.php"> Nouvelle demande </a>
+                                <a class="dropdown-item" href="demandeSaved.php"> Demandes sauvegardées </a>
+                                <a class="dropdown-item" href="demandePublished.php"> Demandes publiées </a>
                             </div>
                         </li>
                     </ul>

@@ -115,7 +115,7 @@
             move_uploaded_file($_FILES["fichier"]["tmp_name"], "fichiers/".$nom_fichier);   
             
             echo '<h4> Votre fichier a été téléchargé avec succès! </h4> ';
-            header("refresh:2; url=demande.php");   
+            header("refresh:2; url=client.php");   
             exit;
 
             // GOOGLE DRIVE API
