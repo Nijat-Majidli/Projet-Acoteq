@@ -5,11 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (isset($_SESSION['email']) && isset($_SESSION['role'])=="client")
-    {
-        echo 'Bonjour '. $_SESSION['email'] ;
-    }
-    else
+    if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -49,8 +45,8 @@
                 </div>
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                    <label for="description"> Description <sup>*</sup> </label>
-                    <textarea class="form-control" id="description" name="desc" rows="10" style="resize:none" required></textarea>
+                    <label for="desc"> Description <sup>*</sup> </label>
+                    <textarea id="desc" class="form-control" name="description" rows="10" style="resize:none" required></textarea>
                 </div>
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">

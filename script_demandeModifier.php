@@ -7,13 +7,14 @@
     l'instruction <<date_default_timezone_set("Europe/Paris");>> dans nos scripts avant toute manipulation de dates.  */
     date_default_timezone_set('Europe/Paris');
 
-    /* Nous récupérons les informations passées dans le fichier "demande.php" dans la balise <form> et l'attribut action="script_demande.php".  
-    Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['budget']) && isset($_POST['etat']))
+    /* Nous récupérons les informations passées dans le fichier "demandeModifier.php" dans la balise <form>  et 
+    l'attribut action="script_demandeModifier.php".   Les informations sont récupéré avec variable superglobale $_POST     */
+    if(isset($_POST['demande_id']) && isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['budget']) && isset($_POST['etat']))
     {
-        if (!empty($_POST['titre'] && $_POST['description'] && $_POST['budget'] && $_POST['etat']))
+        if (!empty($_POST['demande_id'] && $_POST['titre'] && $_POST['description'] && $_POST['budget'] && $_POST['etat']))
         {
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
+            $demande_id = htmlspecialchars($_POST['demande_id']);
             $demande_titre = htmlspecialchars($_POST['titre']);
             $demande_description = htmlspecialchars($_POST['description']);
             $demande_budget = htmlspecialchars($_POST['budget']);
@@ -23,26 +24,22 @@
             require "connection_bdd.php";
 
             // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
-            $requete = $db->prepare("INSERT INTO demande (raison_sociale, siren, responsable_legale, demande_titre, demande_description, 
-            demande_budget, demande_creation, demande_publication, demande_etat, demande_notification, user_id, user_email) 
-            VALUES ((SELECT client_raison_sociale FROM client WHERE user_email=:email), (SELECT client_siren FROM client WHERE user_email=:email), 
-            (SELECT client_responsable_legale FROM client WHERE user_email=:email), :demande_titre, :demande_description, :demande_budget, 
-            :demande_creation, :demande_publication, :demande_etat, :demande_notification, (SELECT user_id FROM client WHERE user_email=:email), :user_email)");
+            $requete = $db->prepare("UPDATE demande SET demande_titre=:demande_titre, demande_description=:demande_description, 
+            demande_budget=:demande_budget, demande_etat=:demande_etat, demande_modification=:demande_modification, 
+            demande_publication=:demande_publication WHERE demande_id=:demande_id");
 
             // Association des valeurs aux marqueurs via méthode "bindValue()"
-            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
             $requete->bindValue(':demande_titre', $demande_titre, PDO::PARAM_STR);
             $requete->bindValue(':demande_description', $demande_description, PDO::PARAM_STR);
             $requete->bindValue(':demande_budget', doubleval($demande_budget), PDO::PARAM_INT); // fonction doubleval() convertit le type de variable en décimale
             $requete->bindValue(':demande_etat', $demande_etat, PDO::PARAM_STR);
-            $requete->bindValue(':demande_notification', 'non envoyé', PDO::PARAM_STR);
-            $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
+            $requete->bindValue(':demande_id', $demande_id, PDO::PARAM_INT);
 
             // On utilise l'objet DateTime() pour enregistrer la date et l'heure de creation et publication de demande dans la base de données
             $time = new DateTime();   
             $date = $time->format("Y/m/d H:i:s"); 
 
-            $requete->bindValue(':demande_creation', $date, PDO::PARAM_STR);
+            $requete->bindValue(':demande_modification', $date, PDO::PARAM_STR);
 
             if($demande_etat=="publié")
             {

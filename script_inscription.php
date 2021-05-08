@@ -1,8 +1,8 @@
 <?php
 
-    /* On va enregistrer la date d'inscription et dernier connexion de nouveau user. Pour obtenir la bonne date et l'heure, 
-    il faut configurer la valeur de l'option datetime_zone sur la valeur Europe/Paris.
-    Donc, il faut ajouter l'instruction <<date_default_timezone_set("Europe/Paris");>> dans vos scripts avant toute manipulation de dates.  */
+    /* On va enregistrer la date d'inscription et dernier connexion de nouvel utilisateur. Pour obtenir la bonne date et l'heure, 
+    il faut configurer la valeur de l'option <<datetime_zone>> sur la valeur Europe/Paris. Donc, il faut ajouter l'instruction 
+    <<date_default_timezone_set("Europe/Paris");>> dans nos scripts avant toute manipulation de dates et heures.  */
     date_default_timezone_set('Europe/Paris');
 
     /* Nous récupérons les informations passées dans le fichier "inscription.html" dans la balise <form> et l'attribut action="script_inscription.php".  
@@ -28,7 +28,7 @@
         else
         {
             echo "<h4> Veuillez remplir tous les champs ! </h4>";
-            header("refresh:2; url=inscription.html");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé sur la page inscription.html 
+            header("refresh:2; url=inscription.html");  // refresh:2 signifie qu'après 2 secondes utilisateur sera redirigé sur la page inscription.html 
             exit;
         }
     }
@@ -40,8 +40,8 @@
     }       
 
 
-    /* Vérification avec l'expréssion RegExp la validité de format de tout les données saisi par utilisateur 
-    en utilisant la fonction preg_match() qui renvoie True or False:        */
+    /* Vérification avec l'expréssion RegExp la validité de format de tout les données saisi par utilisateur en utilisant 
+    la fonction preg_match() qui renvoie True or False:        */
     if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§£@*',.$;-]+$#", $user_RS))
     {
         echo "<h4> Entrez un nom correct de la Raison Sociale ! </h4>";
@@ -102,7 +102,7 @@
     if ($user_mdp === $user_mdp2)
     {
         // Si le mot de passe est valide, on fait cryptage avec fonction password_hash()
-        $user_mdp = password_hash($user_mdp, PASSWORD_DEFAULT);  // PASSWORD_DEFAULT est l’algorithme de cryptage à utiliser, obligatoire.
+        $user_mdp = password_hash($user_mdp, PASSWORD_DEFAULT);  // Ici 2eme paramètre PASSWORD_DEFAULT est l’algorithme de cryptage à utiliser, obligatoire.
     }
     else
     {
@@ -112,7 +112,7 @@
     }
 
 
-    /* Vérification si la Raison Sociale, le numéro SIREN et l'adresse mail saisi par nouvelle utilisateur déjà existe dans notre base de 
+    /* Vérification si la Raison Sociale, le numéro SIREN et l'adresse mail saisi par nouvel utilisateur déjà existe dans notre base de 
     données ou non ?   Car on ne peut pas avoir 2 utilisateurs avec la même Raison Sociale, numéro SIREN ou l'adresse mail.
     Pour faire la vérification d'abord on va se connecter à la base de données:     */
     require ("connection_bdd.php");
@@ -122,7 +122,7 @@
     $req = "SELECT user_raison_sociale, user_siren, user_email FROM users" ;
     
     /* Grace à méthode query() on exécute notre requête et on ramene les colonnes user_raison_sociale, user_siren et user_email et 
-    on les mets dans l'objet $result :      */
+    on les mets dans l'objet $result :     */
     $result = $db->query($req)  or  die(print_r($db->errorInfo()));  // Pour repérer l'erreur SQL en PHP on utilise le code die(print_r($db->errorInfo())) 
 
     // Grace à la méthode "rowCount()" nous pouvons connaitre le nombre de lignes retournées par la requête
@@ -158,8 +158,8 @@
     
 
     /* Construction de la requête préparée INSERT pour la table users. Les requêtes préparées empêchent les injections SQL.
-    On insere pas la valeurs pour les colonnes "login_fail", "user_blocked" et "unblock_time" car dans base de données on a bien 
-    défini que ces colonnes acceptent la valeur 0 ou NULL   */
+    On n'insére pas les valeurs pour les colonnes "login_fail", "user_blocked" et "unblock_time" car dans base de données on a bien 
+    défini que ces colonnes acceptent la valeur NULL   */
    
     $requete = $db->prepare("INSERT INTO users (user_raison_sociale, user_siren, user_responsable_legale, user_role, user_adresse, 
     user_code_postal, user_ville, user_pays, user_email, user_mdp, user_inscription, user_connexion) 
@@ -188,20 +188,29 @@
     // Exécution de la requête
     $requete->execute();
     
-    /* Ensuite on réalise la reqûete INSERT soit pour la table Client, soit pour la table Fournisseur qui sont les enfants de la 
-    table parent Users.  En fait, le Primary Key de la table User est le Foreign Key pour les tables Client et Fournisseur.     */ 
+    /* Ensuite selon le type de l'utilisateur(client ou fournisseur) on réalise la reqûete INSERT soit pour la table Client, 
+    soit pour la table Fournisseur qui sont les enfants de la table parent Users.  
+    En fait, le Primary Key de la table User est le Foreign Key pour les tables Client et Fournisseur.     */ 
     if($user_role == "client")
     {
-        $requete = $db->prepare("INSERT INTO client (user_id, user_email) VALUES ((SELECT user_id FROM users WHERE user_email=:mail), :user_email)");
+        $requete = $db->prepare("INSERT INTO client (user_id, user_email, client_raison_sociale, client_siren, client_responsable_legale) 
+        VALUES ((SELECT user_id FROM users WHERE user_email=:mail), :user_email, :client_raison_sociale, :client_siren, :client_responsable_legale)");
         $requete->bindValue(':mail', $user_email, PDO::PARAM_STR);
         $requete->bindValue(':user_email', $user_email, PDO::PARAM_STR);
+        $requete->bindValue(':client_raison_sociale', $user_RS, PDO::PARAM_STR);
+        $requete->bindValue(':client_siren', $user_siren, PDO::PARAM_INT);
+        $requete->bindValue(':client_responsable_legale', $user_RL, PDO::PARAM_STR);
         $requete->execute();
     }
-    if($user_role == "fournisseur")
+    else if($user_role == "fournisseur")
     {
-        $requete = $db->prepare("INSERT INTO fournisseur (user_id, user_email) VALUES ((SELECT user_id FROM users WHERE user_email=:mail), :user_email)");
+        $requete = $db->prepare("INSERT INTO fournisseur (user_id, user_email, fournisseur_raison_sociale, fournisseur_siren, fournisseur_responsable_legale) 
+        VALUES ((SELECT user_id FROM users WHERE user_email=:mail), :user_email, :fournisseur_raison_sociale, :fournisseur_siren, :fournisseur_responsable_legale)");
         $requete->bindValue(':mail', $user_email, PDO::PARAM_STR);
         $requete->bindValue(':user_email', $user_email, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_raison_sociale', $user_RS, PDO::PARAM_STR);
+        $requete->bindValue(':fournisseur_siren', $user_siren, PDO::PARAM_INT);
+        $requete->bindValue(':fournisseur_responsable_legale', $user_RL, PDO::PARAM_STR);
         $requete->execute();
     }
 
@@ -211,7 +220,6 @@
     // Redirection vers la page acceuil.php 
     header("Location: connexion.html");
     exit;   
-
 
 
     

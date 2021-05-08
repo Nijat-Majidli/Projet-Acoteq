@@ -59,8 +59,7 @@
         $listeEmail = array();  // On crée un tableau (array) $listeEmail dans laquelle on va garder tous les adresses mail
 
         while ($row = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de la colonne user_email et on la mets dans l'objet $row                                            
-        {                                               // Ensuite avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes de la colonne user_email et on les mets dans l'objet $row   
-            
+        {                                               // Ensuite avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes de la colonne user_email et on les mets dans l'objet $row  
             array_push($listeEmail, $row->user_email);  // Avec la méthode array_push on ajoute un par un tous les adresses mail dans tableau $listeEmail 
         }
 

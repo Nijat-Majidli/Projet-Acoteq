@@ -5,11 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (isset($_SESSION['email']) && isset($_SESSION['role'])=="client")
-    {
-        echo 'Bonjour '. $_SESSION['email'] ;
-    }
-    else
+    if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -49,6 +45,7 @@
                             <th scope="col"> Description </th>
                             <th scope="col"> Budget </th>
                             <th scope="col"> Date création </th>
+                            <th scope="col"> Date modification </th>
                         </tr>
                     </thead>
                     
@@ -59,11 +56,11 @@
                     require "connection_bdd.php";
                     
                     // On construit la requête SELECT : 
-                    $requete = $db->prepare ("SELECT * FROM demande WHERE user_email=:email AND demande_etat=:etat");
+                    $requete = $db->prepare ("SELECT * FROM demande WHERE user_email=:user_email AND demande_etat=:demande_etat");
 
                     // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
-                    $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
-                    $requete->bindValue(':etat', "sauvegardé", PDO::PARAM_STR);
+                    $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
+                    $requete->bindValue(':demande_etat', "sauvegardé", PDO::PARAM_STR);
 
                     //On exécute la requête
 	                $requete->execute();
@@ -77,10 +74,21 @@
                         {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
                             <tr>
-                                <td>  <?php echo $row->demande_titre; ?>  </td>
-                                <td>  <?php echo $row->demande_description; ?>  </td>
-                                <td>  <?php echo $row->demande_budget; ?>  </td>
-                                <td>  <?php echo $row->demande_creation; ?>  </td>
+                                <td>  <?php echo $row->demande_titre;?>  </td>
+                                <td>  <?php echo $row->demande_description;?>  </td>
+                                <td>  <?php echo $row->demande_budget;?>  </td>
+                                <td>  <?php echo $row->demande_creation;?>  </td>
+                                <td>  <?php echo $row->demande_modification;?>  </td>
+                                <td> 
+                                    <center>
+                                        <a href="demandeModifier.php?demande_id=<?php echo $row->demande_id;?>"> 
+                                            <button class="btn btn-warning mr-3" type="button"> Modifier </button> 
+                                        </a> 
+                                        <a href="script_demandeValider.php"> 
+                                            <input class="btn btn-success" type="button" value="Valider"> 
+                                        </a>  
+                                    </center>
+                                </td>
                             </tr>
 <?php
                         }

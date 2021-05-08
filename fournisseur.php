@@ -39,42 +39,103 @@
 
     <body>
         <div class="container">
-            <nav class="navbar navbar-expand-sm navbar-light bg-light">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-              
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item active">
-                            <a class="nav-link" href="#"> Mes infos personelles <span class="sr-only">(current)</span></a>
-                        </li>
-                        
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Reponses
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#"> 
-                                    Nouvelle reponse 
+             <!-- PAGE HEAD -->
+            <header>
+                <!-- Navigation Bar -->
+                <nav class="navbar navbar-expand-sm navbar-light bg-light">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="infoPerso.php"> Mes infos personelles <span class="sr-only">(current)</span></a>
+                            </li>
+                            
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Mes réponses
                                 </a>
-                                <a class="dropdown-item" href="#"> 
-                                    Reponses en cours 
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="demande.php"> Nouvelle réponse </a>
+                                    <a class="dropdown-item" href="demandeSaved.php"> Réponsées sauvegardées </a>
+                                    <a class="dropdown-item" href="demandePublished.php"> Réponsées publiées </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+            <br><br>
+
+            <!-- PAGE MAIN CONTENT -->
+            <center> <h3> Les demandes publiées </h3> </center> 
+            <br> <br>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"> Titre </th>
+                            <th scope="col"> Description </th>
+                            <th scope="col"> Budget </th>
+                            <th scope="col"> Date création </th>
+                            <th scope="col"> Date publication </th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                    <!-- Code PHP -->
+<?php
+                    // Connéxion à la base de données 
+                    require "connection_bdd.php";
+                    
+                    // On construit la requête SELECT : 
+                    $requete = $db->prepare ("SELECT * FROM demande WHERE demande_etat=:etat");
+
+                    // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
+                    $requete->bindValue(':etat', "publié", PDO::PARAM_STR);
+
+                    //On exécute la requête
+	                $requete->execute();
+
+                    // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête
+                    $nbLigne = $requete->rowCount(); 
+                    
+                    if($nbLigne >= 1)
+                    {
+                        while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
+                        {                                               // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
+?>
+                            <tr>
+                                <td>  
+                                    <!--Avec la méthode GET on envoie demande_id vers la page detail.php -->
+                                    <a href="detail.php?demande_id=<?php echo $row->demande_id ?>"> 
+                                        <?php echo $row->demande_titre; ?> 
+                                    </a>   
+                                </td> 
+                                <td>  <?php echo $row->demande_description; ?>  </td>
+                                <td>  <?php echo $row->demande_budget; ?> € </td>
+                                <td>  <?php echo $row->demande_creation; ?>  </td>
+                                <td>  <?php echo $row->demande_publication; ?>  </td>
+                            </tr>
+<?php
+                        }
+                    }
+
+                    // Libèration la connection au serveur de BDD
+                    $requete->closeCursor();
+?>    
+                    </tbody>
+                </table>
+            
 
             <div style="text-align:center; margin-top:200px">
                 <a href="script_deconnexion.php"> <button class="btn btn-warning"> Déconnexion </button> </a> 
             </div>
-                
-            
         </div>
+           
 
-     
         <!-- Bootstrap Jquery, Popper -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
