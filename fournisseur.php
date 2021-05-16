@@ -5,11 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (isset($_SESSION['email']) && isset($_SESSION['role'])=="fournisseur")
-    {
-        echo 'Bonjour '. $_SESSION['email'] ;
-    }
-    else
+    if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="fournisseur")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -50,7 +46,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mr-auto">
                             <li class="nav-item active">
-                                <a class="nav-link" href="infoPerso.php"> Mes infos personelles <span class="sr-only">(current)</span></a>
+                                <a class="nav-link" href="infoPerso.php"> Infos personelles <span class="sr-only">(current)</span></a>
                             </li>
                             
                             <li class="nav-item dropdown">
@@ -58,9 +54,7 @@
                                     Mes réponses
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="demande.php"> Nouvelle réponse </a>
-                                    <a class="dropdown-item" href="demandeSaved.php"> Réponsées sauvegardées </a>
-                                    <a class="dropdown-item" href="demandePublished.php"> Réponsées publiées </a>
+                                    <a class="dropdown-item" href="reponsePublished.php"> Réponsées publiées </a>
                                 </div>
                             </li>
                         </ul>
@@ -109,7 +103,7 @@
 ?>
                             <tr>
                                 <td>  
-                                    <!--Avec la méthode GET on envoie demande_id vers la page detail.php -->
+                                    <!-- Avec la méthode GET on envoie demande_id vers la page detail.php -->
                                     <a href="detail.php?demande_id=<?php echo $row->demande_id ?>"> 
                                         <?php echo $row->demande_titre; ?> 
                                     </a>   

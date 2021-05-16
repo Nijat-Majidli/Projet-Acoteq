@@ -30,6 +30,9 @@
     
         <!-- Fichier CSS -->
         <link rel="stylesheet" href="css/style.css">
+
+        <!-- JQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     </head>
 
 
@@ -82,10 +85,10 @@
                                 <td> 
                                     <center>
                                         <a href="demandeModifier.php?demande_id=<?php echo $row->demande_id;?>"> 
-                                            <button class="btn btn-warning mr-3" type="button"> Modifier </button> 
+                                            <button class="btn btn-warning mr-3" type="button" onclick="modifier()"> Modifier </button> 
                                         </a> 
-                                        <a href="script_demandeValider.php"> 
-                                            <input class="btn btn-success" type="button" value="Valider"> 
+                                        <a href="script_demandePublier.php?demande_id=<?php echo $row->demande_id;?>"> 
+                                            <input class="btn btn-success" type="button" value="Publier" class="publish" onclick="confirmer()"> 
                                         </a>  
                                     </center>
                                 </td>
@@ -104,12 +107,45 @@
                     <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
                     <a href="client.php"> <button class="btn btn-primary"> Retour </button> </a> 
                 </div>
-                    
-                
             </div>
         </div>
 
+
+        <script>  
+
+            function modifier()
+            { 
+                //Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
+                var resultat = confirm("Etes-vous certain de vouloir modifier cette demande ?");
+
+                // alert("retour :" + resultat);
+
+                if (resultat==false)
+                {
+                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette demande !");
+
+                    //annule l'évènement par défaut ... SUBMIT vers "demandeModifier.php"
+                    event.preventDefault();    
+                }
+            }
+
+        
+            function confirmer()
+            {
+                var resultat = window.confirm("Êtes-vous sûr de vouloir publier votre demande?")
+
+                if (resultat==false)
+                {
+                    alert("Vous avez annulé publication !");
+
+                    //annule l'évènement par défaut ... SUBMIT vers "script_demandePublier.php"
+                    event.preventDefault();    
+                }
+            }
+            
+        </script>
      
+
         <!-- Bootstrap Jquery, Popper -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>

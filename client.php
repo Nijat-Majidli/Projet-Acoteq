@@ -5,11 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (isset($_SESSION['email']) && isset($_SESSION['role'])=="client")
-    {
-        echo 'Bonjour '. $_SESSION['email'] ;
-    }
-    else
+    if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -50,7 +46,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mr-auto">
                             <li class="nav-item active">
-                                <a class="nav-link" href="infoPerso.php"> Mes infos personelles <span class="sr-only">(current)</span></a>
+                                <a class="nav-link" href="infoPerso.php"> Infos personelles <span class="sr-only">(current)</span></a>
                             </li>
                             
                             <li class="nav-item dropdown">

@@ -61,7 +61,8 @@
             Pour cela on construit la requête SELECT pour aller chercher la colonne demande_etat et demande_notification dans la table "demande":     */
             $req="SELECT demande_etat, demande_notification FROM demande WHERE demande_etat='publié' AND demande_notification='non envoyé'";
 
-            /* Avec la méthode query() on exécute notre requête et on ramene les colonnes demande_etat et demande_notification on les mets dans l'objet $result.     */
+            /* Avec la méthode query() on exécute notre requête et on ramene les colonnes demande_etat et demande_notification 
+            on les mets dans l'objet $result.     */
             $result = $db->query($req)  or  die(print_r($db->errorInfo()));  // Pour repérer l'erreur SQL en PHP on utilise le code die(print_r($db->errorInfo())) 
 
             // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
@@ -160,7 +161,7 @@
             move_uploaded_file($_FILES["fichier"]["tmp_name"], "fichiers/".$nom_fichier);   
             
             echo '<h4> Votre fichier a été téléchargé avec succès! </h4> ';
-            header("refresh:2; url=client.php");   
+            header("refresh:2; url=demandeSaved.php");   
             exit;
 
             // GOOGLE DRIVE API

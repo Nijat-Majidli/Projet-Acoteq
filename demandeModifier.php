@@ -63,7 +63,8 @@
                 while ($row = $requete->fetch(PDO::FETCH_OBJ))  
                 {                                           
 ?>
-                    <!--Pour que le téléchargement soit possible, il faut ajouter l'attribut <<enctype>> à la balise <form>. La valeur doit être "multipart/form"-data-->
+                    <!--  Pour que le téléchargement soit possible, il faut ajouter l'attribut "enctype" à la balise <form>. 
+                    La valeur doit être "multipart/form"-data   -->
                     <form action="script_demandeModifier.php"  method="POST" enctype="multipart/form-data" autocomplete="off">   
                         <input type="hidden" name="demande_id" value="<?php echo $demande_id?>">  
 
@@ -85,11 +86,11 @@
                         </div>
 
                         <div class="form-group mb-4">
-                            <!--  Vous aurez sûrement besoin de limiter la taille du fichier. Il ne faudrait pas que quelqu'un s'amuse à uploader 
-                            des fichiers de plusieurs Mo...  Pour limiter la taille du fichier uploadé, avant le champ de type file il faut 
-                            ajouter un champ caché "hidden", lui donner le nom "MAX_FILE_SIZE" et lui donner en valeur, la taille maximum 
-                            du fichier à uploader en octets(1Mo = 1000000 octets, 1Ko = 1000 octets). 
-                            Ici on limite la taille du fichier à 5Mo :     -->
+                            <!--  Vous aurez sûrement besoin de limiter la taille du fichier. Il ne faudrait pas que quelqu'un s'amuse 
+                            à uploader des fichiers de plusieurs Mo...  
+                            Pour limiter la taille du fichier uploadé, avant le champ de type file il faut ajouter un champ caché "hidden", 
+                            lui donner le nom "MAX_FILE_SIZE" et lui donner en valeur la taille maximum du fichier à uploader en octets.
+                            (1Mo =1 000 000 octets,  1Ko = 1000 octets etc..).  Ici on limite la taille du fichier à 5Mo :     -->
                             <input type="hidden" name="MAX_FILE_SIZE" value="5000000">
 
                             <label for="telecharger"> Télécharger votre demande <sup>*</sup> </label>

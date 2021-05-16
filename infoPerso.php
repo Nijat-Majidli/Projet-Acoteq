@@ -5,11 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (isset($_SESSION['email']))
-    {
-        echo 'Bonjour '. $_SESSION['email'] ;
-    }
-    else
+    if (!isset($_SESSION['email']) && !isset($_SESSION['role']))
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -102,7 +98,17 @@
 
                 <div style="text-align:center; margin-top:200px">
                     <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
-                    <a href="client.php"> <button class="btn btn-primary"> Retour </button> </a> 
+<?php
+                    if($_SESSION['role']=='client')
+                    {
+                        $page="client.php";
+                    }
+                    else if ($_SESSION['role']=='fournisseur')
+                    {
+                        $page="fournisseur.php";
+                    }
+?>
+                    <a href="<?php echo $page?>"> <button class="btn btn-primary"> Retour </button> </a> 
                 </div>
                     
                 

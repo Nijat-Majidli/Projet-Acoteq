@@ -5,11 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (isset($_SESSION['email']))
-    {
-        echo 'Bonjour '. $_SESSION['email'] ;
-    }
-    else
+    if (!isset($_SESSION['email']))
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -68,7 +64,7 @@
             
             <div class="form-group">
                 <label for="desc"> Description : </label> <br>
-                <textarea id="desc" class="form-control" name="description" rows="10" style="resize:none" readonly> 
+                <textarea id="desc" class="form-control" name="description" rows="10" style="width:90%; resize:none" readonly> 
                     <?php echo $row->demande_description?> 
                 </textarea>
             </div>
@@ -104,15 +100,28 @@
             </div>
 
             <div style="text-align:center; margin-top:40px;"> 
-                <a href="fournisseur.php"> <input type="button" class="btn btn-primary" value="Retour"> </a>
+                <a href="fournisseur.php"> <input type="button" class="btn btn-primary" value="Retour" id="retour"> </a>
             </div>
             <br>
 
             <!-- Ajouter commentaire -->
-            <a href="#" id="comment"> Ajouter commentaire </a>
-
+            <a href="#title" id="comment"> Ajouter un commentaire </a>
+            <br><br>
             <form action="script_reponse.php" method="POST" style="display:none">
-                <input name="commentaire" style="width:90%; height:10%; resize:none"> </input>
+                <input type="hidden" name="user_id" value="<?php echo $row->user_id?>"> 
+                <input type="hidden" name="user_email" value="<?php echo $row->user_email?>"> 
+                <input type="hidden" name="demande_id" value="<?php echo $demande_id?>"> 
+                
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label for="title"> Titre <sup>*</sup> </label> 
+                    <input type="text" class="form-control" id="title" name="reponse_titre" style="width:90%" required>
+                </div>
+                <textarea class="form-control" name="reponse_description" rows="10" style="width:90%; resize:none" required> </textarea>
+                <br>
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label for="prix"> Votre tarif proposé : <sup>*</sup> </label> 
+                    <input type="number" class="form-control" id="prix" name="reponse_budget" style="width:15%" required>
+                </div>
                 <br><br>
                 <center>
                     <button class="btn btn-success mr-3" type="submit"> Valider </button>
@@ -121,6 +130,7 @@
                 </center>
             </form>
         </div>
+        <br> <br>
 
 
         <!-- Bootstrap Jquery, Popper -->
@@ -133,10 +143,14 @@
         <script>
             $(function(){
                 $('#comment').click(function(){
-                    $('form').show()});
+                    $('form').show(),
+                    $('#retour').hide()
+                });
 
                 $('#cancel').click(function(){
-                    $('form').hide()})
+                    $('form').hide(),
+                    $('#retour').show()
+                })
             })
         </script>
     </body>
