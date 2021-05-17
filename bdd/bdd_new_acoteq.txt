@@ -77,13 +77,25 @@ CREATE TABLE Reponse(
    reponse_publication DATETIME NOT NULL,
    reponse_notification VARCHAR(255),
    fournisseur_raison_sociale VARCHAR(255) NOT NULL,
-   client_id INT NOT NULL,
-   client_email VARCHAR(255) NOT NULL,
    demande_id INT NOT NULL,
-   fournisseur_id INT NOT NULL,
-   fournisseur_email VARCHAR(255) NOT NULL,   
+   user_id INT NOT NULL,
+   user_email VARCHAR(255) NOT NULL,   
    PRIMARY KEY(reponse_id),
-   FOREIGN KEY(client_id, client_email) REFERENCES Client(user_id, user_email),
    FOREIGN KEY(demande_id) REFERENCES Demande(demande_id),
-   FOREIGN KEY(fournisseur_id, fournisseur_email) REFERENCES Fournisseur(user_id, user_email)
+   FOREIGN KEY(user_id, user_email) REFERENCES Fournisseur(user_id, user_email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE Commentaire(
+   comment_id INT NOT NULL AUTO_INCREMENT,
+   comment_description VARCHAR(500) NOT NULL,
+   comment_publication DATETIME NOT NULL,
+   client_raison_sociale VARCHAR(255) NOT NULL,
+   user_id INT NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
+   reponse_id INT NOT NULL,
+   PRIMARY KEY(comment_id),
+   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email),
+   FOREIGN KEY(reponse_id) REFERENCES Reponse(reponse_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

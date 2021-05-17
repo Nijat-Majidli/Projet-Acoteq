@@ -36,7 +36,17 @@
     <!-- Code PHP -->
     <?php
         // Récupération de paramétre "demande_id" passé en GET dans le fichier "fournisseur.php": 
-        $demande_id=$_GET['demande_id'];
+        if(isset($_GET['demande_id']) && !empty($_GET['demande_id']))
+        {
+            $demande_id = htmlspecialchars((int)$_GET['demande_id']);  // Pour vérifier que $_GET['demande_id'] contient bien un nombre entier, on utilise (int) pour convertir la variable GET en type entier. 
+        }
+        else
+        {
+            echo "<h4> Cette demande n'existe pas ! </h4>";
+            header("refresh:2; url=fournisseur.php"); 
+            exit;
+        }
+       
 
         // Connection à la base de données 
         require "connection_bdd.php";
@@ -108,7 +118,6 @@
             <a href="#title" id="comment"> Ajouter un commentaire </a>
             <br><br>
             <form action="script_reponse.php" method="POST" style="display:none">
-                <input type="hidden" name="user_id" value="<?php echo $row->user_id?>"> 
                 <input type="hidden" name="user_email" value="<?php echo $row->user_email?>"> 
                 <input type="hidden" name="demande_id" value="<?php echo $demande_id?>"> 
                 

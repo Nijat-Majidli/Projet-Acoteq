@@ -12,8 +12,28 @@
         exit;
     }
 
-
-    $demande_id = $_GET['demande_id'];
+    /* Nous récupérons les informations passées dans le fichier "demandePublished.php" dans la balise <a> et l'attribut "href"  
+    Les informations sont récupéré avec variable superglobale $_GET   */
+    if(isset($_GET['demande_id'])) 
+    {   
+        if(!empty($_GET['demande_id']))
+        {
+            $demande_id = (int)$_GET['demande_id'];  // Pour vérifier que $_GET['demande_id'] contient bien un nombre entier, on utilise (int) pour convertir la variable GET en type entier. 
+        }
+        else
+        {
+            echo "<h4> Veuillez indiquer le bon numéro de demande ! </h4>";
+            header("refresh:2; url=demandePublished.php"); 
+            exit;
+        }
+    }
+    else
+    {
+        echo " ";
+        header("refresh:2; url=demandePublished.php"); 
+        exit;
+    }     
+    
 ?>
 
 
@@ -62,41 +82,34 @@
                         $result = $db->prepare("SELECT * FROM reponse WHERE demande_id=:demande_id");
                         
                         // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-                        $result->bindValue(':demande_id', $demande_id, PDO::PARAM_INT);
+                        $result->bindValue(':demande_id', $demande_id);
 
                         // On exécute la requête :
                         $result->execute();
 
-                        // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête :
-                        $nbLigne = $result->rowCount(); 
-
-                        if($nbLigne >= 1)
-                        {
-                            while ($row = $result->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
-                            {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
+                        // Si la requête renvoit un seul et unique résultat, on ne fait pas de boucle, ici c'est le cas: 
+                        $row = $result->fetch(PDO::FETCH_OBJ)              
 ?>                          
-                                <tr>
-                                    <td> <?php echo $row->reponse_titre;?> </td>
-                                    <td> <?php echo $row->reponse_description;?> </td>
-                                    <td> <?php echo $row->reponse_budget;?> </td>
-                                    <td> <?php echo $row->reponse_publication;?> </td>
-                                    <td> <?php echo $row->fournisseur_raison_sociale;?> </td>
-                                    <td> <button class="btn btn-success" id="repondre"> Repondre </button> </td>
-                                </tr>
-                                <!-- <tr class="comments" style="display:none;"> 
-                                    <td> <textarea rows="10" cols="70" style="resize:none;"> </textarea> </td>
-                                </tr> -->
+                        <tr>
+                            <td> <?php echo $row->reponse_titre;?> </td>
+                            <td> <?php echo $row->reponse_description;?> </td>
+                            <td> <?php echo $row->reponse_budget;?> </td>
+                            <td> <?php echo $row->reponse_publication;?> </td>
+                            <td> <?php echo $row->fournisseur_raison_sociale;?> </td>
+                            <td> <button class="btn btn-success" id="repondre"> Repondre </button> </td>
+                        </tr>
 <?php
-                            }
-                        }
-                        // Libèration la connection au serveur de BDD
+                        // Libèration la connection au serveur de BDD:
                         $result->closeCursor();
 ?>
                     </tbody>
                 </table>
                 <br>
+                
                 <form action="script_comments.php" method="POST" style="display:none" class="comments">
                     <h4> Votre réponse : </h4>
+                    <input type="hidden" name="reponse_id" value="<?php echo $row->reponse_id;?>">
+                    <input type="hidden" name="user_email" value="<?php echo $row->user_email;?>">
                     <textarea class="form-control" name="comment" rows="10" cols="70" style="resize:none" required> </textarea>
                     <br>
                     <center>
@@ -122,7 +135,7 @@
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
     
-    
+
         <!-- JQuery code -->
         <script>
             $(document).ready(function(){

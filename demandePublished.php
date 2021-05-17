@@ -35,6 +35,7 @@
 
     <body>
         <div class="container">
+            <br>
             <center> <h3> Mes demandes publiées </h3> </center> 
             <br> <br>
             <div class="table-responsive">
@@ -78,7 +79,9 @@
                                     <td> <?php echo $row->demande_description;?> </td>
                                     <td> <?php echo $row->demande_budget;?> </td>
                                     <td> <?php echo $row->demande_publication;?> </td>
-                                    <td> <a href="comments.php?demande_id=<?php echo $row->demande_id;?>"> Afficher </a>  </td>
+                                    <td> 
+                                        <a href="comments.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a>  
+                                    </td>
                                 </tr>                        
 <?php           
                             }
