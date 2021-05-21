@@ -44,7 +44,7 @@ CREATE TABLE Demande(
    siren INT NOT NULL,
    responsable_legale VARCHAR(255) NOT NULL,
    demande_titre VARCHAR(255) NOT NULL,
-   demande_description VARCHAR(500) NOT NULL,
+   demande_description TEXT NOT NULL,
    demande_budget INT,
    demande_creation DATETIME NOT NULL,
    demande_modification DATETIME,
@@ -72,7 +72,7 @@ CREATE TABLE Fournisseur(
 CREATE TABLE Reponse(
    reponse_id INT NOT NULL AUTO_INCREMENT,
    reponse_titre VARCHAR(50) NOT NULL,
-   reponse_description VARCHAR(255) NOT NULL,
+   reponse_description TEXT NOT NULL,
    reponse_budget INT NOT NULL,
    reponse_publication DATETIME NOT NULL,
    reponse_notification VARCHAR(255),
@@ -88,7 +88,7 @@ CREATE TABLE Reponse(
 
 CREATE TABLE Commentaire(
    comment_id INT NOT NULL AUTO_INCREMENT,
-   comment_description VARCHAR(500) NOT NULL,
+   comment_description TEXT NOT NULL,
    comment_publication DATETIME NOT NULL,
    client_raison_sociale VARCHAR(255) NOT NULL,
    user_id INT NOT NULL,
@@ -99,3 +99,16 @@ CREATE TABLE Commentaire(
    FOREIGN KEY(reponse_id) REFERENCES Reponse(reponse_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+CREATE TABLE Equipe(
+   equipe_id INT NOT NULL AUTO_INCREMENT,
+   equipe_nom VARCHAR(255) NOT NULL,
+   equipe_proprietaire VARCHAR(255) NOT NULL,
+   equipe_membres TEXT,
+   equipe_creation DATETIME NOT NULL,
+   equipe_modification DATETIME,
+   user_id INT NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
+   PRIMARY KEY(equipe_id),
+   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

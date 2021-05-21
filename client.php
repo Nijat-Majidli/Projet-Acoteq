@@ -30,6 +30,9 @@
     
         <!-- Fichier CSS -->
         <link rel="stylesheet" href="css/style.css">
+
+        <!-- JQuery Google CDN: -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
 
 
@@ -51,12 +54,22 @@
                             
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Mes demandes
+                                    Demandes
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="demande.php"> Nouvelle demande </a>
                                     <a class="dropdown-item" href="demandeSaved.php"> Demandes sauvegardées </a>
                                     <a class="dropdown-item" href="demandePublished.php"> Demandes publiées </a>
+                                </div>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Équipes
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="equipe.php"> Nouvelle équipe </a>
+                                    <a class="dropdown-item" href="mesEquipes.php"> Mes équipes </a>
                                 </div>
                             </li>
                         </ul>
@@ -68,7 +81,7 @@
             <div style="text-align:center; margin-top:200px">
                 <a href="script_deconnexion.php"> <button class="btn btn-warning"> Déconnexion </button> </a> 
             </div>
-        </div>
+            </div>
 
      
         <!-- Bootstrap Jquery, Popper -->

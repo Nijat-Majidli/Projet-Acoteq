@@ -2,7 +2,7 @@
     // Pour utiliser la variable superglobale "$_SESSION" il faut ajouter le fonction session_start() tout au début de la page:
     session_start();  
 
-    /* On va enregistrer la date de création et publication de la nouvelle demande. Pour obtenir la bonne date et l'heure, 
+    /* On va enregistrer la date et l'heure de modification de la demande. Pour obtenir la bonne date et l'heure, 
     il faut configurer la valeur de l'option <<datetime_zone>> sur la valeur Europe/Paris. Donc, il faut ajouter 
     l'instruction <<date_default_timezone_set("Europe/Paris");>> dans nos scripts avant toute manipulation de dates.  */
     date_default_timezone_set('Europe/Paris');

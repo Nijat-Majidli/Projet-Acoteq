@@ -1,8 +1,8 @@
 <?php
 
-    /* On va enregistrer la date d'inscription et dernier connexion de nouvel utilisateur. Pour obtenir la bonne date et l'heure, 
-    il faut configurer la valeur de l'option <<datetime_zone>> sur la valeur Europe/Paris. Donc, il faut ajouter l'instruction 
-    <<date_default_timezone_set("Europe/Paris");>> dans nos scripts avant toute manipulation de dates et heures.  */
+    /* On va enregistrer la date et l'heure d'inscription et dernier connexion de nouvel utilisateur. 
+    Pour obtenir la bonne date et l'heure, il faut configurer la valeur de l'option <datetime_zone> sur la valeur Europe/Paris. 
+    Donc, il faut ajouter l'instruction <date_default_timezone_set("Europe/Paris");> dans nos scripts avant toute manipulation de dates et heures.  */
     date_default_timezone_set('Europe/Paris');
 
     /* Nous récupérons les informations passées dans le fichier "inscription.html" dans la balise <form> et l'attribut action="script_inscription.php".  
@@ -42,7 +42,7 @@
 
     /* Vérification avec l'expréssion RegExp la validité de format de tout les données saisi par utilisateur en utilisant 
     la fonction preg_match() qui renvoie True or False:        */
-    if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§£@*',.$;-]+$#", $user_RS))
+    if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§£@*',.$;-]+$#", $user_RS))  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
     {
         echo "<h4> Entrez un nom correct de la Raison Sociale ! </h4>";
         header("refresh:2; url=inscription.html");
@@ -72,7 +72,7 @@
         header("refresh:2; url=inscription.html");
         exit;
     }  
-    else if (!preg_match("#^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$#", $user_ville))
+    else if (!preg_match("#^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ-]+$#", $user_ville))
     {
         echo "<h4> Entrez une ville correcte ! </h4>";
         header("refresh:2; url=inscription.html");
@@ -112,8 +112,8 @@
     }
 
 
-    /* Vérification si la Raison Sociale, le numéro SIREN et l'adresse mail saisi par nouvel utilisateur déjà existe dans notre base de 
-    données ou non ?   Car on ne peut pas avoir 2 utilisateurs avec la même Raison Sociale, numéro SIREN ou l'adresse mail.
+    /* Vérification si la Raison Sociale, le numéro SIREN et l'adresse mail saisi par nouvel utilisateur déjà existe dans base de données ou non ?   
+    Car on ne peut pas avoir 2 utilisateurs avec la même Raison Sociale, numéro SIREN ou l'adresse mail. 
     Pour faire la vérification d'abord on va se connecter à la base de données:     */
     require ("connection_bdd.php");
 

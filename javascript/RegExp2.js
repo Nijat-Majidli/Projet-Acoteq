@@ -7,8 +7,8 @@ document.getElementById("bouton_valider").addEventListener("click", checkForm);
 
 function checkForm()
 {
-    var filtreString = new RegExp(/^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$/);  // aprés a-z on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
-    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§$£@*',;.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc par l'utilisateur
+    var filtreString = new RegExp(/^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$/);  // aprés a-z on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
+    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§$£@*',;.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
     var filtreSiren = new RegExp(/^[0-9]{9}$/);
     var filtreZipCode = new RegExp(/^[0-9]{5}$/);
     var filtreEmail = new RegExp(/^[a-z0-9._àâæçéèêëîïôœùûüÿ-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
@@ -27,7 +27,7 @@ function checkForm()
     var controlSiren = filtreSiren.test(Siren);
     var controlResponsableLegale = filtreString.test(ResponsableLegale);
     var controlAddress = filtreAlphanumeric.test(Address);
-    var controlCity = filtreString.test(City);
+    var controlCity = filtreAlphanumeric.test(City);
     var controlState = filtreString.test(State);
     var controlZipCode = filtreZipCode.test(ZipCode);
     var controlEmail = filtreEmail.test(Email);

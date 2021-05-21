@@ -1,7 +1,7 @@
 <?php
 
-    /* On va enregistrer l'heure de dernier connexion du client. Pour obtenir la bonne heure, il faut configurer la valeur de l'option 
-    datetime_zone sur la valeur Europe/Paris.
+    /* On va enregistrer la date et l'heure de dernier connexion de nos utilisateurs. 
+    Pour obtenir la bonne heure, il faut configurer la valeur de l'option datetime_zone sur la valeur Europe/Paris. 
     Donc, il faut ajouter l'instruction <<date_default_timezone_set("Europe/Paris");>> dans vos scripts avant toute manipulation de dates. */
     date_default_timezone_set('Europe/Paris');
 
