@@ -69,7 +69,7 @@
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="equipe.php"> Nouvelle équipe </a>
-                                    <a class="dropdown-item" href="mesEquipes.php"> Mes équipes </a>
+                                    <a class="dropdown-item" href="equipeSaved.php"> Équipes sauvegardées </a>
                                 </div>
                             </li>
                         </ul>

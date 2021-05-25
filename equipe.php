@@ -44,12 +44,12 @@
             <form action="script_equipe.php" method="POST" autocomplete="off">
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="team"> Nom d'équipe : </label> 
-                    <input id="team" type="text" class="form-control" name="equipe" required>
+                    <input id="team" type="text" class="form-control" name="equipe_nom" required>
                 </div>
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="myInput"> Choisir les membres : </label> 
-                    <input id="myInput" type="search" class="form-control" required>
+                    <input id="myInput" type="search" class="form-control">
 
                     <select id="liste" class="custom-select" style="display:none;" size="5">
                         <!-- Code Php -->
@@ -72,7 +72,7 @@
                             {                       
 ?>
                                 <option> 
-                                    <?php echo $row->client_raison_sociale;?> 
+                                    <?php echo $row->user_email;?> 
                                 </option>
 <?php
                             }
@@ -82,16 +82,14 @@
                 </div>
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                    <label for="member"> Membres d'équipe : </label> 
-                    <input id="member" type="text" class="form-control" name="membres"> 
+                    <label for="member"> Membres d'équipe : </label> <br>
+                    <input id="member" type="text" name="equipe_membres" style="width:100%; border:none; border-bottom:solid 1px #D5DBDB; outline:none"> 
                 </div>
 
                  <!-- Les boutons <Valider> et <Annuler> -->
                  <div style="text-align: center; margin-top: 40px;">
                     <button type="submit" class="btn btn-success" id="bouton_valider"> Valider </button>
-                    <a href="client.php"> 
-                        <input type="button" class="btn btn-danger" value="Annuler"> 
-                    </a>
+                    <a href="client.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
                 </div>
             </form>   
         </div>

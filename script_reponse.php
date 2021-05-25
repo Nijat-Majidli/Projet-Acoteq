@@ -20,7 +20,7 @@
             $reponse_budget = htmlspecialchars($_POST['reponse_budget']);
             $user_email = htmlspecialchars($_POST['user_email']);
         
-            // Connection à la base de données 
+            // Connexion à la base de données 
             require "connection_bdd.php";
 
             // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
@@ -48,20 +48,20 @@
             // Exécution de la requête
             $requete->execute();
 
-            //Libèration la connection au serveur de BDD
+            // Libèration la connection au serveur de BDD
             $requete->closeCursor();
 
-            // Si le fournisseur répond à la demande d'un client avec la méthode mail() on envoie un email de notification à ce client. 
+            // Avec la méthode mail() on envoie un email de notification au client pour lui dire que le fournisseur a répondu à sa demande. 
             mail($user_email, "Nouvelle reponse", "Bonjour, Une nouvelle reponse a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
         
             echo '<h4> Votre commentaire a été publié avec succès! </h4> ';
-            header("refresh:2; url=fournisseur.php");   
+            header("refresh:2; url=fournisseur.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page fournisseur.php
             exit;
         }
         else
         {
             echo "<h4> Veuillez remplir tous les champs ! </h4>";
-            header("refresh:2; url=detail.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page detail.php
+            header("refresh:2; url=detail.php");  
             exit;
         }
     }

@@ -56,11 +56,11 @@
             // Exécution de la requête
             $requete->execute();
 
-            //Libèration la connection au serveur de BDD
+            // Libèration la connection au serveur de BDD
             $requete->closeCursor();
 
 
-            /*  Si un client publie sa demande on envoie un email de notification à tous les fournisseurs. 
+            /*  Si le client publie sa demande on envoie un email de notification à tous les fournisseurs. 
             Pour cela on construit la requête SELECT pour aller chercher la colonne demande_etat et demande_notification dans la table "demande":     */
             $req="SELECT demande_etat, demande_notification FROM demande WHERE demande_etat='publié' AND demande_notification='non envoyé'";
 
@@ -90,7 +90,7 @@
                 }
             }
             
-            //Libèration la connection au serveur de BDD
+            // Libèration la connection au serveur de BDD
             $result->closeCursor();
 
             // Puis on met à jour la colonne demande_notification:
