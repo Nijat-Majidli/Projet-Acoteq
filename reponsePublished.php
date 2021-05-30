@@ -71,7 +71,7 @@
                                 <tr>
                                     <td> <?php echo $row->reponse_titre;?> </td> 
                                     <td> <?php echo $row->reponse_description;?> </td>
-                                    <td> <?php echo $row->reponse_date;?> </td>
+                                    <td> <?php echo $row->reponse_publication;?> </td>
                                 </tr>
 <?php
                             }

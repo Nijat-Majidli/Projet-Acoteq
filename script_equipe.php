@@ -14,30 +14,35 @@
     {
         if (!empty($_POST['equipe_nom'] && $_POST['equipe_membres']))
         {
+            // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
-            $equipe_nom = htmlspecialchars($_POST['equipe_nom']);         
-            $equipe_membres = htmlspecialchars($_POST['equipe_membres']);
+            $equipe_nom = trim(htmlspecialchars($_POST['equipe_nom']));         
+            $equipe_membres = trim(htmlspecialchars($_POST['equipe_membres']));
 
             // Connexion à la base de données:         
             require ("connection_bdd.php");
+
+            /* Avant d'insérer en base de données on convertit tout les caractères en minuscules de nos variables.
+            La fonction strtolower() passe tout les caractères en minuscules :  */
+            $equipe_nom = strtolower($equipe_nom);
+            $equipe_membres = strtolower($equipe_membres);
 
             /* Construction de la requête préparée INSERT pour la table users. Les requêtes préparées empêchent les injections SQL.
             On n'insére pas la valeur pour la colonne "equipe_modification" car dans base de données on a bien défini que cette colonne 
             accepte la valeur NULL.   */ 
             $requete = $db->prepare("INSERT INTO equipe (equipe_nom, equipe_proprietaire, equipe_membres, equipe_creation, user_id, user_email) 
-            VALUES (:equipe_nom, (SELECT client_raison_sociale FROM client WHERE user_email=:email), :equipe_membres, :equipe_creation, 
-            (SELECT user_id FROM client WHERE user_email=:email), (SELECT user_email FROM client WHERE user_email=:email))");
+            VALUES (:equipe_nom, (SELECT CONCAT(client_nom, ' ', client_prenom) AS equipe_proprietaire FROM client WHERE user_email=:email), 
+            :equipe_membres, :equipe_creation, (SELECT user_id FROM client WHERE user_email=:email), (SELECT user_email FROM client WHERE user_email=:email))");
 
             // Association des valeurs aux marqueurs via méthode "bindValue()"
             $requete->bindValue(':equipe_nom', $equipe_nom, PDO::PARAM_STR);
             $requete->bindValue(':equipe_membres', $equipe_membres, PDO::PARAM_STR);    
+            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
 
             // On utilise l'objet DateTime() pour enregistrer la date et l'heure de création de la nouvelle équipe dans la base de données
             $time = new DateTime();   
             $date = $time->format("Y/m/d H:i:s"); 
             $requete->bindValue(':equipe_creation', $date, PDO::PARAM_STR);
-
-            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
 
             // Exécution de la requête
             $requete->execute();

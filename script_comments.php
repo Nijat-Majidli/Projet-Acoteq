@@ -22,8 +22,8 @@
             require "connection_bdd.php";
      
             // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
-            $requete = $db->prepare("INSERT INTO commentaire (comment_publication, comment_description, client_raison_sociale, client_id, 
-            client_email, reponse_id) VALUES(:comment_publication, :comment_description, 
+            $requete = $db->prepare("INSERT INTO commentaire (comment_description, comment_publication, client_raison_sociale, user_id, 
+            user_email, reponse_id) VALUES(:comment_description, :comment_publication, 
             (SELECT client_raison_sociale FROM client WHERE user_email=:email), (SELECT user_id FROM client WHERE user_email=:email), 
             (SELECT user_email FROM client WHERE user_email=:email), :reponse_id)");
             

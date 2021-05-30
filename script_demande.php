@@ -120,16 +120,16 @@
 
     /* Lorsque le formulaire (page demande.php) est soumis, on récupère les informations sur le fichier téléchargé via la variable 
     superglobale $_FILES, qui se comporte comme un tableau associatif PHP.
-    Le problème principal de l'upload d'un fichier est la sécurité. On doit tout d'abord vérifier 2 points basiques :
+    Le problème principal de l'upload d'un fichier est la sécurité. On doit tout d'abord vérifier 3 points basiques :
     1. Le fichier a-t-il bien été téléchargé (upload) ?
     2. La taille du fichier ne dépasse-t-elle pas la taille autorisée? ?
     3. Le type du fichier envoyé par l'utilisateur est-il celui attendu (image, document Word, PDF etc...) ?        */
 
-    if(isset($_FILES['fichier']))
+    if(isset($_FILES['clientFile']))
     { 
         // D'abord on vérifie la taille (en octets) du fichier. Ici la maximale taille autorisée est 5 000 000 octets (soit 5Mo) :
         $taille_maxi = 5000000;
-        $taille_fichier = filesize($_FILES['fichier']['tmp_name']);  // La fonction filesize() retourne la taille d'un fichier.
+        $taille_fichier = filesize($_FILES['clientFile']['tmp_name']);  // La fonction filesize() retourne la taille d'un fichier.
 
         if($taille_fichier > $taille_maxi)
         {
@@ -143,7 +143,7 @@
         
         /* Ensuite on récupére l'extension du fichier téléchargé par l'utilisateur à l'aide de la fonction strrchr() qui nous renvoie 
         le string à partir de '.' qui correspond à l'extension du fichier    */
-        $extension_fichier = strtolower(strrchr($_FILES['fichier']['name'], '.'));   // strtolower() transforme tous les caractères en minuscules
+        $extension_fichier = strtolower(strrchr($_FILES['clientFile']['name'], '.'));  // strtolower() transforme tous les caractères en minuscules
 
         if (in_array($extension_fichier, $extensions_valide))
         {
@@ -152,21 +152,22 @@
             Mais ce fichier devra se trouver dans un répertoire de notre projet, il faut donc le déplacer.
             Donc, via la méthode "move_uploded_file()" on va déplacer notre fichier vers le répertoire "fichiers" de notre projet */   
             
-            $nom_fichier = basename($_FILES['fichier']['name']);  // fonction basename() renvoie le nom de fichier à partir du chemin spécifié
-            
-            /* Le nom du fichier peut lui aussi poser problème. Nous devons donc nous occuper de lui car s'il contient des accents, 
-            caractères spéciaux, espaces, ça peut poser problème. Nous allons donc "formater" le nom du fichier avant de l'uploader.    
-            Ici on remplace les lettres accentutées par les non accentuées dans $nom_fichier:    */
+            /* Maintenant on vérifie le nom du fichier. Le nom du fichier peut lui aussi poser problème. Nous devons donc nous occuper de lui 
+            car s'il contient des accents, caractères spéciaux, espaces, ça peut poser problème. Nous allons donc "formater" le nom du fichier 
+            avant de l'uploader. D'abord avec la fonction basename() on récupére le nom de fichier à partir du chemin spécifié:   */
+            $nom_fichier = basename($_FILES['clientFile']['name']);  
+             
+            // Puis on remplace les lettres accentutées par les non accentuées dans $nom_fichier:    
             $nom_fichier = strtr($nom_fichier, 'ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ', 'AAAAAACEEEEIIIIOOOOOUUUUYaaaaaaceeeeiiiioooooouuuuyy'); 
             
-            // On déplace le fichier de répertoire C:/wamp/tmp vers un répertoire nommé fichiers/ :
-            move_uploaded_file($_FILES["fichier"]["tmp_name"], "fichiers/".$nom_fichier);   
+            // Enfin, on déplace le fichier depuis répertoire C:/wamp/tmp vers un répertoire nommé fichiers/ :
+            move_uploaded_file($_FILES["clientFile"]["tmp_name"], "fichiers/".$nom_fichier);   
             
             echo '<h4> Votre fichier a été téléchargé avec succès! </h4> ';
             header("refresh:2; url=client.php");   
             exit;
 
-            // GOOGLE DRIVE API
+            // GOOGLE DRIVE API pour enregistrer le fichier uploadé dans Google Drive 
             // require_once 'google-api-php-client/src/Google_Client.php';
             // require_once 'google-api-php-client/src/contrib/Google_DriveService.php';
             // // this is google client library and you got to include it in order to use it.

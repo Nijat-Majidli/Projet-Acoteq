@@ -40,7 +40,8 @@
         <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
             <h2> Veuillez créer votre demande </h2>
             <br>
-            <!--Pour que le téléchargement soit possible, il faut ajouter l'attribut <<enctype>> à la balise <form>. La valeur doit être "multipart/form"-data-->
+            <!--  Pour que le téléchargement soit possible, il faut ajouter l'attribut "enctype" à la balise <form>. 
+            La valeur de l'attribut "enctype" doit être "multipart/form"-data  -->
             <form action="script_demande.php"  method="POST" enctype="multipart/form-data" autocomplete="off">   
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="title"> Titre <sup>*</sup> </label> 
@@ -66,7 +67,7 @@
                     <input type="hidden" name="MAX_FILE_SIZE" value="5000000">
 
                     <label for="telecharger"> Télécharger votre demande <sup>*</sup> </label>
-                    <input type="file" class="form-control-file" id="telecharger" name="fichier" required>
+                    <input type="file" class="form-control-file" id="telecharger" name="clientFile" required>
                 </div>
 
                 <p>  Vous voulez : </p>

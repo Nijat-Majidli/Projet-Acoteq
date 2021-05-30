@@ -108,12 +108,17 @@
         // Création d'une session :
         session_start();
         
-        // On va créer 2 variables de SESSION:  $_SESSION['email'] et $_SESSION['role']   
+        // On va créer 3 variables de SESSION:  $_SESSION['email'], $_SESSION['siren'] et $_SESSION['role']   
         $_SESSION['email'] = $user_email;
 
-        $requete = $db->prepare('SELECT user_role FROM users WHERE user_email=:user_email');
-        $requete->execute(array(':user_email' => $user_email));
+        $requete = $db->prepare('SELECT user_siren, user_role FROM users WHERE user_email=:user_email');
+        $requete->execute(array(':user_email' => $user_email));   // L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement".
         $resultat = $requete->fetch();  
+        /* Variable $resultat est un tableau (array) associatif qui contient 2 éléments :  
+        1. user_siren et sa valeur;    
+        2. user_role et sa valeur     */
+
+        $_SESSION['user_siren'] = $resultat['user_siren'];
         
         if ($resultat['user_role']=='client')
         {
@@ -143,7 +148,7 @@
         /* Variable $resultat est un tableau (array) associatif qui contient 3 éléments : 
         1. login_fail et sa valeur, 
         2. user_blocked et sa valeur,
-        3. unblock_time et sa valeur.       */
+        3. unblock_time et sa valeur.    */
         $resultat = $requete->fetch(); 
          
         // On augmente le nombre de login_fail à chaque fois que l'utilisateur saisit mauvais mot de passe :

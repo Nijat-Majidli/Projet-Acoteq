@@ -7,25 +7,26 @@ document.getElementById("bouton_valider").addEventListener("click", checkForm);
 
 function checkForm()
 {
-    var filtreString = new RegExp(/^[A-Za-z àâæçéèêëîïôœùûüÿ-]+$/);  // aprés a-z on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
-    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 àâæçéèêëîïôœùûüÿ_&!§$£@*',;.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
+    var filtreString = new RegExp(/^[A-Za-z ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+$/);  // aprés a-z on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
+    var filtreAlphanumeric = new RegExp(/^[A-Za-z0-9 ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ_&!§$£@*',;.-]+$/);  // aprés 0-9 on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
     var filtreSiren = new RegExp(/^[0-9]{9}$/);
     var filtreZipCode = new RegExp(/^[0-9]{5}$/);
-    var filtreEmail = new RegExp(/^[a-z0-9._àâæçéèêëîïôœùûüÿ-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
+    var filtreEmail = new RegExp(/^[a-z0-9._ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/);
     
-
+    var Nom = document.querySelector("#name").value;
+    var Prenom = document.querySelector("#surname").value;
     var RaisonSociale = document.querySelector("#RaisonSociale").value;
     var Siren = document.querySelector("#siren").value;
-    var ResponsableLegale = document.querySelector("#ResponsableLegale").value;
     var Address = document.querySelector("#address").value;
     var City = document.querySelector("#city").value;
     var State = document.querySelector("#state").value;
     var ZipCode = document.querySelector("#ZipCode").value;
     var Email = document.querySelector("#email").value;
 
+    var controlNom = filtreString.test(Nom);
+    var controlPrenom = filtreString.test(Prenom);
     var controlRaisonSociale = filtreAlphanumeric.test(RaisonSociale);
     var controlSiren = filtreSiren.test(Siren);
-    var controlResponsableLegale = filtreString.test(ResponsableLegale);
     var controlAddress = filtreAlphanumeric.test(Address);
     var controlCity = filtreAlphanumeric.test(City);
     var controlState = filtreString.test(State);
@@ -33,6 +34,16 @@ function checkForm()
     var controlEmail = filtreEmail.test(Email);
 
 
+    if (controlNom==false)
+    {
+        window.alert("Entrez un nom valide !");
+    }
+
+    if (controlPrenom==false)
+    {
+        window.alert("Entrez un prénom valide !");
+    }
+    
     if (controlRaisonSociale==false)
     {
         window.alert("Entrez un nom correct de la Raison Sociale !");
@@ -41,11 +52,6 @@ function checkForm()
     if (controlSiren==false)
     {
         window.alert("Entrez un numéro Siren valide !");
-    }
-
-    if (controlResponsableLegale==false)
-    {
-        window.alert("Entrez un nom et prénom valide !");
     }
 
     if (controlAddress==false)

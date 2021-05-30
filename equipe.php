@@ -5,7 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="client")
+    if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -58,10 +58,12 @@
                         require ("connection_bdd.php");
 
                         // On construit la requête SELECT via la méthode prepare() pour éviter injection SQL : 
-                        $requete = $db->prepare ("SELECT * FROM client");
+                        $requete = $db->prepare("SELECT * FROM client WHERE client_siren = :client_siren");
+
+                        $requete->bindValue(':client_siren', $_SESSION['user_siren'], PDO::PARAM_INT);
 
                         // On exécute la requête
-                        $requete->execute()  or  die(print_r($db->errorInfo()));
+                        $requete->execute() or  die(print_r($db->errorInfo()));
 
                         // Grace à la méthode "rowCount()" nous pouvons connaitre le nombre de lignes retournées par la requête
                         $nbLigne = $requete->rowCount(); 
@@ -72,7 +74,7 @@
                             {                       
 ?>
                                 <option> 
-                                    <?php echo $row->user_email;?> 
+                                    <?php echo $row->client_nom;?> <?php echo $row->client_prenom;?> (<?php echo $row->user_email;?>) 
                                 </option>
 <?php
                             }

@@ -24,7 +24,17 @@
         <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
             <h2> Veuillez saisir vos coordonnées </h2>
             <br>
-            <form action="script_inscription.php" method="POST" autocomplete="off">
+            <form action="script_inscription.php" method="POST" autocomplete="on">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label for="name"> Nom <sup>*</sup> </label> 
+                    <input id="name" type="text" class="form-control" name="userNom" required>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label for="surname"> Prénom <sup>*</sup> </label> 
+                    <input id="surname" type="text" class="form-control" name="userPrenom" required>
+                </div>
+
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="RaisonSociale"> Raison sociale <sup>*</sup> </label> 
                     <input id="RaisonSociale" type="text" class="form-control" name="RS" required>
@@ -33,11 +43,6 @@
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="siren"> N° SIREN <sup>*</sup> </label>
                     <input id="siren" type="text" class="form-control" name="numSiren" required>
-                </div>
-
-                <div class="form-group mb-4"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                    <label for="ResponsableLegale"> Responsable légale <sup>*</sup> </label>
-                    <input id="ResponsableLegale" type="text" class="form-control" name="RL" placeholder="Nom et prénom" required>
                 </div>
                 
                 <p>  Vous êtes : </p>
