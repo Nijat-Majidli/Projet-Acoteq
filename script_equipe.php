@@ -2,14 +2,15 @@
     // Pour utiliser la variable superglobale "$_SESSION" il faut ajouter le fonction session_start() tout au début de la page:
     session_start();  
 
+
     /* On va enregistrer la date de création d'une nouvelle équipe. 
     Pour obtenir la bonne date et l'heure, il faut configurer la valeur de l'option <datetime_zone> sur la valeur Europe/Paris. 
     Donc, il faut ajouter l'instruction <date_default_timezone_set("Europe/Paris");> dans nos scripts avant toute manipulation de dates et heures.  */
     date_default_timezone_set('Europe/Paris');
 
+
     /* Nous récupérons les informations passées dans le fichier "equipe.php" dans la balise <form> et l'attribut action="script_equipe.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-
     if(isset($_POST['equipe_nom']) && isset($_POST['equipe_membres']))
     {
         if (!empty($_POST['equipe_nom'] && $_POST['equipe_membres']))
@@ -19,13 +20,17 @@
             $equipe_nom = trim(htmlspecialchars($_POST['equipe_nom']));         
             $equipe_membres = trim(htmlspecialchars($_POST['equipe_membres']));
 
+
             // Connexion à la base de données:         
             require ("connection_bdd.php");
 
-            /* Avant d'insérer en base de données on convertit tout les caractères en minuscules de nos variables.
-            La fonction strtolower() passe tout les caractères en minuscules :  */
-            $equipe_nom = strtolower($equipe_nom);
-            $equipe_membres = strtolower($equipe_membres);
+
+            /*  Avant d'insérer en base de données on convertit tout les caractères en minuscules de variables. Comme la fonction strtolower() 
+            ne convertit pas les lettres accentuées et les caractères spéciaux en minuscules, ici on utilise la fonction mb_strtolower() 
+            qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.   */  
+            $equipe_nom = mb_strtolower($equipe_nom);
+            $equipe_membres = mb_strtolower($equipe_membres);
+
 
             /* Construction de la requête préparée INSERT pour la table users. Les requêtes préparées empêchent les injections SQL.
             On n'insére pas la valeur pour la colonne "equipe_modification" car dans base de données on a bien défini que cette colonne 
@@ -71,10 +76,6 @@
         header("refresh:2; url=equipe.php");  
         exit;
     }    
-
-
-    
-
 
 
 

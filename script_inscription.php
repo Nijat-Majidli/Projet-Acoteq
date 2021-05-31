@@ -149,14 +149,16 @@
     }        
     
 
-    /* Avant d'insérer en base de données on convertit tout les caractères en minuscules pour certaines variables.
-    La fonction mb_strtolower() passe tout les caractères en minuscules :  */
+    /*  Avant d'insérer en base de données on convertit tout les caractères en minuscules pour certaines variables. 
+    Comme la fonction strtolower() ne convertit pas les lettres accentuées et les caractères spéciaux en minuscules, ici on utilise la fonction 
+    mb_strtolower() qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.   */
     $user_nom = mb_strtolower($user_nom);
     $user_prenom = mb_strtolower($user_prenom);
     $user_RS = mb_strtolower($user_RS);         
     $user_adresse = mb_strtolower($user_adresse);
     $user_ville = mb_strtolower($user_ville);
     $user_pays = mb_strtolower($user_pays);
+    $user_email = mb_strtolower( $user_email);
 
 
     /* Construction de la requête préparée INSERT pour la table users. Les requêtes préparées empêchent les injections SQL.
@@ -224,5 +226,7 @@
     exit;   
 
     
+
+
 ?>
 

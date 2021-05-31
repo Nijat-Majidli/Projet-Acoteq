@@ -23,7 +23,7 @@
         <!-- Responsive design -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title> Equipes sauvegardées </title>
+        <title> Équipes sauvegardées </title>
 
         <!-- Bootstrap CDN link -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -38,7 +38,7 @@
     <body>
         <div class="container">
             <br>
-            <center> <h3> Mes équipes sauvegardées </h3> </center> 
+            <center> <h3> Équipes sauvegardées </h3> </center> 
             <br> <br>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -79,7 +79,7 @@
                             <tr>
                                 <td>  <?php echo $row->equipe_nom;?>  </td>
                                 <td>  <?php echo $row->equipe_proprietaire;?>  </td>
-                                <td>  <?php echo $row->equipe_membres;?>  </td>
+                                <td>  <?php echo $row->equipe_membres;?>  </td> 
                                 <td>  <?php echo $row->equipe_creation;?>  </td>
                                 <td>  <?php echo $row->equipe_modification;?>  </td>
                                 <td> 

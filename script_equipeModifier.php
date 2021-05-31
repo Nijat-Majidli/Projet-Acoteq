@@ -2,23 +2,25 @@
     // Pour utiliser la variable superglobale "$_SESSION" il faut ajouter le fonction session_start() tout au début de la page:
     session_start();  
 
+
     /* On va enregistrer la date et l'heure de modification de l'équipe. Pour obtenir la bonne date et l'heure, 
-    il faut configurer la valeur de l'option <<datetime_zone>> sur la valeur Europe/Paris. Donc, il faut ajouter 
+    il faut configurer la valeur de l'option <datetime_zone> sur la valeur Europe/Paris. Donc, il faut ajouter 
     l'instruction <<date_default_timezone_set("Europe/Paris");>> dans nos scripts avant toute manipulation de dates.  */
     date_default_timezone_set('Europe/Paris');
 
-    /* Nous récupérons les informations passées dans le fichier "equipeModifier.php" dans la balise <form>  et 
-    l'attribut action="script_equipeModifier.php".   
+
+    /* Nous récupérons les informations passées dans le fichier "equipeModifier.php" dans la balise <form> et l'attribut action="script_equipeModifier.php".   
     Les informations sont récupéré avec variable superglobale $_POST     */
     if(isset($_POST['equipe_id']) && isset($_POST['equipe_proprietaire']) && isset($_POST['equipe_nom']) && isset($_POST['equipe_membres']))
     {
         if (!empty($_POST['equipe_id'] && $_POST['equipe_proprietaire'] && $_POST['equipe_nom'] && $_POST['equipe_membres']))
         {
+            // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
-            $equipe_id = htmlspecialchars($_POST['equipe_id']);
-            $equipe_proprietaire = htmlspecialchars($_POST['equipe_proprietaire']);
-            $equipe_nom = htmlspecialchars($_POST['equipe_nom']);
-            $equipe_membres = htmlspecialchars($_POST['equipe_membres']);
+            $equipe_id = trim(htmlspecialchars($_POST['equipe_id']));
+            $equipe_proprietaire = trim(htmlspecialchars($_POST['equipe_proprietaire']));
+            $equipe_nom = trim(htmlspecialchars($_POST['equipe_nom']));
+            $equipe_membres = trim(htmlspecialchars($_POST['equipe_membres']));
 
             // Connection à la base de données 
             require "connection_bdd.php";

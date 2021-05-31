@@ -63,7 +63,7 @@
                         $requete->bindValue(':client_siren', $_SESSION['user_siren'], PDO::PARAM_INT);
 
                         // On exécute la requête
-                        $requete->execute() or  die(print_r($db->errorInfo()));
+                        $requete->execute();
 
                         // Grace à la méthode "rowCount()" nous pouvons connaitre le nombre de lignes retournées par la requête
                         $nbLigne = $requete->rowCount(); 
@@ -122,11 +122,12 @@
                     var member = $("option:selected").text();  
                    
                     // Puis avec la méthode push() on insére la variable "member" dans l'array allMembers:
-                    allMembers.push($.trim(member));   // La méthode trim() est utilisée pour supprimer l'espace blanc du début et de la fin d'une chaîne
+                    allMembers.push($.trim(member));   // La méthode $.trim() est utilisée pour supprimer l'espace blanc du début et de la fin d'une chaîne
 
                     $("option:selected").click(function() 
                     {
-                        $('#member').val($.trim(allMembers.join(", ")));  // La méthode join() retourne le tableau (array) sous forme de chaîne.
+                        $('#member').val((allMembers.join(", ")));  // La méthode join() convertit les éléments d'un tableau (array) sous forme d'une chaîne.
+                                                                    // Le paramètre ", " insére l'éspace aprés les virgules entre les éléments. 
                     })
                 });
 
