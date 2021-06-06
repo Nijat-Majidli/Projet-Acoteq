@@ -46,7 +46,9 @@
                 // On récupérer le paramétre equipe_id transmit en GET par la page "equipeSaved.php" et on le met dans la variable $equipe_id :
                 if(isset($_GET['equipe_id']) && !empty($_GET['equipe_id']))
                 {
-                    $equipe_id = $_GET['equipe_id'];
+                    // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
+                    // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
+                    $equipe_id = trim(htmlspecialchars((int)$_GET['equipe_id']));   // Pour vérifier que $_GET['demande_id'] contient bien un nombre entier, on utilise (int) pour convertir la variable GET en type entier. 
 
                     // Connéxion à la base de données 
                     require "connection_bdd.php";

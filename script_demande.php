@@ -9,31 +9,42 @@
 
     /* Nous récupérons les informations passées dans le fichier "demande.php" dans la balise <form> et l'attribut action="script_demande.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['budget']) && isset($_POST['etat']))
+    if(isset($_POST['titre']) && isset($_POST['description']) && isset($_POST['budget']) && isset($_POST['equipe']) && isset($_POST['etat']))
     {
-        if (!empty($_POST['titre'] && $_POST['description'] && $_POST['budget'] && $_POST['etat']))
+        if (!empty($_POST['titre'] && $_POST['description'] && $_POST['budget'] && $_POST['equipe'] && $_POST['etat']))
         {
+            // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
-            $demande_titre = htmlspecialchars($_POST['titre']);
-            $demande_description = htmlspecialchars($_POST['description']);
-            $demande_budget = htmlspecialchars($_POST['budget']);
-            $demande_etat = htmlspecialchars($_POST['etat']); 
+            $demande_titre = trim(htmlspecialchars($_POST['titre']));
+            $demande_description = trim(htmlspecialchars($_POST['description']));
+            $demande_budget = trim(htmlspecialchars($_POST['budget']));
+            $demande_equipe = trim(htmlspecialchars($_POST['equipe']));
+            $demande_etat = trim(htmlspecialchars($_POST['etat'])); 
+           
+            /*  Avant d'insérer en base de données on convertit tout les caractères en minuscules de variables. Comme la fonction strtolower() 
+            ne convertit pas les lettres accentuées et les caractères spéciaux en minuscules, ici on utilise la fonction mb_strtolower() 
+            qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.   */  
+            $demande_titre = mb_strtolower($demande_titre);
+            $demande_description = mb_strtolower($demande_description);
+            $demande_equipe = mb_strtolower($demande_equipe);
 
             // Connection à la base de données 
             require "connection_bdd.php";
 
             // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
-            $requete = $db->prepare("INSERT INTO demande (raison_sociale, siren, responsable_legale, demande_titre, demande_description, 
-            demande_budget, demande_creation, demande_publication, demande_etat, demande_notification, user_id, user_email) 
-            VALUES ((SELECT client_raison_sociale FROM client WHERE user_email=:email), (SELECT client_siren FROM client WHERE user_email=:email), 
-            (SELECT client_responsable_legale FROM client WHERE user_email=:email), :demande_titre, :demande_description, :demande_budget, 
-            :demande_creation, :demande_publication, :demande_etat, :demande_notification, (SELECT user_id FROM client WHERE user_email=:email), :user_email)");
+            $requete = $db->prepare("INSERT INTO demande (demande_proprietaire, demande_societe, demande_titre, demande_description, demande_budget, 
+            demande_creation, demande_publication, demande_equipe, demande_etat, demande_notification, equipe_id, user_id, user_email) 
+            VALUES((SELECT CONCAT(client_nom, ' ', client_prenom) AS demande_proprietaire FROM client WHERE user_email=:user_email), 
+            (SELECT client_raison_sociale FROM client WHERE user_email=:user_email), :demande_titre, :demande_description, :demande_budget, 
+            :demande_creation, :demande_publication, :demande_equipe, :demande_etat, :demande_notification, 
+            (SELECT equipe_id FROM equipe WHERE user_email=:user_email AND equipe_nom=:demande_equipe), 
+            (SELECT user_id FROM client WHERE user_email=:user_email), :user_email)");
 
             // Association des valeurs aux marqueurs via méthode "bindValue()"
-            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
             $requete->bindValue(':demande_titre', $demande_titre, PDO::PARAM_STR);
             $requete->bindValue(':demande_description', $demande_description, PDO::PARAM_STR);
             $requete->bindValue(':demande_budget', doubleval($demande_budget), PDO::PARAM_INT); // fonction doubleval() convertit le type de variable en décimale
+            $requete->bindValue(':demande_equipe', $demande_equipe, PDO::PARAM_STR);
             $requete->bindValue(':demande_etat', $demande_etat, PDO::PARAM_STR);
             $requete->bindValue(':demande_notification', 'non envoyé', PDO::PARAM_STR);
             $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
@@ -60,7 +71,7 @@
             $requete->closeCursor();
 
 
-            /*  Si le client publie sa demande on envoie un email de notification à tous les fournisseurs. 
+            /*  Dès que le client publie sa demande on doit envoyer un email de notification à tous les fournisseurs. 
             Pour cela on construit la requête SELECT pour aller chercher la colonne demande_etat et demande_notification dans la table "demande":     */
             $req="SELECT demande_etat, demande_notification FROM demande WHERE demande_etat='publié' AND demande_notification='non envoyé'";
 

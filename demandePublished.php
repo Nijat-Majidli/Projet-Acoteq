@@ -37,19 +37,18 @@
 
 
     <body>
+        <br><br>
         <div class="container">
-            <br>
-            <center> <h3> Mes demandes publiées </h3> </center> 
+            <center> <h3> Demandes publiées </h3> </center> 
             <br> <br>
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th scope="col"> Titre </th>
-                            <th scope="col"> Description </th>
                             <th scope="col"> Budget </th>
-                            <th scope="col"> Date publication </th>
-                            <th scope="col"> Commentaires </th>
+                            <th scope="col"> Publiée </th>
+                            <th scope="col"> Détail </th>
                         </tr>
                     </thead>
                     
@@ -78,12 +77,11 @@
                             {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
                                 <tr>
-                                    <td> <?php echo $row->demande_titre;?> </td>
-                                    <td> <?php echo $row->demande_description;?> </td>
-                                    <td> <?php echo $row->demande_budget;?> </td>
+                                    <td>  <?php echo $row->demande_titre;?>  </td>
+                                    <td>  <?php echo $row->demande_budget;?>  </td>
                                     <td> <?php echo $row->demande_publication;?> </td>
                                     <td> 
-                                        <a href="comments.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a>  
+                                        <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a>  
                                     </td>
                                 </tr>                        
 <?php           

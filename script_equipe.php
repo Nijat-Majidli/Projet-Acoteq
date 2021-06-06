@@ -20,16 +20,42 @@
             $equipe_nom = trim(htmlspecialchars($_POST['equipe_nom']));         
             $equipe_membres = trim(htmlspecialchars($_POST['equipe_membres']));
 
-
-            // Connexion à la base de données:         
-            require ("connection_bdd.php");
-
-
             /*  Avant d'insérer en base de données on convertit tout les caractères en minuscules de variables. Comme la fonction strtolower() 
             ne convertit pas les lettres accentuées et les caractères spéciaux en minuscules, ici on utilise la fonction mb_strtolower() 
             qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.   */  
             $equipe_nom = mb_strtolower($equipe_nom);
             $equipe_membres = mb_strtolower($equipe_membres);
+
+            // Connexion à la base de données:         
+            require ("connection_bdd.php");
+
+            // Vérification le nom d'équipe, car on ne doit pas avoir 2 équipe avec le même nom dans base de données:
+            $requete = $db->prepare('SELECT equipe_nom FROM equipe WHERE user_email=:email');  
+
+            // Association des valeurs aux marqueurs via méthode "bindValue()"    
+            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
+
+            // Exécution de la requête
+            $requete->execute();
+
+            // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
+            $nbLigne = $requete->rowCount(); 
+            
+            if ($nbLigne >= 1)
+            {
+                while ($row = $requete->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de la colonne equipe_nom et on les mets dans l'objet $row                                            
+                {                                               // Ensuite avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes de la colonne equipe_nom et on les mets dans l'objet $row 
+                    if ($row->equipe_nom==$equipe_nom)
+                    {
+                        echo "<h4> Cette équipe déjà existe. Veuillez choisir un autre nom pour votre nouvelle équipe ! </h4>";
+                        header("refresh:2; url=equipe.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page equipe.php
+                        exit;
+                    }
+                }
+            }
+
+            // Libèration la connection au serveur de BDD
+            $requete->closeCursor();
 
 
             /* Construction de la requête préparée INSERT pour la table users. Les requêtes préparées empêchent les injections SQL.

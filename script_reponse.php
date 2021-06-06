@@ -9,26 +9,34 @@
 
     /* Nous récupérons les informations passées dans le fichier "detail.php" dans la balise <form> et l'attribut action="script_reponse.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['demande_id']) && isset($_POST['reponse_titre']) && isset($_POST['reponse_description']) && isset($_POST['reponse_budget']) && isset($_POST['user_email']))
+    if(isset($_POST['user_email']) && isset($_POST['demande_id']) && isset($_POST['reponse_titre']) && isset($_POST['reponse_description']) && isset($_POST['reponse_budget']))
     {
-        if (!empty($_POST['demande_id'] && $_POST['reponse_titre'] && $_POST['reponse_description'] && $_POST['reponse_budget'] && $_POST['user_email']))
+        if (!empty($_POST['user_email'] && $_POST['demande_id'] && $_POST['reponse_titre'] && $_POST['reponse_description'] && $_POST['reponse_budget']))
         {
+            // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
-            $demande_id = htmlspecialchars($_POST['demande_id']);
-            $reponse_titre = htmlspecialchars($_POST['reponse_titre']);
-            $reponse_description = htmlspecialchars($_POST['reponse_description']);
-            $reponse_budget = htmlspecialchars($_POST['reponse_budget']);
-            $user_email = htmlspecialchars($_POST['user_email']);
+            $user_email = trim(htmlspecialchars($_POST['user_email']));
+            $demande_id = trim(htmlspecialchars($_POST['demande_id']));
+            $reponse_titre = trim(htmlspecialchars($_POST['reponse_titre']));
+            $reponse_description = trim(htmlspecialchars($_POST['reponse_description']));
+            $reponse_budget = trim(htmlspecialchars($_POST['reponse_budget']));
+
+            /*  Avant d'insérer en base de données on convertit tout les caractères en minuscules de variables. Comme la fonction strtolower() 
+            ne convertit pas les lettres accentuées et les caractères spéciaux en minuscules, ici on utilise la fonction mb_strtolower() 
+            qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.   */  
+            $reponse_titre = mb_strtolower($reponse_titre);
+            $reponse_description = mb_strtolower($reponse_description);
         
             // Connexion à la base de données 
             require "connection_bdd.php";
 
             // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
-            $requete = $db->prepare("INSERT INTO reponse (reponse_titre, reponse_description, reponse_budget, reponse_publication, 
-            reponse_notification, fournisseur_raison_sociale, demande_id, user_id, user_email) 
-            VALUES(:reponse_titre, :reponse_description, :reponse_budget, :reponse_publication, :reponse_notification, 
-            (SELECT fournisseur_raison_sociale FROM fournisseur WHERE user_email=:email), :demande_id, 
-            (SELECT user_id FROM fournisseur WHERE user_email=:email), (SELECT user_email FROM fournisseur WHERE user_email=:email))");
+            $requete = $db->prepare("INSERT INTO reponse (reponse_titre, reponse_proprietaire, reponse_societe, reponse_description, 
+            reponse_budget, reponse_publication, reponse_notification, fournisseur_raison_sociale, demande_id, user_id, user_email) VALUES(:reponse_titre, 
+            (SELECT CONCAT(fournisseur_nom, ' ', fournisseur_prenom) AS reponse_proprietaire FROM fournisseur WHERE user_email=:email), 
+            (SELECT fournisseur_raison_sociale FROM fournisseur WHERE user_email=:email), :reponse_description, :reponse_budget, 
+            :reponse_publication, :reponse_notification, (SELECT fournisseur_raison_sociale FROM fournisseur WHERE user_email=:email), 
+            :demande_id, (SELECT user_id FROM fournisseur WHERE user_email=:email), (SELECT user_email FROM fournisseur WHERE user_email=:email))");
             
 
             // Association des valeurs aux marqueurs via la méthode "bindValue()"
@@ -52,9 +60,9 @@
             $requete->closeCursor();
 
             // Avec la méthode mail() on envoie un email de notification au client pour lui dire que le fournisseur a répondu à sa demande. 
-            mail($user_email, "Nouvelle reponse", "Bonjour, Une nouvelle reponse a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+            mail($user_email, "Nouvelle réponse", "Bonjour, Une nouvelle réponse a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
         
-            echo '<h4> Votre commentaire a été publié avec succès! </h4> ';
+            echo '<h4> Votre réponse a été publié avec succès! </h4> ';
             header("refresh:2; url=fournisseur.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page fournisseur.php
             exit;
         }

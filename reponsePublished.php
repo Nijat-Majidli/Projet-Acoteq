@@ -46,6 +46,7 @@
                             <tr>
                                 <th scope="col"> Titre </th>
                                 <th scope="col"> Description </th>
+                                <th scope="col"> Budget </th>
                                 <th scope="col"> Date publication </th>
                             </tr>
                         </thead>
@@ -56,21 +57,26 @@
                         // Connection à la base de données 
                         require "connection_bdd.php";
 
-                        $requete = "SELECT * FROM reponse";
+                        $requete = $db->prepare("SELECT * FROM reponse WHERE user_email=:user_email");
 
-                        $result = $db->query($requete);
+                        // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+                        $requete->bindValue(':user_email', $_SESSION['email']);
+
+                        // On exécute la requête :
+                        $requete->execute();
 
                         // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête
-                        $nbLigne = $result->rowCount(); 
+                        $nbLigne = $requete->rowCount(); 
                     
                         if($nbLigne >= 1)
                         {
-                            while ($row = $result->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
+                            while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
                             {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
                                 <tr>
                                     <td> <?php echo $row->reponse_titre;?> </td> 
                                     <td> <?php echo $row->reponse_description;?> </td>
+                                    <td> <?php echo $row->reponse_budget;?> </td> 
                                     <td> <?php echo $row->reponse_publication;?> </td>
                                 </tr>
 <?php
@@ -78,7 +84,7 @@
                         }
 
                         // Libèration la connection au serveur de BDD
-                        $result->closeCursor();
+                        $requete->closeCursor();
 ?>    
                         </tbody>
                     </table>

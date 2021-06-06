@@ -6,7 +6,6 @@ USE acoteq;
 
 CREATE TABLE Users(
    user_id INT NOT NULL AUTO_INCREMENT,   
-   user_email VARCHAR(255) NOT NULL,
    user_nom VARCHAR(255) NOT NULL,
    user_prenom VARCHAR(255) NOT NULL,
    user_raison_sociale VARCHAR(255) NOT NULL,
@@ -16,6 +15,7 @@ CREATE TABLE Users(
    user_code_postal INT NOT NULL,
    user_ville VARCHAR(255) NOT NULL,
    user_pays VARCHAR(255) NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
    user_mdp VARCHAR(255) NOT NULL,
    user_inscription DATETIME NOT NULL,
    user_connexion DATETIME NOT NULL,
@@ -34,29 +34,29 @@ CREATE TABLE Client(
    client_raison_sociale VARCHAR(255) NOT NULL,
    client_siren INT NOT NULL,
    PRIMARY KEY(user_id, user_email), 
-   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email)
+   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 CREATE TABLE Demande(
    demande_id INT NOT NULL AUTO_INCREMENT,
-   raison_sociale VARCHAR(255) NOT NULL,
-   siren INT NOT NULL,
-   responsable_legale VARCHAR(255) NOT NULL,
+   demande_proprietaire VARCHAR(255) NOT NULL,
+   demande_societe VARCHAR(255) NOT NULL,
    demande_titre VARCHAR(255) NOT NULL,
    demande_description TEXT NOT NULL,
    demande_budget INT,
    demande_creation DATETIME NOT NULL,
    demande_modification DATETIME,
    demande_publication DATETIME,
+   demande_equipe VARCHAR(255),
    demande_etat VARCHAR(255) NOT NULL,
    demande_notification VARCHAR(255) NOT NULL,
    equipe_id INT,
    user_id INT NOT NULL,
    user_email VARCHAR(255) NOT NULL,
    PRIMARY KEY(demande_id),
-   FOREIGN KEY(equipe_id) REFERENCES Equipe(equipe_id),
-   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) 
+   FOREIGN KEY(equipe_id) REFERENCES Equipe(equipe_id) ON DELETE CASCADE,
+   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) ON DELETE CASCADE 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -68,38 +68,41 @@ CREATE TABLE Fournisseur(
    fournisseur_raison_sociale VARCHAR(255) NOT NULL,
    fournisseur_siren INT NOT NULL,
    PRIMARY KEY(user_id, user_email),
-   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) 
+   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 CREATE TABLE Reponse(
    reponse_id INT NOT NULL AUTO_INCREMENT,
+   reponse_proprietaire VARCHAR(255) NOT NULL,
+   reponse_societe VARCHAR(255) NOT NULL,
    reponse_titre VARCHAR(50) NOT NULL,
    reponse_description TEXT NOT NULL,
    reponse_budget INT NOT NULL,
    reponse_publication DATETIME NOT NULL,
    reponse_notification VARCHAR(255),
-   fournisseur_raison_sociale VARCHAR(255) NOT NULL,
    demande_id INT NOT NULL,
    user_id INT NOT NULL,
    user_email VARCHAR(255) NOT NULL,   
    PRIMARY KEY(reponse_id),
-   FOREIGN KEY(demande_id) REFERENCES Demande(demande_id),
-   FOREIGN KEY(user_id, user_email) REFERENCES Fournisseur(user_id, user_email)
+   FOREIGN KEY(demande_id) REFERENCES Demande(demande_id) ON DELETE CASCADE,
+   FOREIGN KEY(user_id, user_email) REFERENCES Fournisseur(user_id, user_email) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 CREATE TABLE Commentaire(
    comment_id INT NOT NULL AUTO_INCREMENT,
+   comment_proprietaire VARCHAR(255) NOT NULL,
+   comment_societe VARCHAR(255) NOT NULL,
    comment_description TEXT NOT NULL,
    comment_publication DATETIME NOT NULL,
-   client_raison_sociale VARCHAR(255) NOT NULL,
+   comment_visibilite VARCHAR(50),
    user_id INT NOT NULL,
    user_email VARCHAR(255) NOT NULL,
    reponse_id INT NOT NULL,
    PRIMARY KEY(comment_id),
-   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email),
-   FOREIGN KEY(reponse_id) REFERENCES Reponse(reponse_id)
+   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) ON DELETE CASCADE,
+   FOREIGN KEY(reponse_id) REFERENCES Reponse(reponse_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -113,5 +116,5 @@ CREATE TABLE Equipe(
    user_id INT NOT NULL,
    user_email VARCHAR(255) NOT NULL,
    PRIMARY KEY(equipe_id),
-   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email)
+   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

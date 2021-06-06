@@ -5,7 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (!isset($_SESSION['email']) && !isset($_SESSION['role']))
+    if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role']))
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -44,9 +44,10 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
+                            <th scope="col"> Nom </th>
+                            <th scope="col"> Prénom </th>
                             <th scope="col"> Raison Sociale </th>
                             <th scope="col"> SIREN </th>
-                            <th scope="col"> Responsable légale </th>
                             <th scope="col"> Adresse </th>
                             <th scope="col"> Code postal </th>
                             <th scope="col"> Ville </th>
@@ -79,9 +80,10 @@
                         {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
                             <tr>
+                                <td>  <?php echo $row->user_nom; ?>  </td>
+                                <td>  <?php echo $row->user_prenom; ?>  </td>
                                 <td>  <?php echo $row->user_raison_sociale; ?>  </td>
                                 <td>  <?php echo $row->user_siren; ?>  </td>
-                                <td>  <?php echo $row->user_responsable_legale; ?>  </td>
                                 <td>  <?php echo $row->user_adresse; ?>  </td>
                                 <td>  <?php echo $row->user_code_postal; ?>  </td>
                                 <td>  <?php echo $row->user_ville; ?>  </td>

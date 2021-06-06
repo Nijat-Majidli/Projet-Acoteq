@@ -5,7 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
-    if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="client")
+    if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -37,8 +37,9 @@
 
 
     <body>
+        <br><br>
         <div class="container">
-            <center> <h3> Mes demandes sauvegardées </h3> </center> 
+            <center> <h3> Demandes sauvegardées </h3> </center> 
             <br> <br>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -47,8 +48,9 @@
                             <th scope="col"> Titre </th>
                             <th scope="col"> Description </th>
                             <th scope="col"> Budget </th>
-                            <th scope="col"> Date création </th>
-                            <th scope="col"> Date modification </th>
+                            <th scope="col"> Équipe </th>
+                            <th scope="col"> Crée </th>
+                            <th scope="col"> Modifiée </th>
                         </tr>
                     </thead>
                     
@@ -80,6 +82,7 @@
                                 <td>  <?php echo $row->demande_titre;?>  </td>
                                 <td>  <?php echo $row->demande_description;?>  </td>
                                 <td>  <?php echo $row->demande_budget;?>  </td>
+                                <td>  <?php echo $row->demande_equipe;?>  </td>
                                 <td>  <?php echo $row->demande_creation;?>  </td>
                                 <td>  <?php echo $row->demande_modification;?>  </td>
                                 <td> 

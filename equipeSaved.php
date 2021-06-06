@@ -37,7 +37,7 @@
 
     <body>
         <div class="container">
-            <br>
+            <br><br>
             <center> <h3> Équipes sauvegardées </h3> </center> 
             <br> <br>
             <div class="table-responsive">
@@ -47,8 +47,8 @@
                             <th scope="col"> Nom </th>
                             <th scope="col"> Propriétaire </th>
                             <th scope="col"> Membres </th>
-                            <th scope="col"> Date création </th>
-                            <th scope="col"> Date modification </th>
+                            <th scope="col"> Crée </th>
+                            <th scope="col"> Modifiée </th>
                             <th scope="col" colspan="2"> <center> Action </center> </th> 
                         </tr>
                     </thead>
@@ -116,14 +116,14 @@
 
             function Modifier()
             { 
-                // Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
-                var resultat = confirm("Etes-vous certain de vouloir modifier cette equipe ?");
+                // Rappel : window.confirm() -> Bouton "OK" renvoie true, mais bouton "Annuler" renvoie false
+                var resultat = window.confirm("Etes-vous certain de vouloir modifier cette équipe ?");
 
                 if (resultat==false)
                 {
-                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette equipe !");
+                    window.alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette équipe !");
 
-                    //annule l'évènement par défaut (envoie vers "equipeModifier.php")
+                    // "event.preventDefault()" annule l'évènement par défaut (envoie vers la page "equipeModifier.php")
                     event.preventDefault();    
                 }
             }
@@ -131,14 +131,14 @@
 
             function Supprimer()
             { 
-                // Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
-                var resultat = confirm("Etes-vous certain de vouloir supprimer cette equipe ?");
+                // Rappel : window.confirm() -> Bouton "OK" renvoie true, mais bouton "Annuler" renvoie false
+                var resultat = window.confirm("Etes-vous certain de vouloir supprimer cette équipe ?");
 
                 if (resultat==false)
                 {
-                    alert("Vous avez annulé la suppression de cette équipe !");
+                    window.alert("Vous avez annulé la suppression de cette équipe !");
 
-                    // "event.preventDefault()" annule l'évènement par défaut (envoie vers "script_equipeSupprimer.php")
+                    // "event.preventDefault()" annule l'évènement par défaut (envoie vers le fichier "script_equipeSupprimer.php")
                     event.preventDefault();    
                 }
             }
