@@ -75,7 +75,7 @@
                         <tr>
                             <th scope="col"> Titre </th>
                             <th scope="col"> Société </th>
-                            <th scope="col"> Date </th>
+                            <th scope="col"> Publiée </th>
                             <th scope="col"> Détail </th>
                         </tr>
                     </thead>
@@ -106,10 +106,14 @@
                             <tr>
                                 <td>  <?php echo $row->demande_titre; ?>  </td>
                                 <td>  <?php echo $row->demande_societe; ?>  </td>
-                                <td>  <?php echo $row->demande_publication; ?> </td>
-                                <td>  
-                                    <a href="detail.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a>   
-                                </td> 
+
+                                <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
+                                Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:    -->
+                                <?php $datePublication = new DateTime($row->demande_publication);?>
+                                <td> <?php echo $datePublication->format("d/m/Y H:\hi");?> </td>
+            
+                                <!-- On envoie en URL (méthode GET) le paramètre demande_id vers la page demandeDetail.php :   -->
+                                <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a> </td> 
                             </tr>
 <?php
                         }

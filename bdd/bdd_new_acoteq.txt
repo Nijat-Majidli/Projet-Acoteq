@@ -99,9 +99,12 @@ CREATE TABLE Commentaire(
    comment_visibilite VARCHAR(50),
    user_id INT NOT NULL,
    user_email VARCHAR(255) NOT NULL,
+   user_id_1 INT NOT NULL,
+   user_email_1 VARCHAR(255) NOT NULL,
    reponse_id INT NOT NULL,
    PRIMARY KEY(comment_id),
    FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) ON DELETE CASCADE,
+   FOREIGN KEY(user_id_1, user_email_1) REFERENCES Fournisseur(user_id, user_email) ON DELETE CASCADE,
    FOREIGN KEY(reponse_id) REFERENCES Reponse(reponse_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

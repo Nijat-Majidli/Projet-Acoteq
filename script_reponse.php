@@ -7,7 +7,7 @@
     l'instruction <<date_default_timezone_set("Europe/Paris");>> dans nos scripts avant toute manipulation de dates.  */
     date_default_timezone_set('Europe/Paris');
 
-    /* Nous récupérons les informations passées dans le fichier "detail.php" dans la balise <form> et l'attribut action="script_reponse.php".  
+    /* Nous récupérons les informations passées dans le fichier "demandeDetail.php" dans la balise <form> et l'attribut action="script_reponse.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
     if(isset($_POST['user_email']) && isset($_POST['demande_id']) && isset($_POST['reponse_titre']) && isset($_POST['reponse_description']) && isset($_POST['reponse_budget']))
     {

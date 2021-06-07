@@ -9,13 +9,15 @@
 
     /* Nous récupérons les informations passées dans le fichier "comments.php" dans la balise <form> et l'attribut action="script_comment.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['reponse_id']) && isset($_POST['user_email']) && isset($_POST['comment']))
+    if(isset($_POST['reponse_id']) && isset($_POST['fournisseur_email']) && isset($_POST['client_email']) && isset($_POST['comment']))
     {
-        if (!empty($_POST['reponse_id'] && $_POST['user_email'] && $_POST['comment']))
+        if (!empty($_POST['reponse_id'] && $_POST['fournisseur_email'] && isset($_POST['client_email']) && $_POST['comment']))
         {
+            
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
             $reponse_id = htmlspecialchars($_POST['reponse_id']);  
-            $fournisseur_email = htmlspecialchars($_POST['user_email']); 
+            $fournisseur_email = htmlspecialchars($_POST['fournisseur_email']); 
+            $client_email = htmlspecialchars($_POST['client_email']);
             $comment_description = trim(htmlspecialchars($_POST['comment']));  // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             
             if(isset($_POST['visibilite'])=='visible')
@@ -37,12 +39,26 @@
             require "connection_bdd.php";
      
             // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
-            $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
-            comment_publication, comment_visibilite, user_id, user_email, reponse_id) 
-            VALUES((SELECT CONCAT(client_nom, ' ', client_prenom) AS comment_proprietaire FROM client WHERE user_email=:email), 
-            (SELECT client_raison_sociale FROM client AS comment_societe WHERE user_email=:email), :comment_description, :comment_publication, 
-            :comment_visibilite, (SELECT user_id FROM client WHERE user_email=:email), (SELECT user_email FROM client WHERE user_email=:email), 
-            :reponse_id)");
+            if($_SESSION['role']=="client")
+            {
+                $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
+                comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
+                VALUES((SELECT CONCAT(client_nom, ' ', client_prenom) AS comment_proprietaire FROM client WHERE user_email=:email), 
+                (SELECT client_raison_sociale FROM client AS comment_societe WHERE user_email=:email), :comment_description, :comment_publication, 
+                :comment_visibilite, (SELECT user_id FROM client WHERE user_email=:email), (SELECT user_email FROM client WHERE user_email=:email), 
+                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:user_email), 
+                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:user_email), :reponse_id)");
+            }
+            else if($_SESSION['role']=="fournisseur")
+            {
+                $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
+                comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
+                VALUES((SELECT CONCAT(fournisseur_nom, ' ', fournisseur_prenom) AS comment_proprietaire FROM fournisseur WHERE user_email=:email), 
+                (SELECT fournisseur_raison_sociale FROM fournisseur AS comment_societe WHERE user_email=:email), :comment_description, :comment_publication, 
+                :comment_visibilite, (SELECT user_id FROM client WHERE user_email=:email), (SELECT user_email FROM client WHERE user_email=:email), 
+                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:user_email), 
+                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:user_email), :reponse_id)");
+            }
             
             // Association des valeurs aux marqueurs via la méthode "bindValue()"
             $requete->bindValue(':comment_description', $comment_description, PDO::PARAM_STR);
@@ -53,7 +69,8 @@
             $requete->bindValue(':comment_publication', $date, PDO::PARAM_STR);
 
             $requete->bindValue(':comment_visibilite', $comment_visibilite, PDO::PARAM_STR);            
-            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
+            $requete->bindValue(':email', $client_email, PDO::PARAM_STR);
+            $requete->bindValue(':user_email', $fournisseur_email, PDO::PARAM_STR);
             $requete->bindValue(':reponse_id', $reponse_id, PDO::PARAM_INT);
 
             // Exécution de la requête

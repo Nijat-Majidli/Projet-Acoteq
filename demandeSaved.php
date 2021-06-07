@@ -83,8 +83,15 @@
                                 <td>  <?php echo $row->demande_description;?>  </td>
                                 <td>  <?php echo $row->demande_budget;?>  </td>
                                 <td>  <?php echo $row->demande_equipe;?>  </td>
-                                <td>  <?php echo $row->demande_creation;?>  </td>
-                                <td>  <?php echo $row->demande_modification;?>  </td>
+
+                                <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
+                                Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:   -->
+                                <?php $dateCreation = new DateTime($row->demande_creation);?>
+                                <td> <?php echo $dateCreation->format("d/m/Y H:\hi");?> </td>
+
+                                <?php $dateModification = new DateTime($row->demande_modification);?>
+                                <td> <?php echo $dateModification->format("d/m/Y H:\hi");?> </td>
+                                
                                 <td> 
                                     <center>
                                         <a href="demandeModifier.php?demande_id=<?php echo $row->demande_id;?>"> 

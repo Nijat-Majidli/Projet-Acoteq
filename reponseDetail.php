@@ -5,7 +5,7 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.   */
 
-    if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
+    if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role']))
     {
         echo "<h4> Cette page nécessite une identification </h4>";
         header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
@@ -51,7 +51,7 @@
     </head>
 
     <body>
-        <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
+        <div class="container p-4 mt-3 col-7 bg-light text-dark">
             <form action="#"  method="#">   
 <?php 
                 // Connéxion à la base de données 
@@ -88,7 +88,10 @@
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label> Date publication </label>
-                    <input type="text" class="form-control" name="budget" value="<?php echo $row->reponse_publication;?>" readonly>
+                    <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
+                    Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:      -->
+                    <?php $datePublication = new DateTime($row->reponse_publication);?>
+                    <input type="text" class="form-control" name="budget" value="<?php echo $datePublication->format("d/m/Y H:\hi");?>" readonly>
                 </div>
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
@@ -102,43 +105,42 @@
                 </div>
             </form>
 
-            <div style="text-align:center; margin-top:80px" id="buttons">
+
+            <!-- Les boutons Commenter, Déconnexion et Retour  -->
+            <div style="text-align:center; margin-top:45px" id="buttons">
                 <button class="btn btn-success mr-3" id="commenter"> Commenter </button> 
                 <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
-                <a href="demandePublished.php"> <button class="btn btn-primary"> Retour </button> </a> 
+<?php
+                    if($_SESSION['role']=='client')
+                    {
+                        $retour = 'demandePublished.php';
+                    }
+                    else if($_SESSION['role']=='fournisseur')
+                    {
+                        $retour = 'fournisseur.php';
+                    }
+?>
+                    <a href="<?php echo $retour;?>"> <button class="btn btn-primary"> Retour </button> </a> 
             </div>
             <br>
 
-
-            <form action="script_comment.php" method="POST" style="display:none" class="comments">
-                <h4> Votre commentaire : </h4>
-                <input type="hidden" name="reponse_id"  value="<?php echo $row->reponse_id;?>">
-                <input type="hidden" name="user_email"  value="<?php echo $row->user_email;?>">
-                <textarea class="form-control" name="comment" rows="10" cols="70" style="resize:none" required> </textarea>
-
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="customCheck1" name="visibilite" value="visible">
-                    <label class="custom-control-label" for="customCheck1"> Visible par le fournisseur </label>
-                </div>
-                <br>
-                <center>
-                    <div>
-                        <button class="btn btn-success mr-3" type="submit"> Valider </button>
-                        <input class="btn btn-warning mr-3" type="reset" value="Effacer"> 
-                        <input class="btn btn-danger" type="button" id="cancel" value="Annuler"> 
-                    </div>
-                </center>
-            </form>
-            <br><br>
-
-            <h5> Commentaires </h5>
+            <h5> Commentaires publiés : </h5>
             <hr>
             <?php
             // On construit la requête SELECT : 
-            $result = $db->prepare("SELECT * FROM commentaire WHERE reponse_id=:reponse_id");
-                
-            // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-            $result->bindValue(':reponse_id', $reponse_id);
+            if($_SESSION['role']=="client")
+            {
+                $result = $db->prepare("SELECT * FROM commentaire WHERE reponse_id=:reponse_id");
+                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+                $result->bindValue(':reponse_id', $reponse_id);
+            }
+            else if($_SESSION['role']=="fournisseur")
+            {
+                $result = $db->prepare("SELECT * FROM commentaire WHERE reponse_id=:reponse_id AND comment_visibilite=:comment_visibilite");
+                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+                $result->bindValue(':reponse_id', $reponse_id);
+                $result->bindValue(':comment_visibilite', 'visible');
+            }   
 
             // On exécute la requête :
             $result->execute();
@@ -169,6 +171,37 @@
             // Libèration la connection au serveur de BDD:
             $result->closeCursor();
 ?>
+
+
+            <!-- Commentaire à écrire -->
+            <form action="script_comment.php" method="POST" style="display:none; margin-top:2%" class="comments">
+                <h4> Votre commentaire : </h4>
+                <input type="hidden" name="reponse_id"  value="<?php echo $row->reponse_id;?>">
+                <input type="hidden" name="fournisseur_email"  value="<?php echo $row->user_email;?>">
+                <input type="hidden" name="client_email"  value="<?php echo $ligne->user_email;?>">
+
+                <textarea class="form-control" name="comment" rows="10" cols="70" style="resize:none" required> </textarea>
+<?php                
+                if($_SESSION['role']=="client")
+                {
+?>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheck1" name="visibilite" value="visible">
+                        <label class="custom-control-label" for="customCheck1"> Visible par le fournisseur </label>
+                    </div>
+<?php
+                }
+?>
+                <br>
+                <center>
+                    <div>
+                        <button class="btn btn-success mr-3" type="submit"> Valider </button>
+                        <input class="btn btn-warning mr-3" type="reset" value="Effacer"> 
+                        <input class="btn btn-danger" type="button" id="cancel" value="Annuler"> 
+                    </div>
+                </center>
+            </form>
+            <br><br>
         </div>
         
 
