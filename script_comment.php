@@ -9,15 +9,15 @@
 
     /* Nous récupérons les informations passées dans le fichier "comments.php" dans la balise <form> et l'attribut action="script_comment.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['reponse_id']) && isset($_POST['fournisseur_email']) && isset($_POST['client_email']) && isset($_POST['comment']))
+    if(isset($_POST['reponse_id']) && isset($_POST['client_email']) && isset($_POST['fournisseur_email']) && isset($_POST['comment']))
     {
-        if (!empty($_POST['reponse_id'] && $_POST['fournisseur_email'] && isset($_POST['client_email']) && $_POST['comment']))
+        if (!empty($_POST['reponse_id'] && $_POST['client_email'] && $_POST['fournisseur_email'] && $_POST['comment']))
         {
             
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
             $reponse_id = htmlspecialchars($_POST['reponse_id']);  
-            $fournisseur_email = htmlspecialchars($_POST['fournisseur_email']); 
             $client_email = htmlspecialchars($_POST['client_email']);
+            $fournisseur_email = htmlspecialchars($_POST['fournisseur_email']); 
             $comment_description = trim(htmlspecialchars($_POST['comment']));  // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             
             if(isset($_POST['visibilite'])=='visible')
@@ -43,21 +43,27 @@
             {
                 $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
                 comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
-                VALUES((SELECT CONCAT(client_nom, ' ', client_prenom) AS comment_proprietaire FROM client WHERE user_email=:email), 
-                (SELECT client_raison_sociale FROM client AS comment_societe WHERE user_email=:email), :comment_description, :comment_publication, 
-                :comment_visibilite, (SELECT user_id FROM client WHERE user_email=:email), (SELECT user_email FROM client WHERE user_email=:email), 
-                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:user_email), 
-                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:user_email), :reponse_id)");
+                VALUES((SELECT CONCAT(client_nom, ' ', client_prenom) AS comment_proprietaire FROM client WHERE user_email=:client_email), 
+                (SELECT client_raison_sociale FROM client AS comment_societe WHERE user_email=:client_email), :comment_description, 
+                :comment_publication, :comment_visibilite, (SELECT user_id FROM client WHERE user_email=:client_email), 
+                (SELECT user_email FROM client WHERE user_email=:client_email), 
+                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:fournisseur_email), 
+                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:fournisseur_email), :reponse_id)");
+
+                $requete->bindValue(':comment_visibilite', $comment_visibilite, PDO::PARAM_STR);
             }
             else if($_SESSION['role']=="fournisseur")
             {
                 $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
                 comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
-                VALUES((SELECT CONCAT(fournisseur_nom, ' ', fournisseur_prenom) AS comment_proprietaire FROM fournisseur WHERE user_email=:email), 
-                (SELECT fournisseur_raison_sociale FROM fournisseur AS comment_societe WHERE user_email=:email), :comment_description, :comment_publication, 
-                :comment_visibilite, (SELECT user_id FROM client WHERE user_email=:email), (SELECT user_email FROM client WHERE user_email=:email), 
-                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:user_email), 
-                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:user_email), :reponse_id)");
+                VALUES((SELECT CONCAT(fournisseur_nom, ' ', fournisseur_prenom) AS comment_proprietaire FROM fournisseur WHERE user_email=:fournisseur_email), 
+                (SELECT fournisseur_raison_sociale FROM fournisseur AS comment_societe WHERE user_email=:fournisseur_email), 
+                :comment_description, :comment_publication, :comment_visibilite, 
+                (SELECT user_id FROM client WHERE user_email=:client_email), (SELECT user_email FROM client WHERE user_email=:client_email), 
+                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:fournisseur_email), 
+                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:fournisseur_email), :reponse_id)");
+
+                $requete->bindValue(':comment_visibilite', 'visible', PDO::PARAM_STR);
             }
             
             // Association des valeurs aux marqueurs via la méthode "bindValue()"
@@ -67,10 +73,9 @@
             $time = new DateTime();   
             $date = $time->format("Y/m/d H:i:s"); 
             $requete->bindValue(':comment_publication', $date, PDO::PARAM_STR);
-
-            $requete->bindValue(':comment_visibilite', $comment_visibilite, PDO::PARAM_STR);            
-            $requete->bindValue(':email', $client_email, PDO::PARAM_STR);
-            $requete->bindValue(':user_email', $fournisseur_email, PDO::PARAM_STR);
+  
+            $requete->bindValue(':client_email', $client_email, PDO::PARAM_STR);          
+            $requete->bindValue(':fournisseur_email', $fournisseur_email, PDO::PARAM_STR);
             $requete->bindValue(':reponse_id', $reponse_id, PDO::PARAM_INT);
 
             // Exécution de la requête
@@ -79,24 +84,37 @@
             //Libèration la connection au serveur de BDD
             $requete->closeCursor();
 
-            // Si le fournisseur répond à la demande d'un client avec la méthode mail() on envoie un email de notification à ce client. 
-            mail($fournisseur_email, "Nouvelle reponse", "Bonjour, le client a commenté à votre reponse!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+            if($_SESSION['role']=="client")
+            {
+                // Si le fournisseur répond au commentaire du client on envoie un email de notification à ce client avec la méthode mail() : 
+                mail($client_email, "Nouvelle reponse", "Bonjour, le fournisseur a commenté!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
 
-            echo '<h4> Votre commentaire a été publié avec succès! </h4> ';      // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page comments.php
-            header("refresh:2; url=demandePublished.php");   
+                $page = "demandePublished.php";
+            }
+            else if($_SESSION['role']=="fournisseur")
+            {
+                // Si le client répond au commentaire du fournisseur on envoie un email de notification à ce fournisseur avec la méthode mail() : 
+                mail($fournisseur_email, "Nouvelle reponse", "Bonjour, le client a commenté!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+
+                $page = "fournisseur.php";   
+            }
+
+            echo '<h4> Votre commentaire a été publié avec succès! </h4> ';  
+            header("refresh:2; url=$page");   
             exit;
+
         }
         else
         {
             echo "<h4> Veuillez remplir tous les champs ! </h4>";
-            header("refresh:2; url=demandePublished.php"); 
+            header("refresh:2; url=$page"); 
             exit;
         }
     }
     else
     {
         echo "<h4> Veuillez remplir tous les champs ! </h4>";
-        header("refresh:2; url=demandePublished.php");  
+        header("refresh:2; url=$page");  
         exit;
     }
 
