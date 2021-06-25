@@ -62,7 +62,7 @@
             }
             else
             {
-                echo "file 'header_client.php' n'existe pas";
+                echo "le fichier n'existe pas";
             }
         ?>
 

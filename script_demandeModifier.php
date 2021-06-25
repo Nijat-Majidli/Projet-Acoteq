@@ -23,7 +23,7 @@
             // Connection à la base de données 
             require "connection_bdd.php";
 
-            // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
+            // Construction de la requête UPDATE avec la méthode prepare() sans injection SQL
             $requete = $db->prepare("UPDATE demande SET demande_titre=:demande_titre, demande_description=:demande_description, 
             demande_budget=:demande_budget, demande_etat=:demande_etat, demande_modification=:demande_modification, 
             demande_publication=:demande_publication WHERE demande_id=:demande_id");

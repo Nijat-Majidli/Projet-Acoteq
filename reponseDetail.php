@@ -70,7 +70,7 @@
                 }
                 else
                 {
-                    echo "file 'header_client.php' n'existe pas";
+                    echo "le fichier n'existe pas";
                 }
             }
             elseif($_SESSION['role']=='fournisseur')
@@ -81,7 +81,7 @@
                 }
                 else
                 {
-                    echo "file 'header_fournisseur.php' n'existe pas";
+                    echo "le fichier n'existe pas";
                 }
             }
         ?>
@@ -147,11 +147,11 @@
             {
 ?>
                 <div style="text-align:center"  id="buttons">
-                    <a href="reponseModifier.php?demande_id=<?php echo $row->reponse_id;?>"> 
+                    <a href="reponseModifier.php?reponse_id=<?php echo $row->reponse_id;?>"> 
                         <button class="btn btn-primary mr-3" type="button" onclick="modifier()"> Modifier </button> 
                     </a> 
                     
-                    <a href="script_reponseSupprimer.php?demande_id=<?php echo $row->reponse_id ?>"> 
+                    <a href="script_reponseSupprimer.php?reponse_id=<?php echo $row->reponse_id ?>"> 
                         <input class="btn btn-danger mr-3" type="button" onclick="supprimer()" value="Supprimer"> 
                     </a> 
 

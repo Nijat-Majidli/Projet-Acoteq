@@ -1,9 +1,9 @@
 <?php 
     session_start();  
     /* ATTENTION
-    Il est impératif d'utiliser la fonction session_start() au début de chaque fichier PHP dans lequel on manipulera cette 
-    variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
-    avoir encore été écrit/envoyé à la page web.  */
+    Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction au début de chaque 
+    fichier PHP dans lequel on utilisera la variable superglobale $_SESSION et avant tout envoi de requêtes HTTP, c'est-à-dire 
+    avant tout code HTML (donc avant la balise <!DOCTYPE> ).  */  
 
     if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="client")
     {
@@ -46,7 +46,7 @@
             }
             else
             {
-                echo "file 'header_client.php' n'existe pas";
+                echo "le fichier n'existe pas";
             }
         ?>
 

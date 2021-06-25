@@ -71,6 +71,7 @@ CREATE TABLE Reponse(
    reponse_budget INT NOT NULL,
    reponse_publication DATETIME NOT NULL,
    reponse_notification VARCHAR(255),
+   reponse_modification DATETIME,
    user_id INT NOT NULL,
    user_email VARCHAR(255) NOT NULL,
    demande_id INT NOT NULL,   

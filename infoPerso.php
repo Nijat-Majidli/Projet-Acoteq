@@ -47,7 +47,7 @@
                 }
                 else
                 {
-                    echo "file 'header_client.php' n'existe pas";
+                    echo "le fichier n'existe pas";
                 }
             }
             elseif($_SESSION['role']=='fournisseur')
@@ -58,7 +58,7 @@
                 }
                 else
                 {
-                    echo "file 'header_fournisseur.php' n'existe pas";
+                    echo "le fichier n'existe pas";
                 }
             }
         ?>

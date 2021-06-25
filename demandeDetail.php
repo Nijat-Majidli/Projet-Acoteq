@@ -70,7 +70,7 @@
                 }
                 else
                 {
-                    echo "file 'header_client.php' n'existe pas";
+                    echo "le fichier n'existe pas";
                 }
             }
             elseif($_SESSION['role']=='fournisseur')
@@ -81,7 +81,7 @@
                 }
                 else
                 {
-                    echo "file 'header_fournisseur.php' n'existe pas";
+                    echo "le fichier n'existe pas";
                 }
             }
         ?>
@@ -192,8 +192,14 @@
                         <label for="title"> Titre <sup>*</sup> </label> 
                         <input type="text" class="form-control" id="title" name="reponse_titre" style="width:90%" required>
                     </div>
-                    <textarea class="form-control text-left" name="reponse_description" rows="10" style="width:90%; resize:none" required> </textarea>
-                    <br>
+
+                    <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                        <label for="desc"> Description <sup>*</sup> </label>
+                        <textarea id="desc" class="form-control text-left" name="reponse_description" rows="10" style="width:90%; resize:none" required> 
+                            <?php echo $row->reponse_description?> 
+                        </textarea>
+                    </div>
+
                     <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                         <label for="prix"> Votre tarif proposé : <sup>*</sup> </label> 
                         <input type="number" class="form-control" id="prix" name="reponse_budget" style="width:15%" required>

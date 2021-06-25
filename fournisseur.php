@@ -1,8 +1,8 @@
 <?php   
     /* ATTENTION
-    Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction au début de chaque 
+    Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction tout au début de chaque 
     fichier PHP dans lequel on utilisera la variable superglobale $_SESSION et avant tout envoi de requêtes HTTP, c'est-à-dire 
-    avant tout code HTML (donc avant la balise <!DOCTYPE> ).  */
+    avant tout code HTML (donc avant la balise <!DOCTYPE> ).   */
     session_start();
 
     if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="fournisseur")
@@ -62,7 +62,7 @@
             }
             else
             {
-                echo "file 'header_fournisseur.php' n'existe pas";
+                echo "le fichier n'existe pas";
             }
         ?>
 
