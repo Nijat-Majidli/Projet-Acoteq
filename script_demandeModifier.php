@@ -73,7 +73,7 @@
                 while ($row = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de la colonne demande_etat et demande_notification et on les mets dans l'objet $row                                            
                 {                                               // Ensuite avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes de la colonne demande_etat et demande_notification et on les mets dans l'objet $row  
                     
-                    $requete="SELECT user_email FROM fournisseur";
+                    $requete="SELECT user_email FROM users WHERE user_role='fournisseur'";
                     $resultat = $db->query($requete)  or  die(print_r($db->errorInfo()));
                     $nbLigne = $resultat->rowCount(); 
             
@@ -82,7 +82,7 @@
                         while ($row2 = $resultat->fetch(PDO::FETCH_OBJ))
                         {
                             // Avec la méthode mail() on envoie un email de notification aux fournisseurs:
-                            mail($row2->user_email, "Nouvelle demande", "Bonjour, Une nouvelle demande a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+                            mail($row2->user_email, "Nouvelle demande", "Bonjour, Une nouvelle demande a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
                         } 
                     }
                 }
@@ -95,7 +95,8 @@
             $req = "UPDATE demande SET demande_notification=:demande_notification WHERE user_email=:user_email AND demande_etat='publié'";
             $requete = $db->prepare($req);
 
-            // Execution de requête:
+            /* Execution de requête:
+            L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement"     */
             $requete->execute(array(':demande_notification' => 'envoyé', ':user_email' => $_SESSION['email']));
 
             //Libèration la connection au serveur de BDD
@@ -104,19 +105,19 @@
         else
         {
             echo "<h4> Veuillez remplir tous les champs ! </h4>";
-            header("refresh:2; url=demande.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page demande.php
+            header("refresh:2; url=demandeNew.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page demandeNew.php
             exit;
         }
     }
     else
     {
         echo "<h4> Veuillez remplir tous les champs ! </h4>";
-        header("refresh:2; url=demande.php");  
+        header("refresh:2; url=demandeNew.php");  
         exit;
     }       
     
 
-    /* Lorsque le formulaire (page demande.php) est soumis, on récupère les informations sur le fichier téléchargé via la variable 
+    /* Lorsque le formulaire (page demandeNew.php) est soumis, on récupère les informations sur le fichier téléchargé via la variable 
     superglobale $_FILES, qui se comporte comme un tableau associatif PHP.
     Le problème principal de l'upload d'un fichier est la sécurité. On doit tout d'abord vérifier 2 points basiques :
     1. Le fichier a-t-il bien été téléchargé (upload) ?
@@ -132,7 +133,7 @@
         if($taille_fichier > $taille_maxi)
         {
             echo "<h4> La taille du fichier ne peut pas dépasser 5Mo ! </h4>";
-            header("refresh:2; url=demande.php");  
+            header("refresh:2; url=demandeNew.php");  
             exit;
         }
         
@@ -210,14 +211,14 @@
         {
             // Le type n'est pas autorisé, donc ERREUR
             echo "<h4> Vous devez télécharger un fichier de type pdf, doc, docx ou txt'; </h4>"; 
-            header("refresh:2; url=demande.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page demande.php
+            header("refresh:2; url=demandeNew.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page demandeNew.php
             exit;
         }     
     } 
     else
     {
         echo "<h4> Veuillez télécharger un fichier </h4>"; 
-        header("refresh:2; url=demande.php");   
+        header("refresh:2; url=demandeNew.php");   
         exit;
     }
     

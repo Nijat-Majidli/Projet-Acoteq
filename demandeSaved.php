@@ -8,7 +8,7 @@
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 ?>
@@ -37,25 +37,23 @@
 
 
     <body>
-        <br><br>
+        <!-- PAGE HEAD -->        
+        <?php
+            if (file_exists("header_client.php"))
+            {
+                include("header_client.php");
+            }
+            else
+            {
+                echo "file 'header_client.php' n'existe pas";
+            }
+        ?>
+
+        <!-- PAGE CONTENT -->
         <div class="container">
+            <br><br>
             <center> <h3> Demandes sauvegardées </h3> </center> 
-            <br> <br>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col"> Titre </th>
-                            <th scope="col"> Description </th>
-                            <th scope="col"> Budget </th>
-                            <th scope="col"> Équipe </th>
-                            <th scope="col"> Crée </th>
-                            <th scope="col"> Modifiée </th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody>
-                    <!-- Code PHP -->
+            <br><br><br>
 <?php
                     // Connéxion à la base de données 
                     require "connection_bdd.php";
@@ -63,7 +61,7 @@
                     // On construit la requête SELECT : 
                     $requete = $db->prepare ("SELECT * FROM demande WHERE user_email=:user_email AND demande_etat=:demande_etat");
 
-                    // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
+                    // Association valeurs aux marqueurs via méthode "bindValue()" :
                     $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
                     $requete->bindValue(':demande_etat', "sauvegardé", PDO::PARAM_STR);
 
@@ -78,83 +76,57 @@
                         while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
                         {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
-                            <tr>
-                                <td>  <?php echo $row->demande_titre;?>  </td>
-                                <td>  <?php echo $row->demande_description;?>  </td>
-                                <td>  <?php echo $row->demande_budget;?>  </td>
-                                <td>  <?php echo $row->demande_equipe;?>  </td>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col"> Titre </th>
+                                            <th scope="col"> Budget </th>
+                                            <th scope="col"> Crée </th>
+                                            <th scope="col"> Détail </>
+                                        </tr>
+                                    </thead>
+                    
+                                    <tbody>
+                                        <tr>
+                                            <td>  <?php echo $row->demande_titre;?>  </td>
+                                            <td>  <?php echo $row->demande_budget;?>  </td>
 
-                                <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
-                                Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:   -->
-                                <?php $dateCreation = new DateTime($row->demande_creation);?>
-                                <td> <?php echo $dateCreation->format("d/m/Y H:\hi");?> </td>
+                                            <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est 
+                                            dans un format MySql: 2018-11-16
+                                            Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:   -->
+                                            <?php $dateCreation = new DateTime($row->demande_creation);?>
+                                            <td> <?php echo $dateCreation->format("d/m/Y H:\hi");?> </td>          
 
-                                <?php $dateModification = new DateTime($row->demande_modification);?>
-                                <td> <?php echo $dateModification->format("d/m/Y H:\hi");?> </td>
-                                
-                                <td> 
-                                    <center>
-                                        <a href="demandeModifier.php?demande_id=<?php echo $row->demande_id;?>"> 
-                                            <button class="btn btn-warning mr-3" type="button" onclick="modifier()"> Modifier </button> 
-                                        </a> 
-                                        <a href="script_demandePublier.php?demande_id=<?php echo $row->demande_id;?>"> 
-                                            <input class="btn btn-success" type="button" value="Publier" class="publish" onclick="confirmer()"> 
-                                        </a>  
-                                    </center>
-                                </td>
-                            </tr>
+                                            <!-- On envoie en URL (méthode GET) le paramètre demande_id vers la page demandeDetail.php :   -->
+                                            <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a> </td>                   
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 <?php
                         }
-                        
-                        //Libèration la connection au serveur de BDD
-                        $requete->closeCursor();
                     }
+                    else
+                    {
+                        echo "<center> <h5 style='color:red'> Pour l'instant vous avez aucune demande sauvegardées ! </h5> </center> <br>"; 
+                        echo '<center> 
+                                Pour créer une demande veuillez cliquer : <a href="demandeNew.php"> Nouvelle demande </a>
+                              <center>';
+                    }
+
+                    //Libèration la connection au serveur de BDD
+                    $requete->closeCursor();
 ?>    
-                    </tbody>
-                </table>
+                    
 
                 <div style="text-align:center; margin-top:200px">
                     <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
                     <a href="client.php"> <button class="btn btn-primary"> Retour </button> </a> 
                 </div>
-            </div>
         </div>
 
 
-        <script>  
-
-            function modifier()
-            { 
-                //Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
-                var resultat = confirm("Etes-vous certain de vouloir modifier cette demande ?");
-
-                // alert("retour :" + resultat);
-
-                if (resultat==false)
-                {
-                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette demande !");
-
-                    //annule l'évènement par défaut ... SUBMIT vers "demandeModifier.php"
-                    event.preventDefault();    
-                }
-            }
-
-        
-            function confirmer()
-            {
-                var resultat = window.confirm("Êtes-vous sûr de vouloir publier votre demande?")
-
-                if (resultat==false)
-                {
-                    alert("Vous avez annulé publication !");
-
-                    //annule l'évènement par défaut ... SUBMIT vers "script_demandePublier.php"
-                    event.preventDefault();    
-                }
-            }
-            
-        </script>
-     
 
         <!-- Bootstrap Jquery, Popper -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

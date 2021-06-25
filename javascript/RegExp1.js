@@ -1,5 +1,5 @@
 /*  
-A l'aide de la fonction verif() on va contrôler le format de l'adresse mail saisi par l'utilisateur. 
+A l'aide de la fonction verif() on va contrôler le format de l'adresse mail saisi par l'utilisateur dans la pge connexion.php. 
 Si le format n'est pas correct on va afficher un message d'erreur à l'utilisateur.
 */
 

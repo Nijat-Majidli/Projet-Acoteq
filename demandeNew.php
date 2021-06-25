@@ -5,10 +5,11 @@
     variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
     avoir encore été écrit/envoyé à la page web.  */
 
+    // La demande (appel d'offre) peut être créer que par le client, c'est pour ça la role d'utilisateur doit être égale à "client":
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 ?>
@@ -37,12 +38,25 @@
 
 
     <body>
+        <!-- PAGE HEAD -->        
+        <?php
+            if (file_exists("header_client.php"))
+            {
+                include("header_client.php");
+            }
+            else
+            {
+                echo "file 'header_client.php' n'existe pas";
+            }
+        ?>
+
+        <!-- PAGE CONTENT -->
         <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
-            <h2> Veuillez créer votre demande </h2>
+            <h3> Veuillez créer votre demande </h3>
             <br>
             <!--  Pour que le téléchargement soit possible, il faut ajouter l'attribut "enctype" à la balise <form>. 
             La valeur de l'attribut "enctype" doit être "multipart/form"-data  -->
-            <form action="script_demande.php"  method="POST" enctype="multipart/form-data" autocomplete="off">   
+            <form action="script_demandeNew.php"  method="POST" enctype="multipart/form-data" autocomplete="off">   
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="title"> Titre <sup>*</sup> </label> 
                     <input id="title" type="text" class="form-control" name="titre" required>
@@ -50,7 +64,7 @@
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="desc"> Description <sup>*</sup> </label>
-                    <textarea id="desc" class="form-control" name="description" rows="10" style="resize:none" required></textarea>
+                    <textarea id="desc" class="form-control text-left" name="description" rows="10" style="resize:none" required></textarea>
                 </div>
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
@@ -70,6 +84,7 @@
                     <input id="telecharger" type="file" class="form-control-file" name="clientFile" required>
                 </div>
 
+                <!-- Ajouter une équipe dans une demande est facultative, n'est pas obligatoire. -->
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="myInput"> Ajouter une équipe : </label> 
                     <input id="myInput" type="search" class="form-control">

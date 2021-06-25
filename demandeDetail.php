@@ -1,18 +1,18 @@
 <?php 
     session_start();  
     /* ATTENTION
-    Il est impératif d'utiliser la fonction session_start() au début de chaque fichier PHP dans lequel on manipulera cette 
-    variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
-    avoir encore été écrit/envoyé à la page web.   */
+    Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction au début de chaque 
+    fichier PHP dans lequel on utilisera la variable superglobale $_SESSION et avant tout envoi de requêtes HTTP, c'est-à-dire 
+    avant tout code HTML (donc avant la balise <!DOCTYPE> ).  */  
 
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role']))
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 
-    /* Nous récupérons les informations passées soit dans le fichier "demandePublished.php" ou "fournisseur.php" dans la balise <a> et l'attribut "href"  
+    /* Nous récupérons les informations passées soit dans le fichier "client.php" ou "fournisseur.php" dans la balise <a> et l'attribut "href"  
     Les informations sont récupéré avec variable superglobale $_GET   */
     if(isset($_GET['demande_id']) && !empty($_GET['demande_id']))
     {
@@ -22,8 +22,17 @@
     }
     else
     {
+        if($_SESSION['role']=='client')
+        {
+            $page='client.php';
+        }
+        elseif($_SESSION['role']=='fournisseur')
+        {
+            $page='fournisseur.php';
+        }
+
         echo "<h4> Veuillez indiquer le numéro de demande ! </h4>";
-        header("refresh:2; url=demandePublished.php"); 
+        header("refresh:2; url=$page"); 
         exit;
     }  
 ?>
@@ -51,6 +60,34 @@
     </head>
 
     <body>
+        <!-- PAGE HEAD -->        
+        <?php
+            if($_SESSION['role']=='client')
+            {
+                if (file_exists("header_client.php"))
+                {
+                    include("header_client.php");
+                }
+                else
+                {
+                    echo "file 'header_client.php' n'existe pas";
+                }
+            }
+            elseif($_SESSION['role']=='fournisseur')
+            {
+                if (file_exists("header_fournisseur.php"))
+                {
+                    include("header_fournisseur.php");
+                }
+                else
+                {
+                    echo "file 'header_fournisseur.php' n'existe pas";
+                }
+            }
+        ?>
+
+
+        <!-- PAGE CONTENT -->
         <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
             <form action="#"  method="#">   
 <?php 
@@ -73,7 +110,7 @@
                 <br>
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label> Description </label>
-                    <textarea class="form-control" rows="10" style="resize:none" readonly>
+                    <textarea class="form-control text-left" rows="10" style="resize:none; " readonly>
                         <?php echo $row->demande_description;?>
                     </textarea>
                 </div>
@@ -83,10 +120,14 @@
                     <input type="number" class="form-control" value="<?php echo $row->demande_budget;?>" readonly>
                 </div>
 <?php
+            /* Si l'utilisateur est un client (pas fournisseur) on lui montre certain informations supplémantaires :
+            1. Equipe de demande;
+            2. Date création de la demande;
+            3. Date modification de la demande.   */
             if($_SESSION['role']=="client")
             {
 ?>
-                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label> Équipe </label>
                     <input type="text" class="form-control" name="budget" value="<?php echo $row->demande_equipe;?>" readonly>
                 </div>
@@ -115,40 +156,35 @@
             </form>
             <br>
 
-
-            <!-- Les boutons Répondre, Déconnexion et Retour  -->
-            <div style="text-align:center; margin:10px 0 15px 0"  id="buttons">
 <?php
-                if($_SESSION['role']=="fournisseur")
-                {
-?>                  <!-- bouton Répondre -->
-                    <a href="#title"> <input type="button" id="reponse" value="Répondre" class="btn btn-success mr-3"> </a>
-<?php
-                }
-?>
-                <!-- bouton Déconnexion -->
-                <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
-<?php
-                if($_SESSION['role']=='client')
-                {
-                    $retour = 'demandePublished.php';
-                }
-                else if($_SESSION['role']=='fournisseur')
-                {
-                    $retour = 'fournisseur.php';
-                }
-?>              <!-- bouton Retour -->
-                <a href="<?php echo $retour;?>"> <button class="btn btn-primary"> Retour </button> </a> 
-            </div>    
-            
-
-            <!-- Réponse de fournisseur -->
-<?php
-            if($_SESSION['role']=="fournisseur")
+            /* Les boutons Modifier, Publier et Supprimer  
+            Seul la proprietaire de la demande (client qui a crée la demande) peut la modifier, publier ou supprimer :  */
+            if($_SESSION['role']=="client" && $row->user_email==$_SESSION['email'])
             {
 ?>
-                <form action="script_reponse.php" method="POST" style="display:none" id="answer">
-                    <input type="hidden" name="user_email" value="<?php echo $row->user_email?>"> 
+                <div style="text-align:center; margin:10px 0 15px 0"  id="buttons">
+                    <a href="demandeModifier.php?demande_id=<?php echo $row->demande_id;?>"> 
+                        <button class="btn btn-primary mr-3" type="button" onclick="modifier()"> Modifier </button> 
+                    </a> 
+                    
+                    <a href="script_demandePublier.php?demande_id=<?php echo $row->demande_id;?>"> 
+                        <button class="btn btn-success mr-3" type="button" onclick="publier()"> Publier </button> 
+                    </a>  
+                    
+                    <a href="script_demandeSupprimer.php?demande_id=<?php echo $row->demande_id ?>"> 
+                        <input class="btn btn-danger" type="button" onclick="supprimer()" value="Supprimer"> 
+                    </a> 
+                </div> 
+<?php
+            }            
+            else if($_SESSION['role']=="fournisseur")
+            {
+                /* Bouton Répondre 
+                Seul le fournisseur peut écrire la reponse à la demande du client     */
+                echo '<center> <input type="button" id="repondre" value="Répondre" class="btn btn-success mr-3"> </center>';
+?>
+                <form action="script_reponse.php" method="POST" style="display:none; margin-top:20px;" id="answer">
+                    <input type="hidden" name="user_email" value="<?php echo $row->user_email?>">   
                     <input type="hidden" name="demande_id" value="<?php echo $demande_id?>"> 
                     
                     <h5> Votre réponse </h5>
@@ -156,7 +192,7 @@
                         <label for="title"> Titre <sup>*</sup> </label> 
                         <input type="text" class="form-control" id="title" name="reponse_titre" style="width:90%" required>
                     </div>
-                    <textarea class="form-control" name="reponse_description" rows="10" style="width:90%; resize:none" required> </textarea>
+                    <textarea class="form-control text-left" name="reponse_description" rows="10" style="width:90%; resize:none" required> </textarea>
                     <br>
                     <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                         <label for="prix"> Votre tarif proposé : <sup>*</sup> </label> 
@@ -168,103 +204,149 @@
                         <input class="btn btn-danger" type="button" id="cancel" value="Annuler"> 
                     </center>
                 </form>
-                <br><br><br>
+                <br><br>
 <?php
             }
 ?>
-
-
-            <h5> Réponses publiées : </h5> 
-            <div class="table-responsive">
-                <table class="table table-striped" style="margin-bottom:2%;">
-                    <thead>
-                        <tr>
-                            <th scope="col"> Titre </th>
-                            <th scope="col"> Société </th>
-                            <th scope="col"> Publiée </th>
-                            <th scope="col"> Détail </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <!-- Code PHP -->
+            <br>
+            <h5> Réponses : </h5> 
 <?php
-                        // Connéxion à la base de données 
-                        require "connection_bdd.php";
-                        
-                        if($_SESSION['role']=="client")
-                        {
-                            // On construit la requête SELECT : 
-                            $result = $db->prepare("SELECT * FROM reponse WHERE demande_id=:demande_id");
-                            
-                            // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-                            $result->bindValue(':demande_id', $demande_id);
-                        }
-                        else if($_SESSION['role']=="fournisseur")
-                        {
-                            // On construit la requête SELECT : 
-                            $result = $db->prepare("SELECT * FROM reponse WHERE user_email=:user_email AND demande_id=:demande_id");
-                        
-                            // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-                            $result->bindValue(':user_email', $_SESSION['email']);
-                            $result->bindValue(':demande_id', $demande_id);
-                        }
+            // Connéxion à la base de données :
+            require "connection_bdd.php";
+            
+            if($_SESSION['role']=="client")
+            {
+                // On construit la requête SELECT : 
+                $result = $db->prepare("SELECT * FROM reponse WHERE demande_id=:demande_id");
+                
+                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+                $result->bindValue(':demande_id', $demande_id);
+            }
+            else if($_SESSION['role']=="fournisseur")
+            {
+                // On construit la requête SELECT : 
+                $result = $db->prepare("SELECT * FROM reponse WHERE user_email=:user_email AND demande_id=:demande_id");
+            
+                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+                $result->bindValue(':user_email', $_SESSION['email']);
+                $result->bindValue(':demande_id', $demande_id);
+            }
 
-                        // On exécute la requête :
-                        $result->execute();
+            // On exécute la requête :
+            $result->execute();
 
-                        // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
-                        $nbLigne = $result->rowCount(); 
-                        
-                        if ($nbLigne >= 1)
-                        {
-                            while ($row = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $row                                            
-                            { 
-                                if(!empty($row))
-                                {  
+            // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
+            $nbLigne = $result->rowCount(); 
+            
+            if ($nbLigne >= 1)
+            {
+                while ($row = $result->fetch(PDO::FETCH_OBJ))  // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $row                                            
+                { 
 ?>                          
-                                    <tr>
-                                        <td> <?php echo $row->reponse_titre;?> </td>
-                                        <td> <?php echo $row->reponse_societe;?> </td>
+                    <div class="table-responsive">
+                        <table class="table table-striped" style="margin-bottom:2%;">
+                            <thead>
+                                <tr>
+                                    <th scope="col"> Titre </th>
+                                    <th scope="col"> Société </th>
+                                    <th scope="col"> Publiée </th>
+                                    <th scope="col"> Détail </th>
+                                </tr>
+                            </thead>
 
-                                        <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
-                                        Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format :   -->
-                                        <?php $date = new DateTime($row->reponse_publication);?>
-                                        <td> <?php echo $date->format("d/m/Y H:\hi");?> </td>
+                            <tbody>
+                                <tr>
+                                    <td> <?php echo $row->reponse_titre;?> </td>
+                                    <td> <?php echo $row->reponse_societe;?> </td>
 
-                                        <!-- On envoie en URL (méthode GET) le paramètre reponse_id vers la page reponseDetail.php :  -->
-                                        <td> <a href="reponseDetail.php?reponse_id=<?php echo $row->reponse_id;?>"> Afficher </a> </td>
-                                    </tr>
+                                    <!-- Ici on a besoin d'afficher une date qui provient de la base de données et 
+                                    qui est dans un format MySql: 2018-11-16.
+                                    Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format :   -->
+                                    <?php $date = new DateTime($row->reponse_publication);?>
+                                    <td> <?php echo $date->format("d/m/Y H:\hi");?> </td>
+
+                                    <!-- On envoie en URL (méthode GET) le paramètre reponse_id vers la page reponseDetail.php :  -->
+                                    <td> <a href="reponseDetail.php?reponse_id=<?php echo $row->reponse_id;?>"> Afficher </a> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 <?php
-                                }
-                                else
-                                {
-                                    echo "<h5> Il n'y a aucunes réponses pour cette demande! </h5>";   
-                                }
-                            }
-                        }
+                }
+            }
+            else
+            {
+                echo "<h6 style='color:red'> Il n'y a aucunes réponses pour cette demande! </h6>";   
+            }
 
-                        // Libèration la connection au serveur de BDD:
-                        $result->closeCursor();
-?>
-                    </tbody>
-                </table>
-            </div>
+            // Libèration la connection au serveur de BDD:
+            $result->closeCursor();
+?>            
         </div>
 
 
 
-        <!-- JQUERY Code -->
-        <script>
-            $(function(){
-                $('#reponse').click(function(){
+        <!-- Javascript Codes -->
+        <script>  
+
+            function modifier()
+            { 
+                //Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
+                var resultat = confirm("Etes-vous certain de vouloir modifier cette demande ?");
+
+                // alert("retour :" + resultat);
+
+                if (resultat==false)
+                {
+                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette demande!");
+
+                    //annule l'évènement par défaut ... SUBMIT vers "demandeModifier.php"
+                    event.preventDefault();    
+                }
+            }
+
+
+            function publier()
+            {
+                var resultat = window.confirm("Êtes-vous sûr de vouloir publier votre demande?")
+
+                if (resultat==false)
+                {
+                    alert("Vous avez annulé publication!");
+
+                    //annule l'évènement par défaut ... SUBMIT vers "script_demandePublier.php"
+                    event.preventDefault();    
+                }
+            }
+
+            
+            function supprimer()
+            {
+                var resultat = window.confirm("Êtes-vous sûr de vouloir supprimer votre demande?")
+
+                if (resultat==false)
+                {
+                    alert("Vous avez annulé suppression!");
+
+                    //annule l'évènement par défaut ... SUBMIT vers "script_demandeSupprimer.php"
+                    event.preventDefault();    
+                }
+            }
+     
+
+
+            // JQUERY Codes 
+            $(document).ready(function()
+            {
+                $('#repondre').click(function(){
                     $('#answer').show(),
-                    $('#buttons').hide()
+                    $('#repondre').hide()
                 });
+
 
                 $('#cancel').click(function(){
                     $('#answer').hide(),
-                    $('#buttons').show()
+                    $('#repondre').show()
                 })
             })
         </script>

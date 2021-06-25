@@ -8,7 +8,7 @@
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 ?>
@@ -23,7 +23,7 @@
         <!-- Responsive design -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title> Équipes sauvegardées </title>
+        <title> Équipes crées </title>
 
         <!-- Bootstrap CDN link -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -36,34 +36,32 @@
     </head>
 
     <body>
+        <!-- PAGE HEAD -->        
+        <?php
+            if (file_exists("header_client.php"))
+            {
+                include("header_client.php");
+            }
+            else
+            {
+                echo "file 'header_client.php' n'existe pas";
+            }
+        ?>
+
+        <!-- PAGE CONTENT -->
         <div class="container">
             <br><br>
-            <center> <h3> Équipes sauvegardées </h3> </center> 
-            <br> <br>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col"> Nom </th>
-                            <th scope="col"> Propriétaire </th>
-                            <th scope="col"> Membres </th>
-                            <th scope="col"> Crée </th>
-                            <th scope="col"> Modifiée </th>
-                            <th scope="col" colspan="2"> <center> Action </center> </th> 
-                        </tr>
-                    </thead>
-                    
-                    <tbody>
-                    <!-- Code PHP -->
+            <center> <h3> Mes équipes crées </h3> </center> 
+            <br><br><br>
 <?php
                     // Connéxion à la base de données 
                     require "connection_bdd.php";
                     
                     // On construit la requête SELECT : 
-                    $requete = $db->prepare ("SELECT * FROM equipe WHERE user_email=:email");
+                    $requete = $db->prepare ("SELECT * FROM equipe WHERE user_email=:user_email");
 
                     // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
-                    $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
+                    $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
 
                     //On exécute la requête
 	                $requete->execute();
@@ -76,42 +74,65 @@
                         while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
                         {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
-                            <tr>
-                                <td>  <?php echo $row->equipe_nom;?>  </td>
-                                <td>  <?php echo $row->equipe_proprietaire;?>  </td>
-                                <td>  <?php echo $row->equipe_membres;?>  </td> 
-                                <td>  <?php echo $row->equipe_creation;?>  </td>
-                                <td>  <?php echo $row->equipe_modification;?>  </td>
-                                <td> 
-                                    <a href="equipeModifier.php?equipe_id=<?php echo $row->equipe_id;?>"> 
-                                        <button class="btn btn-secondary" type="button" onclick="Modifier()"> Modifier </button> 
-                                    </a> 
-                                </td>
-                                <td>   
-                                    <a href="script_equipeSupprimer.php?equipe_id=<?php echo $row->equipe_id;?>"> 
-                                        <button class="btn btn-danger" type="button" onclick="Supprimer()"> Supprimer </button> 
-                                    </a>  
-                                </td>
-                            </tr>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col"> Nom </th>
+                                            <th scope="col"> Propriétaire </th>
+                                            <th scope="col"> Membres </th>
+                                            <th scope="col"> Crée </th>
+                                            <th scope="col"> Modifiée </th>
+                                            <th scope="col" colspan="2"> <center> Action </center> </th> 
+                                        </tr>
+                                    </thead>
+                                    
+                                    <tbody>
+                                        <tr>
+                                            <td>  <?php echo $row->equipe_nom;?>  </td>
+                                            <td>  <?php echo $row->equipe_proprietaire;?>  </td>
+                                            <td>  <?php echo $row->equipe_membres;?>  </td> 
+                                            <td>  <?php echo $row->equipe_creation;?>  </td>
+                                            <td>  <?php echo $row->equipe_modification;?>  </td>
+                                            <td> 
+                                                <a href="equipeModifier.php?equipe_id=<?php echo $row->equipe_id;?>"> 
+                                                    <button class="btn btn-secondary" type="button" onclick="Modifier()"> Modifier </button> 
+                                                </a> 
+                                            </td>
+                                            <td>   
+                                                <a href="script_equipeSupprimer.php?equipe_id=<?php echo $row->equipe_id;?>"> 
+                                                    <button class="btn btn-danger" type="button" onclick="Supprimer()"> Supprimer </button> 
+                                                </a>  
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 <?php
                         }
-                        
-                        //Libèration la connection au serveur de BDD
-                        $requete->closeCursor();
                     }
-?>    
-                    </tbody>
-                </table>
+                    else
+                    {
+                        echo "<center> <h5 style='color:red'> Pour l'instant il y a aucune équipe crée ! </h5> </center> <br>";
+                        echo '<center> 
+                                Pour créer une équipe veuillez cliquer : <a href="equipeNew.php"> Nouvelle équipe </a>
+                              <center>';
+                    }
 
-                <div style="text-align:center; margin-top:150px">
-                    <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
-                    <a href="client.php"> <button class="btn btn-primary"> Retour </button> </a> 
-                </div>
+                    // Libèration la connection au serveur de BDD
+                    $requete->closeCursor();
+?>    
+                    
+
+            <div style="text-align:center; margin-top:150px">
+                <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
+                <a href="client.php"> <button class="btn btn-primary"> Retour </button> </a> 
             </div>
         </div>
 
 
 
+        <!-- Javascript codes -->
         <script>  
 
             function Modifier()

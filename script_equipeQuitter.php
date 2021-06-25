@@ -1,6 +1,6 @@
 <?php
      
-    // On récupérer le paramétre equipe_id transmit en GET par la page "equipeCreated.php" et on le met dans la variable $equipe_id :
+    // On récupérer le paramétre equipe_id transmit en GET par la page "equipeMember.php" et on le met dans la variable $equipe_id :
     if(isset($_GET['equipe_id']) && !empty($_GET['equipe_id']))
     {
         // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
@@ -11,7 +11,7 @@
         require "connection_bdd.php";
                         
         // On construit la requête DELETE avec la méthode prepare() sans injection SQL : 
-        $requete = $db->prepare("DELETE FROM equipe WHERE equipe_id=:equipe_id");
+        $requete = $db->prepare("SELECT * FROM equipe WHERE equipe_id=:equipe_id");
 
         // Association valeur au marqueur :email via méthode "bindValue()"
         $requete->bindValue(':equipe_id', $equipe_id, PDO::PARAM_INT);

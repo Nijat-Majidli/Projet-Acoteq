@@ -8,7 +8,7 @@
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 ?>
@@ -36,12 +36,25 @@
     </head>
 
     <body>
+        <!-- PAGE HEAD -->        
+        <?php
+            if (file_exists("header_client.php"))
+            {
+                include("header_client.php");
+            }
+            else
+            {
+                echo "file 'header_client.php' n'existe pas";
+            }
+        ?>
+
+        <!-- PAGE CONTENT -->
         <div class="container">
             <br>
             <h3> Créer une équipe </h3>
             <hr> <br>
 
-            <form action="script_equipe.php" method="POST" autocomplete="off">
+            <form action="script_equipeNew.php" method="POST" autocomplete="off">
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label for="team"> Nom d'équipe : </label> 
                     <input id="team" type="text" class="form-control" name="equipe_nom" required>
@@ -58,9 +71,11 @@
                         require ("connection_bdd.php");
 
                         // On construit la requête SELECT via la méthode prepare() pour éviter injection SQL : 
-                        $requete = $db->prepare("SELECT * FROM client WHERE client_siren = :client_siren");
+                        $requete = $db->prepare("SELECT * FROM users WHERE user_siren = :user_siren");
 
-                        $requete->bindValue(':client_siren', $_SESSION['user_siren'], PDO::PARAM_INT);
+                        /* Comme on veux choisir les utilisateurs qui travaillent dans la même société on utuilise user_siren, 
+                        car les utilisateurs travaillant dans la même société possede le même numéro de siren.       */ 
+                        $requete->bindValue(':user_siren', $_SESSION['user_siren'], PDO::PARAM_INT);
 
                         // On exécute la requête
                         $requete->execute();
@@ -74,7 +89,7 @@
                             {                       
 ?>
                                 <option> 
-                                    <?php echo $row->client_nom;?> <?php echo $row->client_prenom;?> (<?php echo $row->user_email;?>) 
+                                    <?php echo $row->user_nom;?> <?php echo $row->user_prenom;?> (<?php echo $row->user_email;?>) 
                                 </option>
 <?php
                             }
@@ -90,7 +105,7 @@
 
                  <!-- Les boutons <Valider> et <Annuler> -->
                  <div style="text-align: center; margin-top: 40px;">
-                    <button type="submit" class="btn btn-success" id="bouton_valider"> Valider </button>
+                    <button type="submit" class="btn btn-success mr-3" id="bouton_valider"> Valider </button>
                     <a href="client.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
                 </div>
             </form>   

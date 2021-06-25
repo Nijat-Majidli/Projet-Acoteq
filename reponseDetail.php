@@ -1,14 +1,14 @@
 <?php 
     session_start();  
     /* ATTENTION
-    Il est impératif d'utiliser la fonction session_start() au début de chaque fichier PHP dans lequel on manipulera cette 
-    variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
-    avoir encore été écrit/envoyé à la page web.   */
+    Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction au début de chaque 
+    fichier PHP dans lequel on utilisera la variable superglobale $_SESSION et avant tout envoi de requêtes HTTP, c'est-à-dire 
+    avant tout code HTML (donc avant la balise <!DOCTYPE> ).  */  
 
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role']))
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 
@@ -22,8 +22,17 @@
     }
     else
     {
+        if($_SESSION['role']=='client')
+        {
+            $page='client.php';
+        }
+        elseif($_SESSION['role']=='fournisseur')
+        {
+            $page='fournisseur.php';
+        }
+
         echo "<h4> Veuillez indiquer le numéro de reponse ! </h4>";
-        header("refresh:2; url=demandeDetail.php"); 
+        header("refresh:2; url=$page"); 
         exit;
     }  
 ?>
@@ -51,6 +60,34 @@
     </head>
 
     <body>
+        <!-- PAGE HEAD -->        
+        <?php
+            if($_SESSION['role']=='client')
+            {
+                if (file_exists("header_client.php"))
+                {
+                    include("header_client.php");
+                }
+                else
+                {
+                    echo "file 'header_client.php' n'existe pas";
+                }
+            }
+            elseif($_SESSION['role']=='fournisseur')
+            {
+                if (file_exists("header_fournisseur.php"))
+                {
+                    include("header_fournisseur.php");
+                }
+                else
+                {
+                    echo "file 'header_fournisseur.php' n'existe pas";
+                }
+            }
+        ?>
+
+
+        <!-- PAGE CONTENT -->
         <div class="container p-4 mt-3 col-7 bg-light text-dark">
             <form action="#"  method="#">   
 <?php 
@@ -59,12 +96,10 @@
                                     
                 // On construit la requête SELECT : 
                 $result = $db->prepare("SELECT * FROM reponse WHERE reponse_id=:reponse_id");
-                
-                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-                $result->bindValue(':reponse_id', $reponse_id);
 
-                // On exécute la requête :
-                $result->execute();
+                /* Association la valeur au marqueur et execution de requête:
+                L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement"     */
+                $result->execute(array(':reponse_id' => $reponse_id));
 
                 // Si la requête renvoit un seul et unique résultat, on ne fait pas de boucle, ici c'est le cas: 
                 $row = $result->fetch(PDO::FETCH_OBJ);
@@ -104,106 +139,182 @@
                     <input type="text" class="form-control" value="<?php echo $row->reponse_proprietaire;?>" readonly>
                 </div>
             </form>
-
-            <!-- Les boutons Commenter, Déconnexion et Retour  -->
-            <div style="text-align:center; margin-top:45px" id="buttons">
-                <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
+            <br>
 <?php
-                    if($_SESSION['role']=='client')
-                    {
-                        $retour = 'demandePublished.php';
-                    }
-                    else if($_SESSION['role']=='fournisseur')
-                    {
-                        $retour = 'fournisseur.php';
-                    }
+            /* Les boutons Modifier, Supprimer et Déconnexion  
+            Seul la proprietaire de la demande (client qui a crée la demande) peut la modifier, publier ou supprimer :  */
+            if($_SESSION['role']=="fournisseur" && $row->user_email==$_SESSION['email'])
+            {
 ?>
-                    <a href="<?php echo $retour;?>"> <button class="btn btn-primary"> Retour </button> </a> 
-            </div>
-            <br><br>
+                <div style="text-align:center"  id="buttons">
+                    <a href="reponseModifier.php?demande_id=<?php echo $row->reponse_id;?>"> 
+                        <button class="btn btn-primary mr-3" type="button" onclick="modifier()"> Modifier </button> 
+                    </a> 
+                    
+                    <a href="script_reponseSupprimer.php?demande_id=<?php echo $row->reponse_id ?>"> 
+                        <input class="btn btn-danger mr-3" type="button" onclick="supprimer()" value="Supprimer"> 
+                    </a> 
 
-            <h5> Commentaires publiés : </h5>
+                    <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a>
+                </div> 
+<?php
+            }
+?>
+<br><br>
+
+            <h5> Commentaires : </h5>
             <hr>
+<?php
+            // On construit la requête SELECT : 
+            if($_SESSION['role']=="client")
+            {
+                $result = $db->prepare("SELECT * FROM commentaire WHERE reponse_id=:reponse_id");
+                
+                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+                $result->bindValue(':reponse_id', $reponse_id);
+            }
+            else if($_SESSION['role']=="fournisseur")
+            {
+                $result = $db->prepare("SELECT * FROM commentaire WHERE reponse_id=:reponse_id AND comment_visibilite=:comment_visibilite");
+                
+                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+                $result->bindValue(':reponse_id', $reponse_id);
+                $result->bindValue(':comment_visibilite', 'visible');
+            }   
 
-            <!-- Commentaire à écrire -->
+            // On exécute la requête :
+            $result->execute();
+
+            // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
+            $nbLigne = $result->rowCount(); 
+                    
+            if ($nbLigne >= 1)
+            {
+                // On crée un tableau (array) dans lequel on va enregistrer liste des emails clients:
+                $liste_emailClient = array();
+
+                while ($ligne = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $ligne                                            
+                {    
+                    /* Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
+                    Pour formater cette date, on va utiliser l'objet de la classe DateTime() et la méthode format():        */
+                    $date = new DateTime($ligne->comment_publication);
+                    
+                    echo "Le ".$date->format("d/m/Y H:\hi")."<br>".$ligne->comment_proprietaire." de la société ".$ligne->comment_societe." a écrit: <br> <h6>".$ligne->comment_description."</h6> <br>";
+                    
+                    if(!in_array($ligne->user_email, $liste_emailClient))
+                    {
+                        array_push($liste_emailClient, $ligne->user_email);
+                    }
+                }
+
+                $mail="";
+
+                // Avec la fonction implode() on mets les éléments du tableau $liste_emailClient dans le string $mail:
+                $mail = implode(", ", $liste_emailClient);  // La fonction implode() transforme le tableau (array) à une chaîne de caractères (string).
+            }
+            else
+            {
+                echo "<h6 style='color:red'> Il n'y a aucuns commentaires pour cette réponse! </h6> <br>";  
+            } 
+
+            // Libèration la connection au serveur de BDD:
+            $result->closeCursor();
+?>
+                
             <form action="script_comment.php" method="POST">
                 <input type="hidden" name="reponse_id"  value="<?php echo $row->reponse_id;?>">
                 <input type="hidden" name="fournisseur_email"  value="<?php echo $row->user_email;?>">
+
 <?php
-                // On construit la requête SELECT : 
-                if($_SESSION['role']=="client")
+                if(isset($mail))
                 {
-                    $result = $db->prepare("SELECT * FROM commentaire WHERE reponse_id=:reponse_id");
-                    // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-                    $result->bindValue(':reponse_id', $reponse_id);
+                  echo '<input type="hidden" name="client_email"  value="<?php echo $mail;?>">';
                 }
-                else if($_SESSION['role']=="fournisseur")
-                {
-                    $result = $db->prepare("SELECT * FROM commentaire WHERE reponse_id=:reponse_id AND comment_visibilite=:comment_visibilite");
-                    // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-                    $result->bindValue(':reponse_id', $reponse_id);
-                    $result->bindValue(':comment_visibilite', 'visible');
-                }   
-
-                // On exécute la requête :
-                $result->execute();
-
-                // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
-                $nbLigne = $result->rowCount(); 
-                        
-                if ($nbLigne >= 1)
-                {
-                    while ($ligne = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $ligne                                            
-                    {
-                        if(!empty($ligne))
-                        {
-                            /* Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
-                            Pour formater cette date, on va utiliser l'objet de la classe DateTime() et la méthode format():        */
-                            $date = new DateTime($ligne->comment_publication);
-                            
-                            echo "Le ".$date->format("d/m/Y H:\hi")." ".$ligne->comment_proprietaire." de la société ".$ligne->comment_societe." a écrit: <br> <h6>".$ligne->comment_description."</h6>";
 ?>
-                            <b onclick='show("<?php echo $ligne->comment_id;?>")' style='color:darkblue; cursor:pointer'> RÉPONDRE </b>  
-                            <br><br>
-                            <input type="hidden" name="client_email"  value="<?php echo $ligne->user_email;?>">
 
-                            <div style="margin-bottom:5%;"  class="hide"  id="<?php echo $ligne->comment_id;?>">  
-                                <textarea class="form-control" name="comment" rows="10" cols="70" style="resize:none" required> </textarea>
+                <b onclick="show()" style='color:darkblue; cursor:pointer' class='respond'> COMMENTER </b>  
+        
+                <div style="margin-bottom:5%;"  class="hide">  
+                    <h5> Votre commentaire : </h5>
+                    <textarea class="form-control text-left" name="comment" rows="10" cols="70" style="resize:none" required> </textarea>
 <?php                
-                                if($_SESSION['role']=="client")
-                                {
+                    if($_SESSION['role']=="client")
+                    {
 ?>
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="customCheck1" name="visibilite" value="visible">
-                                        <label class="custom-control-label" for="customCheck1"> Visible par le fournisseur </label>
-                                    </div>
+                        <div class="custom-control custom-checkbox mt-2">
+                            <input type="checkbox" class="custom-control-input" id="customCheck1" name="visibilite" value="visible">
+                            <label class="custom-control-label" for="customCheck1"> Visible par le fournisseur </label>
+                        </div>
 <?php
-                                 }
-?>
-                                <br>
-                                <center>
-                                    <div>
-                                        <button class="btn btn-success mr-3" type="submit"> Valider </button>
-                                        <input class="btn btn-warning mr-3" type="reset" value="Effacer"> 
-                                        <input class="btn btn-danger" type="button" onclick="hide('<?php echo $ligne->comment_id;?>')" value="Annuler"> 
-                                    </div>
-                                </center>
-                            </div>
-<?php
-                        }   
-                        else
-                        {
-                            echo "<h5> Il n'y a aucuns commentaires pour cette réponse! </h5>";   
-                        }
                     }
-                }
-                    
-                // Libèration la connection au serveur de BDD:
-                $result->closeCursor();
 ?>
+                    <br>
+                    <center>
+                        <div>
+                            <button class="btn btn-success mr-3" type="submit"> Valider </button>
+                            <input class="btn btn-warning mr-3" type="reset" value="Effacer"> 
+                            <input class="btn btn-danger" type="button" onclick="hide()" value="Annuler"> 
+                        </div>
+                    </center>
+                </div>
             </form>
-            <br><br>
         </div>
+
+
+
+        <!-- Javascript Codes -->
+        <script>  
+
+            function modifier()
+            { 
+                //Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
+                var resultat = confirm("Etes-vous certain de vouloir modifier cette réponse ?");
+
+                // alert("retour :" + resultat);
+
+                if (resultat==false)
+                {
+                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette réponse !");
+
+                    //annule l'évènement par défaut ... SUBMIT vers "reponseModifier.php"
+                    event.preventDefault();    
+                }
+            }
+
+
+            function supprimer()
+            {
+                var resultat = window.confirm("Êtes-vous sûr de vouloir supprimer votre réponse?")
+
+                if (resultat==false)
+                {
+                    alert("Vous avez annulé suppression !");
+
+                    //annule l'évènement par défaut ... SUBMIT vers "script_reponseSupprimer.php"
+                    event.preventDefault();    
+                }
+            }
+
+            
+            // JQuery code 
+            $(document).ready(function()
+            {
+                $('.hide').hide();
+            });
+
+            function show(){
+                $('.hide').show(),
+                $('.respond').hide(),
+                $('#buttons').hide()
+            };
+
+            function hide(){
+                $('.hide').hide(),
+                $('.respond').show(),
+                $('#buttons').show()
+            }
+        </script>
+
 
 
 
@@ -211,26 +322,6 @@
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
-    
-
-
-        <!-- JQuery code -->
-        <script>
-            $(document).ready(function()
-            {
-                $('.hide').hide();
-            });
-
-            function show(param){
-                $('#'+param).show(),
-                $('#buttons').hide()
-            };
-
-            function hide(param){
-                $('#'+param).hide(),
-                $('#buttons').show()
-            }
-        </script>
        
     </body>
 </html>

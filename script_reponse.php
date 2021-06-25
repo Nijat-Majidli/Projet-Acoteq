@@ -32,11 +32,11 @@
 
             // Construction de la requête INSERT avec la méthode prepare() sans injection SQL
             $requete = $db->prepare("INSERT INTO reponse (reponse_titre, reponse_proprietaire, reponse_societe, reponse_description, 
-            reponse_budget, reponse_publication, reponse_notification, fournisseur_raison_sociale, demande_id, user_id, user_email) VALUES(:reponse_titre, 
-            (SELECT CONCAT(fournisseur_nom, ' ', fournisseur_prenom) AS reponse_proprietaire FROM fournisseur WHERE user_email=:email), 
-            (SELECT fournisseur_raison_sociale FROM fournisseur WHERE user_email=:email), :reponse_description, :reponse_budget, 
-            :reponse_publication, :reponse_notification, (SELECT fournisseur_raison_sociale FROM fournisseur WHERE user_email=:email), 
-            :demande_id, (SELECT user_id FROM fournisseur WHERE user_email=:email), (SELECT user_email FROM fournisseur WHERE user_email=:email))");
+            reponse_budget, reponse_publication, reponse_notification, demande_id, user_id, user_email) 
+            VALUES(:reponse_titre, (SELECT CONCAT(user_nom, ' ', user_prenom) AS reponse_proprietaire FROM users WHERE user_email=:user_email), 
+            (SELECT user_societe AS reponse_societe FROM users WHERE user_email=:user_email), :reponse_description, :reponse_budget, 
+            :reponse_publication, :reponse_notification, :demande_id, (SELECT user_id FROM users WHERE user_email=:user_email), 
+            (SELECT user_email FROM users WHERE user_email=:user_email))");
             
 
             // Association des valeurs aux marqueurs via la méthode "bindValue()"
@@ -51,7 +51,7 @@
 
             $requete->bindValue(':reponse_notification', 'envoyé', PDO::PARAM_STR);
             $requete->bindValue(':demande_id', $demande_id, PDO::PARAM_STR);
-            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
+            $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
 
             // Exécution de la requête
             $requete->execute();
@@ -60,7 +60,7 @@
             $requete->closeCursor();
 
             // Avec la méthode mail() on envoie un email de notification au client pour lui dire que le fournisseur a répondu à sa demande. 
-            mail($user_email, "Nouvelle réponse", "Bonjour, Une nouvelle réponse a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+            mail($user_email, "Nouvelle réponse", "Bonjour, Une nouvelle réponse a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
         
             echo '<h4> Votre réponse a été publié avec succès! </h4> ';
             header("refresh:2; url=fournisseur.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page fournisseur.php

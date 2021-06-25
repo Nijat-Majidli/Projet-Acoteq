@@ -8,7 +8,7 @@ CREATE TABLE Users(
    user_id INT NOT NULL AUTO_INCREMENT,   
    user_nom VARCHAR(255) NOT NULL,
    user_prenom VARCHAR(255) NOT NULL,
-   user_raison_sociale VARCHAR(255) NOT NULL,
+   user_societe VARCHAR(255) NOT NULL,
    user_siren INT NOT NULL,
    user_role VARCHAR(255) NOT NULL,
    user_adresse VARCHAR(255) NOT NULL,
@@ -26,14 +26,16 @@ CREATE TABLE Users(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-CREATE TABLE Client(
-   user_id INT,   
-   user_email VARCHAR(255),
-   client_nom VARCHAR(255) NOT NULL,
-   client_prenom VARCHAR(255) NOT NULL,
-   client_raison_sociale VARCHAR(255) NOT NULL,
-   client_siren INT NOT NULL,
-   PRIMARY KEY(user_id, user_email), 
+CREATE TABLE Equipe(
+   equipe_id INT NOT NULL AUTO_INCREMENT,
+   equipe_nom VARCHAR(255) NOT NULL,
+   equipe_proprietaire VARCHAR(255) NOT NULL,
+   equipe_membres TEXT,
+   equipe_creation DATETIME NOT NULL,
+   equipe_modification DATETIME,
+   user_id INT NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
+   PRIMARY KEY(equipe_id),
    FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -44,7 +46,7 @@ CREATE TABLE Demande(
    demande_societe VARCHAR(255) NOT NULL,
    demande_titre VARCHAR(255) NOT NULL,
    demande_description TEXT NOT NULL,
-   demande_budget INT,
+   demande_budget INT NOT NULL,
    demande_creation DATETIME NOT NULL,
    demande_modification DATETIME,
    demande_publication DATETIME,
@@ -56,19 +58,7 @@ CREATE TABLE Demande(
    user_email VARCHAR(255) NOT NULL,
    PRIMARY KEY(demande_id),
    FOREIGN KEY(equipe_id) REFERENCES Equipe(equipe_id) ON DELETE CASCADE,
-   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) ON DELETE CASCADE 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-CREATE TABLE Fournisseur(
-   user_id INT,
-   user_email VARCHAR(255),
-   fournisseur_nom VARCHAR(255) NOT NULL,
-   fournisseur_prenom VARCHAR(255) NOT NULL,
-   fournisseur_raison_sociale VARCHAR(255) NOT NULL,
-   fournisseur_siren INT NOT NULL,
-   PRIMARY KEY(user_id, user_email),
-   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) ON DELETE CASCADE
+   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) ON DELETE CASCADE 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -81,12 +71,12 @@ CREATE TABLE Reponse(
    reponse_budget INT NOT NULL,
    reponse_publication DATETIME NOT NULL,
    reponse_notification VARCHAR(255),
-   demande_id INT NOT NULL,
    user_id INT NOT NULL,
-   user_email VARCHAR(255) NOT NULL,   
+   user_email VARCHAR(255) NOT NULL,
+   demande_id INT NOT NULL,   
    PRIMARY KEY(reponse_id),
-   FOREIGN KEY(demande_id) REFERENCES Demande(demande_id) ON DELETE CASCADE,
-   FOREIGN KEY(user_id, user_email) REFERENCES Fournisseur(user_id, user_email) ON DELETE CASCADE
+   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) ON DELETE CASCADE,
+   FOREIGN KEY(demande_id) REFERENCES Demande(demande_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -103,21 +93,7 @@ CREATE TABLE Commentaire(
    user_email_1 VARCHAR(255) NOT NULL,
    reponse_id INT NOT NULL,
    PRIMARY KEY(comment_id),
-   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) ON DELETE CASCADE,
-   FOREIGN KEY(user_id_1, user_email_1) REFERENCES Fournisseur(user_id, user_email) ON DELETE CASCADE,
+   FOREIGN KEY(user_id, user_email) REFERENCES Users(user_id, user_email) ON DELETE CASCADE,
+   FOREIGN KEY(user_id_1, user_email_1) REFERENCES Users(user_id, user_email) ON DELETE CASCADE,
    FOREIGN KEY(reponse_id) REFERENCES Reponse(reponse_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-CREATE TABLE Equipe(
-   equipe_id INT NOT NULL AUTO_INCREMENT,
-   equipe_nom VARCHAR(255) NOT NULL,
-   equipe_proprietaire VARCHAR(255) NOT NULL,
-   equipe_membres TEXT,
-   equipe_creation DATETIME NOT NULL,
-   equipe_modification DATETIME,
-   user_id INT NOT NULL,
-   user_email VARCHAR(255) NOT NULL,
-   PRIMARY KEY(equipe_id),
-   FOREIGN KEY(user_id, user_email) REFERENCES Client(user_id, user_email) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

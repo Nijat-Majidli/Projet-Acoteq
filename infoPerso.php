@@ -8,7 +8,7 @@
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role']))
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 ?>
@@ -23,7 +23,7 @@
         <!-- Responsive design -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title> Demandes sauvegardées </title>
+        <title> Infos personnelles </title>
 
         <!-- Bootstrap CDN link -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -37,88 +37,130 @@
 
 
     <body>
-        <div class="container">
-            <center> <h3> Mes infos personnelles </h3> </center> 
-            <br> <br>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col"> Nom </th>
-                            <th scope="col"> Prénom </th>
-                            <th scope="col"> Raison Sociale </th>
-                            <th scope="col"> SIREN </th>
-                            <th scope="col"> Adresse </th>
-                            <th scope="col"> Code postal </th>
-                            <th scope="col"> Ville </th>
-                            <th scope="col"> Pays </th>
-                            <th scope="col"> Date inscription </th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody>
-                    <!-- Code PHP -->
-<?php
-                    // Connéxion à la base de données 
-                    require "connection_bdd.php";
-                    
-                    // On construit la requête SELECT : 
-                    $requete = $db->prepare ("SELECT * FROM users WHERE user_email=:email");
+        <!-- PAGE HEAD -->        
+        <?php
+            if($_SESSION['role']=='client')
+            {
+                if (file_exists("header_client.php"))
+                {
+                    include("header_client.php");
+                }
+                else
+                {
+                    echo "file 'header_client.php' n'existe pas";
+                }
+            }
+            elseif($_SESSION['role']=='fournisseur')
+            {
+                if (file_exists("header_fournisseur.php"))
+                {
+                    include("header_fournisseur.php");
+                }
+                else
+                {
+                    echo "file 'header_fournisseur.php' n'existe pas";
+                }
+            }
+        ?>
 
-                    // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
-                    $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
 
-                    //On exécute la requête
-	                $requete->execute();
+        <!-- PAGE CONTENT -->
+        <div class="container" id="form_infoPerso">
+            <br><br>
+            <center> <h3> Infos personnelles </h3> </center> 
+            <br><br>
+<?php 
+            // Connéxion à la base de données 
+            require "connection_bdd.php";
+                                
+            // On construit la requête SELECT : 
+            $requete = $db->prepare ("SELECT * FROM users WHERE user_email=:email");
 
-                    // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête
-                    $nbLigne = $requete->rowCount(); 
-                    
-                    if($nbLigne >= 1)
-                    {
-                        while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
-                        {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
+            // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
+            $requete->bindValue(':email', $_SESSION['email'], PDO::PARAM_STR);
+
+            //On exécute la requête
+            $requete->execute();
+
+            // Si la requête renvoit un seul et unique résultat, on ne fait pas de boucle, ici c'est le cas: 
+            $row = $requete->fetch(PDO::FETCH_OBJ);
 ?>
-                            <tr>
-                                <td>  <?php echo $row->user_nom; ?>  </td>
-                                <td>  <?php echo $row->user_prenom; ?>  </td>
-                                <td>  <?php echo $row->user_raison_sociale; ?>  </td>
-                                <td>  <?php echo $row->user_siren; ?>  </td>
-                                <td>  <?php echo $row->user_adresse; ?>  </td>
-                                <td>  <?php echo $row->user_code_postal; ?>  </td>
-                                <td>  <?php echo $row->user_ville; ?>  </td>
-                                <td>  <?php echo $row->user_pays; ?>  </td>
-                                <td>  <?php echo $row->user_inscription; ?>  </td>
-
-                            </tr>
-<?php
-                        }
-                        
-                        //Libèration la connection au serveur de BDD
-                        $requete->closeCursor();
-                    }
-?>    
-                    </tbody>
-                </table>
-
-                <div style="text-align:center; margin-top:200px">
-                    <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
-<?php
-                    if($_SESSION['role']=='client')
-                    {
-                        $page="client.php";
-                    }
-                    else if ($_SESSION['role']=='fournisseur')
-                    {
-                        $page="fournisseur.php";
-                    }
-?>
-                    <a href="<?php echo $page?>"> <button class="btn btn-primary"> Retour </button> </a> 
+            <form action="#"  method="#" style="margin-bottom:50px;">   
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Nom </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_nom;?>" readonly>
                 </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Prénom </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_prenom;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Adresse mail </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_email;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Raison Sociale </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_societe;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> SIREN </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_siren;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Adresse </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_adresse;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Code postal </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_code_postal;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Ville </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_ville;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Pays </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_pays;?>" readonly>
+                </div>
+
+                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <label> Date inscription </label>
+                    <input type="text" class="form-control" value="<?php echo $row->user_inscription;?>" readonly>
+                </div>
+            </form>
+<?php    
+            // Libèration la connection au serveur de BDD
+            $requete->closeCursor();               
+?>    
+                    
+            <div class="boutons">
+                <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
+<?php
+                if($_SESSION['role']=='client')
+                {
+                    $page="client.php";
+                }
+                else if ($_SESSION['role']=='fournisseur')
+                {
+                    $page="fournisseur.php";
+                }
+?>
+                <a href="<?php echo $page?>"> <button class="btn btn-primary"> Retour </button> </a> 
+            </div>
                     
                 
-            </div>
+        
         </div>
+
+
 
      
         <!-- Bootstrap Jquery, Popper -->

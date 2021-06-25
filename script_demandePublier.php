@@ -49,7 +49,7 @@
         while ($row = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de la colonne demande_etat et demande_notification et on les mets dans l'objet $row                                            
         {                                               // Ensuite avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes de la colonne demande_etat et demande_notification et on les mets dans l'objet $row  
             
-            $requete="SELECT user_email FROM fournisseur";
+            $requete="SELECT user_email FROM users WHERE user_role='fournisseur'";
             $resultat = $db->query($requete)  or  die(print_r($db->errorInfo()));
             $nbLigne = $resultat->rowCount(); 
     
@@ -58,7 +58,7 @@
                 while ($row2 = $resultat->fetch(PDO::FETCH_OBJ))
                 {
                     // Avec la méthode mail() on envoie un email de notification aux fournisseurs:
-                    mail($row2->user_email, "Nouvelle demande", "Bonjour, Une nouvelle demande a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+                    mail($row2->user_email, "Nouvelle demande", "Bonjour, Une nouvelle demande a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
                 } 
             }
         }
@@ -71,7 +71,8 @@
     $req = "UPDATE demande SET demande_notification=:demande_notification WHERE user_email=:user_email AND demande_etat='publié'";
     $requete = $db->prepare($req);
 
-    // Execution de requête:
+    /* Execution de requête:
+    L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement"     */
     $requete->execute(array(':demande_notification' => 'envoyé', ':user_email' => $_SESSION['email']));
 
     //Libèration la connection au serveur de BDD

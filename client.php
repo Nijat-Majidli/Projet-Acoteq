@@ -1,16 +1,33 @@
-<?php 
-    session_start();  
+<?php   
     /* ATTENTION
-    Il est impératif d'utiliser la fonction session_start() au début de chaque fichier PHP dans lequel on manipulera cette 
-    variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
-    avoir encore été écrit/envoyé à la page web.  */
+    Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction au début de chaque 
+    fichier PHP dans lequel on utilisera la variable superglobale $_SESSION et avant tout envoi de requêtes HTTP, c'est-à-dire 
+    avant tout code HTML (donc avant la balise <!DOCTYPE> ).  */  
+    session_start();
 
-    if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
+    if (!isset($_SESSION['email']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
+
+
+    /*  Pour écrire un cookie, on utilise la fonction setcookie(). Il est impératif d'utiliser cette fonction au début de chaque 
+    fichier PHP dans lequel on utilisera la variable superglobale $_SESSION et avant tout envoi de requêtes HTTP, c'est-à-dire 
+    avant tout code HTML (donc avant la balise <!DOCTYPE> ).  
+    On lui donne en général trois paramètres, dans l'ordre suivant :
+    1. Le nom du cookie (exemple: 'login');
+    2. La valeur du cookie (exemple: 'dupont@gmail.com');
+    3. La date d'expiration du cookie, sous forme de timestamp (exemple: 1090521508 ). 
+    Le dernier paramètre "true" permet d'activer le mode  << httpOnly >>  sur le cookie et permet de réduire drastiquement les risques 
+    de faille XSS sur votre site.   */
+    if(isset($_SESSION['cookie']))
+    {
+        setcookie('login', $_SESSION['email'], time() + 365*24*3600, null, null, false, true);
+        setcookie('password', $_SESSION['mdp'], time() + 365*24*3600, null, null, false, true);
+    }
+    
 ?>
 
 
@@ -37,51 +54,96 @@
 
 
     <body>
+        <!-- PAGE HEAD -->        
+        <?php
+            if (file_exists("header_client.php"))
+            {
+                include("header_client.php");
+            }
+            else
+            {
+                echo "file 'header_client.php' n'existe pas";
+            }
+        ?>
+
+
+        <!-- PAGE CONTENT -->
         <div class="container">
-            <!-- PAGE HEAD -->
-            <header>
-                <!-- Navigation Bar -->
-                <nav class="navbar navbar-expand-sm navbar-light bg-light">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                    </button>
-                
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item active">
-                                <a class="nav-link" href="infoPerso.php"> Infos personelles <span class="sr-only">(current)</span></a>
-                            </li>
-                            
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Demandes
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="demande.php"> Nouvelle demande </a>
-                                    <a class="dropdown-item" href="demandeSaved.php"> Demandes sauvegardées </a>
-                                    <a class="dropdown-item" href="demandePublished.php"> Demandes publiées </a>
-                                </div>
-                            </li>
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Équipes
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="equipe.php"> Nouvelle équipe </a>
-                                    <a class="dropdown-item" href="equipeSaved.php"> Équipes sauvegardées </a>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-            </header>
-
+            <br><br>
+            <center> <h3> Demandes publiées </h3> </center> 
+            <br><br><br>
+<?php
+            // Connéxion à la base de données 
+            require "connection_bdd.php";
             
+            // On construit la requête SELECT : 
+            $requete = $db->prepare ("SELECT * FROM demande WHERE user_email=:user_email AND demande_etat=:demande_etat");
+
+            // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+            $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
+            $requete->bindValue(':demande_etat', "publié", PDO::PARAM_STR);
+
+            // On exécute la requête :
+            $requete->execute();
+
+            // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête :
+            $nbLigne = $requete->rowCount(); 
+            
+            if($nbLigne >= 1)
+            {
+                while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
+                {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
+?>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col"> Titre </th>
+                                    <th scope="col"> Budget </th>
+                                    <th scope="col"> Publiée </th>
+                                    <th scope="col"> Détail </th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <tr>
+                                    <td>  <?php echo $row->demande_titre;?>  </td>
+                                    <td>  <?php echo $row->demande_budget;?>  </td>
+
+                                    <!-- Ici on a besoin d'afficher une date qui provient de la base de données et 
+                                    qui est dans un format MySql: 2018-11-16.
+                                    Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:     -->
+                                    <?php $datePublication = new DateTime($row->demande_publication);?>
+                                    <td> <?php echo $datePublication->format("d/m/Y H:\hi");?> </td>
+
+                                    <!-- On envoie en URL (méthode GET) le paramètre demande_id vers la page demandeDetail.php :   -->
+                                    <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a> </td>
+                                </tr>    
+                            </tbody>
+                        </table>     
+                    </div>               
+<?php           
+                }
+            }
+            else
+            {
+                echo "<center> <h5 style='color:red'> Pour l'instant vous avez aucune demande publiées ! </h5> </center> <br>";
+                echo '<center> 
+                        Pour créer une demande veuillez cliquer : <a href="demandeNew.php"> Nouvelle demande </a>
+                      <center>';
+            }
+
+            // Libèration la connection au serveur de BDD
+            $requete->closeCursor();
+?>    
+                   
+
+            <!-- Bouton Déconnexion -->
             <div style="text-align:center; margin-top:200px">
                 <a href="script_deconnexion.php"> <button class="btn btn-warning"> Déconnexion </button> </a> 
             </div>
-            </div>
+        </div>
+
 
      
         <!-- Bootstrap Jquery, Popper -->

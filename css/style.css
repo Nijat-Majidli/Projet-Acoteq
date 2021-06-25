@@ -1,16 +1,69 @@
-/* Page connexion.html */
+h3 {
+    color: hsl(214, 100%, 50%);
+}
+
+
+
+/* header.php */
+#nav {
+    margin: 25px 20px;
+}
+
+#web_site {
+    margin-right: 850px;
+}
+
+
+
+/* Page accueil*/
+.maison {
+    float: left;
+    margin: 70px 70px 0 90px ;
+}
+
+#slogan_1 {
+    float: left;
+    margin-top: 220px;
+    color: hsl(214, 100%, 50%);
+}
+
+
+
+/* Page connexion.php */
+.maison {
+    float: left;
+    margin: 70px 70px 0 80px ;
+}
+
+.aside {
+    float: left;
+    margin: 120px 0 0 50px;
+    width: 40%;
+}
+
+.slogan_2 {
+    float: left;
+    margin-bottom: 40px;
+    margin-left: 100px;
+    color: hsl(214, 100%, 50%);
+    text-align: center;
+}
+
+.form_connect {
+    clear: both;
+}
+
 #eyeIcon {  
     cursor:pointer;
 }
 
-#bouton_valider {
-    margin-right: 30px; 
-    padding: 6px 16px; 
+
+
+/* Page inscription.php */
+#form_inscription {
+    width: 50%;
 }
 
-
-
-/* Page inscription.html */
 #liste_CP {
     list-style: none;
     margin: 0;
@@ -31,6 +84,18 @@
 #liste_CP li:hover {
 background: #dfdfdf;
 }
+
+.boutons {
+    margin: 30px 0 30px 265px;
+}
+
+
+
+/* Page infoPerso.php */
+#form_infoPerso {
+    width: 50%;
+}
+
 
 
 

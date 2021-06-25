@@ -7,18 +7,25 @@
     Donc, il faut ajouter l'instruction <<date_default_timezone_set("Europe/Paris");>> dans nos scripts avant toute manipulation de dates.  */
     date_default_timezone_set('Europe/Paris');
 
-    /* Nous récupérons les informations passées dans le fichier "comments.php" dans la balise <form> et l'attribut action="script_comment.php".  
+    /* Nous récupérons les informations passées dans le fichier "reponseDetail.php" dans la balise <form> et l'attribut action="script_comment.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['reponse_id']) && isset($_POST['client_email']) && isset($_POST['fournisseur_email']) && isset($_POST['comment']))
+    if(isset($_POST['reponse_id']) && isset($_POST['fournisseur_email']) && isset($_POST['client_email']) && isset($_POST['comment']))
     {
-        if (!empty($_POST['reponse_id'] && $_POST['client_email'] && $_POST['fournisseur_email'] && $_POST['comment']))
+        if (!empty($_POST['reponse_id'] && $_POST['fournisseur_email'] && isset($_POST['client_email']) && $_POST['comment']))
         {
             
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
             $reponse_id = htmlspecialchars($_POST['reponse_id']);  
+            $fournisseur_email = htmlspecialchars($_POST['fournisseur_email']);
             $client_email = htmlspecialchars($_POST['client_email']);
-            $fournisseur_email = htmlspecialchars($_POST['fournisseur_email']); 
             $comment_description = trim(htmlspecialchars($_POST['comment']));  // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
+            
+            // On crée un tableau (array) dans lequel on va enregistrer liste des emails clients:
+            $liste_email=array();
+
+            // Avec la fonction explose() on mets les éléments du string $client_email dans le tableau $liste_email :
+            $liste_email = explode(",", $client_email);    // La fonction explose() transforme une chaîne de caractères (string) au tableau (array).
+
             
             if(isset($_POST['visibilite'])=='visible')
             {
@@ -43,26 +50,28 @@
             {
                 $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
                 comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
-                VALUES((SELECT CONCAT(client_nom, ' ', client_prenom) AS comment_proprietaire FROM client WHERE user_email=:client_email), 
-                (SELECT client_raison_sociale FROM client AS comment_societe WHERE user_email=:client_email), :comment_description, 
-                :comment_publication, :comment_visibilite, (SELECT user_id FROM client WHERE user_email=:client_email), 
-                (SELECT user_email FROM client WHERE user_email=:client_email), 
-                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:fournisseur_email), 
-                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:fournisseur_email), :reponse_id)");
+                VALUES((SELECT CONCAT(user_nom, ' ', user_prenom) AS comment_proprietaire FROM users WHERE user_email=:client_email), 
+                (SELECT user_societe FROM users AS comment_societe WHERE user_email=:client_email), :comment_description, 
+                :comment_publication, :comment_visibilite, (SELECT user_id FROM users WHERE user_email=:client_email), 
+                (SELECT user_email FROM users WHERE user_email=:client_email), 
+                (SELECT user_id FROM users AS user_id_1 WHERE user_email=:fournisseur_email), 
+                (SELECT user_email FROM users AS user_email_1 WHERE user_email=:fournisseur_email), :reponse_id)");
 
+                $requete->bindValue(':client_email', $_SESSION['email'], PDO::PARAM_STR);
                 $requete->bindValue(':comment_visibilite', $comment_visibilite, PDO::PARAM_STR);
             }
             else if($_SESSION['role']=="fournisseur")
             {
                 $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
                 comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
-                VALUES((SELECT CONCAT(fournisseur_nom, ' ', fournisseur_prenom) AS comment_proprietaire FROM fournisseur WHERE user_email=:fournisseur_email), 
-                (SELECT fournisseur_raison_sociale FROM fournisseur AS comment_societe WHERE user_email=:fournisseur_email), 
-                :comment_description, :comment_publication, :comment_visibilite, 
-                (SELECT user_id FROM client WHERE user_email=:client_email), (SELECT user_email FROM client WHERE user_email=:client_email), 
-                (SELECT user_id FROM fournisseur AS user_id_1 WHERE user_email=:fournisseur_email), 
-                (SELECT user_email FROM fournisseur AS user_email_1 WHERE user_email=:fournisseur_email), :reponse_id)");
+                VALUES((SELECT CONCAT(user_nom, ' ', user_prenom) AS comment_proprietaire FROM users WHERE user_email=:fournisseur_email), 
+                (SELECT user_societe FROM users AS comment_societe WHERE user_email=:fournisseur_email), :comment_description, 
+                :comment_publication, :comment_visibilite, (SELECT user_id FROM users WHERE user_email=:client_email), 
+                (SELECT user_email FROM users WHERE user_email=:client_email), 
+                (SELECT user_id FROM users AS user_id_1 WHERE user_email=:fournisseur_email), 
+                (SELECT user_email FROM users AS user_email_1 WHERE user_email=:fournisseur_email), :reponse_id)");
 
+                $requete->bindValue(':client_email', $liste_email[0], PDO::PARAM_STR);
                 $requete->bindValue(':comment_visibilite', 'visible', PDO::PARAM_STR);
             }
             
@@ -74,8 +83,8 @@
             $date = $time->format("Y/m/d H:i:s"); 
             $requete->bindValue(':comment_publication', $date, PDO::PARAM_STR);
   
-            $requete->bindValue(':client_email', $client_email, PDO::PARAM_STR);          
-            $requete->bindValue(':fournisseur_email', $fournisseur_email, PDO::PARAM_STR);
+            $requete->bindValue(':fournisseur_email', $fournisseur_email, PDO::PARAM_STR);          
+            
             $requete->bindValue(':reponse_id', $reponse_id, PDO::PARAM_INT);
 
             // Exécution de la requête
@@ -84,37 +93,37 @@
             //Libèration la connection au serveur de BDD
             $requete->closeCursor();
 
-            if($_SESSION['role']=="client")
+            
+            if($_SESSION['role']=="client" && $comment_visibilite=='visible')
             {
-                // Si le fournisseur répond au commentaire du client on envoie un email de notification à ce client avec la méthode mail() : 
-                mail($client_email, "Nouvelle reponse", "Bonjour, le fournisseur a commenté!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+                // Si le client écrit commentaire visible au fournisseur on envoie un email de notification à ce fournisseur avec la méthode mail() : 
+                mail($fournisseur_email, "Nouvelle reponse", "Bonjour, le client a commenté!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
 
-                $page = "demandePublished.php";
+                $page = "client.php";
             }
             else if($_SESSION['role']=="fournisseur")
             {
-                // Si le client répond au commentaire du fournisseur on envoie un email de notification à ce fournisseur avec la méthode mail() : 
-                mail($fournisseur_email, "Nouvelle reponse", "Bonjour, le client a commenté!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+                // Si le fournisseur répond au commentaire du client on envoie un email de notification à ce client avec la méthode mail() : 
+                mail($client_email, "Nouvelle reponse", "Bonjour, le fournisseur a commenté!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
 
                 $page = "fournisseur.php";   
             }
 
             echo '<h4> Votre commentaire a été publié avec succès! </h4> ';  
-            header("refresh:2; url=$page");   
+            header("refresh:2; url='reponseDetail.php?reponse_id=$reponse_id'");   
             exit;
-
         }
         else
         {
             echo "<h4> Veuillez remplir tous les champs ! </h4>";
-            header("refresh:2; url=$page"); 
+            header("refresh:2; url='reponseDetail.php?reponse_id=$reponse_id'"); 
             exit;
         }
     }
     else
     {
         echo "<h4> Veuillez remplir tous les champs ! </h4>";
-        header("refresh:2; url=$page");  
+        header("refresh:2; url='reponseDetail.php?reponse_id=$reponse_id'");  
         exit;
     }
 

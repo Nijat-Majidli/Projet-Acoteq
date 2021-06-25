@@ -8,7 +8,7 @@
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
         echo "<h4> Cette page nécessite une identification </h4>";
-        header("refresh:2; url=connexion.html");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.html
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
 ?>
@@ -37,13 +37,26 @@
 
 
     <body>
+        <!-- PAGE HEAD -->        
+        <?php
+            if (file_exists("header_client.php"))
+            {
+                include("header_client.php");
+            }
+            else
+            {
+                echo "file 'header_client.php' n'existe pas";
+            }
+        ?>
+
+        <!-- PAGE CONTENT -->
         <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
             <h2> Veuillez modifier votre équipe </h2>
             <br>
             <form action="script_equipeModifier.php" method="POST" autocomplete="off">
                 <!-- Code PHP -->
 <?php
-                // On récupérer le paramétre equipe_id transmit en GET par la page "equipeSaved.php" et on le met dans la variable $equipe_id :
+                // On récupérer le paramétre equipe_id transmit en GET par la page "equipeCreated.php" et on le met dans la variable $equipe_id :
                 if(isset($_GET['equipe_id']) && !empty($_GET['equipe_id']))
                 {
                     // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
@@ -94,9 +107,11 @@
                                     require ("connection_bdd.php");
 
                                     // On construit la requête SELECT via la méthode prepare() pour éviter injection SQL : 
-                                    $requete = $db->prepare ("SELECT * FROM client WHERE client_siren = :client_siren");
+                                    $requete = $db->prepare ("SELECT * FROM users WHERE user_siren = :user_siren");
 
-                                    $requete->execute(array(':client_siren' => $_SESSION['user_siren']));   // L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement".
+                                    /* Association valeur au marqueur et execution de la requete.
+                                    L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement". */
+                                    $requete->execute(array(':user_siren' => $_SESSION['user_siren']));   
 
                                     // Grace à la méthode "rowCount()" nous pouvons connaitre le nombre de lignes retournées par la requête
                                     $nbLigne = $requete->rowCount(); 
@@ -107,7 +122,7 @@
                                         {                       
 ?>
                                             <option> 
-                                                <?php echo $row->client_nom;?> <?php echo $row->client_prenom;?> (<?php echo $row->user_email;?>) 
+                                                <?php echo $row->user_nom;?> <?php echo $row->user_prenom;?> (<?php echo $row->user_email;?>) 
                                             </option>
 <?php
                                         }
@@ -129,14 +144,14 @@
                 else
                 {
                     echo "<h4> Veuillez remplir tous les champs ! </h4>";
-                    header("refresh:2; url=equipeSaved.php");  
+                    header("refresh:2; url=equipeCreated.php");  
                     exit;
                 }   
 ?>        
                 <!-- Les boutons <Valider> et <Annuler> -->
                 <div style="text-align: center; margin-top: 40px;">
                     <button type="submit" class="btn btn-success" id="bouton_valider"> Valider </button>
-                    <a href="equipeSaved.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
+                    <a href="equipeCreated.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
                 </div>
             </form>   
         </div>

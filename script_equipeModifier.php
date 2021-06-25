@@ -48,10 +48,10 @@
             $requete->closeCursor();
 
             // Aprés création d'une nouvelle équipe on envoie un email de notification à tous les membres d'équipe via la méthode mail() :
-            mail($equipe_membres, "Modification d'équipe", "Bonjour, une modification d'équipe a été effectuée!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@acoteq.com", "X-Mailer" => "PHP/".phpversion()));
+            mail($equipe_membres, "Modification d'équipe", "Bonjour, une modification d'équipe a été effectuée!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
         
             echo '<h4> Votre équipe a été modifié avec succès! </h4> ';
-            header("refresh:2; url=equipeSaved.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page equipeSaved.php
+            header("refresh:2; url=equipeCreated.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page equipeCreated.php
             exit;
         }
         else

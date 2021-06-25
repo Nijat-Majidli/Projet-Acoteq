@@ -4,14 +4,14 @@ USE acoteq;
 
 CREATE TABLE Client(
    client_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   client_raison_sociale VARCHAR(50) NOT NULL,
-   client_siren VARCHAR(9) NOT NULL,
+   user_societe VARCHAR(50) NOT NULL,
+   user_siren VARCHAR(9) NOT NULL,
    client_responsable_legale VARCHAR(50),
    client_adresse VARCHAR(255) NOT NULL,
    client_ville VARCHAR(50) NOT NULL,
    client_pays VARCHAR(50) NOT NULL,
    client_code_postal INT NOT NULL,
-   client_email VARCHAR(255) NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
    client_password VARCHAR(255) NOT NULL,
    client_date_inscription DATETIME NOT NULL,
    client_connexion DATETIME NOT NULL
@@ -30,14 +30,14 @@ CREATE TABLE Demande(
 
 CREATE TABLE Fournisseur(
    fournisseur_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   fournisseur_raison_sociale VARCHAR(50) NOT NULL,
-   fournisseur_siren VARCHAR(9) NOT NULL,
+   user_societe VARCHAR(50) NOT NULL,
+   user_siren VARCHAR(9) NOT NULL,
    fournisseur_responsable_legale VARCHAR(50),
    fournisseur_adresse VARCHAR(255) NOT NULL,
    fournisseur_ville VARCHAR(50) NOT NULL,
    fournisseur_pays VARCHAR(50) NOT NULL,
    fournisseur_code_postal INT NOT NULL,
-   fournisseur_email VARCHAR(255) NOT NULL,
+   user_email VARCHAR(255) NOT NULL,
    fournisseur_password VARCHAR(255) NOT NULL,
    fournisseur_date_inscription DATETIME NOT NULL,
    fournisseur_connexion DATETIME NOT NULL
