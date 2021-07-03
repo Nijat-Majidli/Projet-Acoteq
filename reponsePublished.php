@@ -36,7 +36,7 @@
     </head>
 
     <body>
-        <div class="container">
+        <div class="container-fluid">
             <!-- PAGE MAIN CONTENT -->
             <center> <h3> Mes reponses publiées </h3> </center> 
                 <br> <br>

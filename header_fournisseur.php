@@ -3,7 +3,7 @@ Les pages comme "header.php" ou "footer.php" doivent contenir que les codes html
 Dans la page "header.php" ou "footer.php" il ne faut pas mettre ni balise <doctype>, ni balise <html>, ni de balise <head>, 
 on doit écrire juste les codes nécessaire.  -->
 
-<div class="container">
+<div class="container-fluid">
     <header>
         <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-sm navbar-light bg-light">

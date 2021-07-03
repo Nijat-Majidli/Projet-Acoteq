@@ -1,3 +1,10 @@
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
 <?php
     /* Nous récupérons les informations passées dans le fichier "mdpNew.php" dans la balise <form> et l'attribut action="script_mdpNew.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
@@ -14,14 +21,22 @@
         }
         else
         {
-            echo "<h4> Veuillez saisir votre email et nouveau mot de passe ! </h4>";
+            echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                <center> 
+                    <h4> Veuillez saisir votre email et nouveau mot de passe ! </h4> 
+                </center>
+            </div>'; 
             header("refresh:2; url=mdpNew.php");  // refresh:2 signifie qu'après 2 secondes utilisateur sera redirigé sur la page mdpNew.php 
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez saisir votre email et nouveau mot de passe ! </h4>";
+        echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                <center> 
+                    <h4> Veuillez saisir votre email et nouveau mot de passe ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=mdpNew.php");  
         exit;
     }       
@@ -31,7 +46,11 @@
     la fonction preg_match() qui renvoie True or False:      */
     if (!preg_match("#^[a-z0-9._ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $user_email))
     {
-        echo "<h4> L'adresse mail n'a pas le bon format! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> L\'adresse mail n\'a pas le bon format! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=mdpNew.php");
         exit;
     }
@@ -50,7 +69,11 @@
     }
     else
     {
-        echo "<h4> Le mot de passe n'est pas identique. </h4>";
+        echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                <center> 
+                    <h4> Le mot de passe n\'est pas identique. </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=mdpNew.php");
         exit;
     }
@@ -83,7 +106,11 @@
 
         if (!in_array($user_email, $listeEmail))
         {
-            echo "<h4> Cette utilisateur n'existe pas! </h4>";
+            echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                    <center> 
+                        <h4> Cette utilisateur n\'existe pas! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=mdpNew.php");
             exit;
         } 
@@ -103,9 +130,13 @@
     // Libèration la connection au serveur de BDD
     $requete->closeCursor();
 
-    // Redirection vers la page acceuil.php 
-    echo "<h4> Votre mot de passe a été modifié avec success. </h4>";
-    header("Location: connexion.php");
+    // Redirection vers la page connexion.php 
+    echo'<div class="container-fluid alert alert-success mt-5" role="alert">
+            <center> 
+                <h4> Votre mot de passe a été modifié avec success! </h4> 
+            </center>
+        </div>'; 
+    header("refresh:2; url=connexion.php");
     exit;   
     
 

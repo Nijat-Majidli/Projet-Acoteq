@@ -1,3 +1,10 @@
+<!-- Bootstrap CDN link -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
 <?php
     /* On va enregistrer la date et l'heure de dernier connexion de nos utilisateurs. 
     Pour obtenir la bonne heure, il faut configurer la valeur de l'option datetime_zone sur la valeur Europe/Paris. 
@@ -17,14 +24,22 @@
         }
         else
         {
-            echo "<h4> Veuillez remplir tous les champs ! </h4>";
+            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=connexion.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez remplir tous les champs ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
         header("refresh:2; url=connexion.php");  
         exit;
     }      
@@ -42,7 +57,12 @@
     la fonction <<preg_match()>> qui renvoie True or False:         */
     if (!preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $user_email))
     {
-        echo "<h4> L'adresse mail n'a pas bon format! </h4>";
+        echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
+                <center> 
+                    <h4> L'adresse mail n'a pas bon format ! </h4> 
+                </center>
+            </div>"; 
+
         header("refresh:2; url=connexion.php");
         exit;
     }
@@ -72,7 +92,12 @@
 
         if (!in_array($user_email, $listeEmail))
         {
-            echo "<h4> Cette utilisateur n'existe pas! </h4>";
+            echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
+                    <center> 
+                        <h4> Cette utilisateur n'existe pas! </h4> 
+                    </center>
+                </div>"; 
+
             header("refresh:2; url=connexion.php");
             exit;
         } 
@@ -137,6 +162,7 @@
 
         $_SESSION['nom'] = $resultat['user_nom'];
         $_SESSION['prenom'] = $resultat['user_prenom'];
+        $_SESSION['fullName'] = $resultat['user_prenom']." ".$resultat['user_nom'];
         $_SESSION['user_siren'] = $resultat['user_siren'];
         
         if ($resultat['user_role']=='client')
@@ -152,7 +178,25 @@
             $page = 'fournisseur.php';
         }
 
-        echo '<h4>  Bonjour '.$_SESSION['prenom']." ".$_SESSION['nom'].'<br> Vous êtes connecté! </h4>';
+        
+        echo'<div class="container-fluid alert alert-primary mt-5" role="alert">
+                <center> 
+                    <h4> Bonjour '.$_SESSION['prenom'].' '.$_SESSION['nom'].'<br> Vous êtes connecté! </h4> 
+                </center>
+            </div> 
+
+            <div class="container-fluid-fluid ml-5">
+                <section class="maison">
+                    <img src="../Acoteq/image/logo.png" alt="logo" title="logo">
+                </section>
+        
+                <aside>
+                    <div class="slogan_1">
+                        <center> <h2 style="margin: 100px 0 0 100px"> Bienvenu sur notre site ! </h2>  </center> 
+                    </div>
+                </aside>
+            </div>';
+
         header("refresh:2; url=$page");
         exit;
     }
@@ -187,7 +231,12 @@
             // Exécution de la requête
             $requete->execute(); 
            
-            echo "<h4> Mauvais email ou mot de passe ! </h4>";
+            echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
+                    <center> 
+                        <h4> Mauvais email ou mot de passe! </h4> 
+                    </center>
+                </div>";  
+
             header("refresh:2; url=connexion.php");  
             exit;
         }
@@ -208,7 +257,12 @@
 				// Exécution de la requête
 				$requete->execute(); 
 
-				echo "<h4> Vous êtes bloqué pour 2 minutes! </h4>";
+                echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
+                    <center> 
+                        <h4> Vous êtes bloqué pour 2 minutes! </h4> 
+                    </center>
+                </div>"; 
+
 				header("refresh:2; url=connexion.php");  
 				exit;
 			}
@@ -227,13 +281,23 @@
 					
 					$requete->execute();
 
-					echo "<h4> Maintenant vous êtes débloqué ! <br> Veuillez réessayer de vous connecter ! </h4>";
+                    echo"<div class='container-fluid alert alert-success mt-5' role='alert'>
+                            <center> 
+                                <h4> Maintenant vous êtes débloqué ! <br> Veuillez réessayer de vous connecter! </h4> 
+                            </center>
+                        </div>"; 
+
 					header("refresh:3; url=connexion.php");  
 					exit;
 				}
 				else
 				{
-					echo "<h4> Vous êtes bloqué pour 2 minutes! </h4>";
+                    echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
+                            <center> 
+                                <h4> Vous êtes bloqué pour 2 minutes! </h4> 
+                            </center>
+                        </div>"; 
+					
 					header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php.
 					exit;
 				}

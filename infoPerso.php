@@ -65,8 +65,8 @@
 
 
         <!-- PAGE CONTENT -->
-        <div class="container" id="form_infoPerso">
-            <br><br>
+        <div class="container-fluid col-7">
+            <br>
             <center> <h3> Infos personnelles </h3> </center> 
             <br><br>
 <?php 
@@ -141,19 +141,20 @@
             $requete->closeCursor();               
 ?>    
                     
-            <div class="boutons">
-                <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
+            <div>
+                <center> 
 <?php
-                if($_SESSION['role']=='client')
-                {
-                    $page="client.php";
-                }
-                else if ($_SESSION['role']=='fournisseur')
-                {
-                    $page="fournisseur.php";
-                }
+                    if($_SESSION['role']=='client')
+                    {
+                        $page="client.php";
+                    }
+                    else if ($_SESSION['role']=='fournisseur')
+                    {
+                        $page="fournisseur.php";
+                    }
 ?>
-                <a href="<?php echo $page?>"> <button class="btn btn-primary"> Retour </button> </a> 
+                    <a href="<?php echo $page?>"> <button class="btn btn-primary"> Retour </button> </a> 
+                </center>
             </div>
                     
                 

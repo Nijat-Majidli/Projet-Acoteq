@@ -3,7 +3,7 @@ Les pages comme "header.php" ou "footer.php" doivent contenir que les codes html
 Dans la page "header.php" ou "footer.php" il ne faut pas mettre ni balise <doctype>, ni balise <html>, ni de balise <head>, 
 on doit écrire juste les codes nécessaire.  -->
 
-<div class="container">
+<div class="container-fluid">
     <header>
         <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-sm navbar-light bg-light">
@@ -24,7 +24,7 @@ on doit écrire juste les codes nécessaire.  -->
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="equipeNew.php"> Nouvelle équipe </a>
                             <a class="dropdown-item" href="equipeCreated.php"> Mes équipes crées </a>
-                            <a class="dropdown-item" href="equipeMember.php"> Les équipes dont je fais partie </a>
+                            <a class="dropdown-item" href="equipeAutres.php"> Autres équipes </a>
                         </div>
                     </li>
                     

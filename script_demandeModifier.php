@@ -1,3 +1,10 @@
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
 <?php
     // Pour utiliser la variable superglobale "$_SESSION" il faut ajouter le fonction session_start() tout au début de la page:
     session_start();  
@@ -20,18 +27,141 @@
             $demande_budget = htmlspecialchars($_POST['budget']);
             $demande_etat = htmlspecialchars($_POST['etat']); 
 
-            // Connection à la base de données 
-            require "connection_bdd.php";
+            /* Ajouter une équipe dans une demande est facultative, n'est pas obligatoire. 
+            Donc si le client décide d'ajouter une équipe on crée la variable $demande_equipe     */
+            if(isset($_POST['equipe']) && !empty($_POST['equipe']))
+            {
+                $demande_equipe = trim(htmlspecialchars($_POST['equipe']));
+            }
+
+
+            /* Avant d'insérer en base de données on convertit tout les caractères en minuscules pour certaines variables. 
+            Comme la fonction strtolower() ne convertit pas les lettres accentuées et les caractères spéciaux en minuscules, ici on utilise 
+            la fonction mb_strtolower() qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) 
+            en minuscules. Ensuite on utilise la fonction ucfirst() pour convertir que la 1ere lettre d'un mot en majuscule.      */ 
+            $demande_titre = ucfirst(mb_strtolower($demande_titre));
+            $demande_description = mb_strtolower($demande_description);
+            
+            if(isset($demande_equipe))
+            {
+                $demande_equipe = ucfirst(mb_strtolower($demande_equipe));
+            }
+
+           
+            /* Lorsque le formulaire (page demandeNew.php) est soumis, on récupère les informations sur le fichier téléchargé par utilisateur
+            via la variable superglobale $_FILES, qui se comporte comme un tableau associatif PHP.
+            Le problème principal de l'upload d'un fichier est la sécurité. On doit tout d'abord vérifier 3 points basiques :
+            1. Le fichier a-t-il bien été téléchargé (upload) ?
+            2. La taille du fichier ne dépasse-t-elle pas la taille autorisée? ?
+            3. Le type du fichier envoyé par l'utilisateur est-il celui attendu (image, document Word, PDF etc...) ?        */
+
+            if(isset($_FILES['clientFile']))
+            { 
+                /* On doit sûrement limiter la taille du fichier. Il ne faudrait pas que quelqu'un s'amuse à uploader des fichiers de 
+                plusieurs Mo. Donc on vérifie la taille (en octets) du fichier (1Mo = 1 000 000 octets,  1Ko = 1000 octets).
+                Ici on definit la maximale taille autorisée comme 5 000 000 octets (soit 5Mo) :     */
+                $taille_maxi = 5000000;
+                
+                $taille_fichier = $_FILES['clientFile']['size'];  // $_FILES['clientFile']['size'] retourne la taille du fichier en octets
+
+                if($taille_fichier > $taille_maxi)
+                {
+            
+                    echo '<div class="container-fluid alert alert-warning mt-5" role="alert">
+                            <center> 
+                                <h4> La taille du fichier ne doit pas dépasser 5Mo ! </h4> 
+                            </center>
+                        </div>'; 
+                    header("refresh:2; url=demandeModifier.php?demande_id=$demande_id");  
+                    exit;
+                }
+        
+                // Maintenant on vérifie le type du fichier. Pour cela on met les types autorisés dans un tableau nommé $extensions_valide :  
+                $extensions_valide = array(".pdf", ".doc", ".docx", ".txt");
+                
+                /* Ensuite on récupére l'extension du fichier téléchargé par l'utilisateur à l'aide de la fonction strrchr() qui nous renvoie 
+                le string à partir de '.' qui correspond à l'extension du fichier    */
+                $extension_fichier = mb_strtolower(strrchr($_FILES['clientFile']['name'], '.'));   // mb_strtolower() transforme tous les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.
+
+                if (!in_array($extension_fichier, $extensions_valide))
+                {
+                    // Le type n'est pas autorisé, donc message d'ERREUR
+                    echo '<div class="container-fluid alert alert-warning mt-5" role="alert">
+                            <center> 
+                                <h4> Vous devez télécharger un fichier de type pdf, doc, docx ou txt ! </h4> 
+                            </center>
+                        </div>'; 
+                    header("refresh:3; url=demandeModifier.php?demande_id=$demande_id");   // refresh:3 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page demandeNew.php
+                    exit;
+                }     
+            } 
+            else
+            {
+                echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                        <center> 
+                            <h4> Veuillez télécharger un fichier ! </h4> 
+                        </center>
+                    </div>'; 
+                
+                header("refresh:2; url=demandeModifier.php?demande_id=$demande_id");   
+                exit;
+            }
+
+            
+            /* Maintenant on vérifie le nom du fichier. Le nom du fichier peut lui aussi poser problème. Nous devons donc nous occuper de lui 
+            car s'il contient des accents, caractères spéciaux, espaces, ça peut poser problème. Nous allons donc "formater" le nom du fichier 
+            avant de l'uploader. D'abord on récupére le nom de fichier :   */ 
+            $nom_fichier = $_FILES['clientFile']['name'];   // $_FILES['clientFile']['name'] retourne nom du fichier d'origine
+            
+            // La fonction accent_to_noaccent($str) convertit les lettres accentutées aux lettres non accentuées  
+            function accent_to_noaccent($str)
+            {
+                $url = $str;
+                $url = preg_replace('#Ç#', 'C', $url);
+                $url = preg_replace('#ç#', 'c', $url);
+                $url = preg_replace('#è|é|ê|ë#', 'e', $url);
+                $url = preg_replace('#È|É|Ê|Ë#', 'E', $url);
+                $url = preg_replace('#à|á|â|ã|ä|å#', 'a', $url);
+                $url = preg_replace('#@|À|Á|Â|Ã|Ä|Å#', 'A', $url);
+                $url = preg_replace('#ì|í|î|ï#', 'i', $url);
+                $url = preg_replace('#Ì|Í|Î|Ï#', 'I', $url);
+                $url = preg_replace('#ð|ò|ó|ô|õ|ö#', 'o', $url);
+                $url = preg_replace('#Ò|Ó|Ô|Õ|Ö#', 'O', $url);
+                $url = preg_replace('#ù|ú|û|ü#', 'u', $url);
+                $url = preg_replace('#Ù|Ú|Û|Ü#', 'U', $url);
+                $url = preg_replace('#ý|ÿ#', 'y', $url);
+                $url = preg_replace('#Ý#', 'Y', $url);
+                $url = preg_replace('#ñ#', 'n', $url);
+                $url = preg_replace('#Ñ#', 'N', $url);
+                
+                return ($url);
+            }
+
+            // Avec la fonction accent_to_noaccent($str) on remplace les lettres accentutées par les non accentuées dans $nom_fichier:
+            $nom_fichier = accent_to_noaccent($nom_fichier);
+
+            
+            /* Enfin, on va pouvoir déplacer et renommer le fichier. Par défaut, le fichier téléchargé par utilisateur est stocké 
+            dans le répertoire tmp (temporary) de notre serveur Wamp dans C:/wamp/tmp. 
+            Mais ce fichier devra se trouver dans un répertoire de notre projet, il faut donc le déplacer.
+            Donc, via la méthode "move_uploded_file()" on va déplacer et renommer notre fichier depuis répertoire C:/wamp/tmp 
+            vers le répertoire "fichiers" de notre projet. Le nouveau nom du fichier sera par exemple "demande_5 Isothermique".   */  
+            move_uploaded_file($_FILES["clientFile"]["tmp_name"], "fichiers/demande_".$demande_id." ".$nom_fichier);   
+    
+            
+            // Connexion à la base de données:     
+            require ("connection_bdd.php");
 
             // Construction de la requête UPDATE avec la méthode prepare() sans injection SQL
             $requete = $db->prepare("UPDATE demande SET demande_titre=:demande_titre, demande_description=:demande_description, 
-            demande_budget=:demande_budget, demande_etat=:demande_etat, demande_modification=:demande_modification, 
-            demande_publication=:demande_publication WHERE demande_id=:demande_id");
+            demande_budget=:demande_budget, demande_file_name=:demande_file_name, demande_etat=:demande_etat, 
+            demande_modification=:demande_modification, demande_publication=:demande_publication WHERE demande_id=:demande_id");
 
             // Association des valeurs aux marqueurs via méthode "bindValue()"
             $requete->bindValue(':demande_titre', $demande_titre, PDO::PARAM_STR);
             $requete->bindValue(':demande_description', $demande_description, PDO::PARAM_STR);
             $requete->bindValue(':demande_budget', doubleval($demande_budget), PDO::PARAM_INT); // fonction doubleval() convertit le type de variable en décimale
+            $requete->bindValue(':demande_file_name', $nom_fichier, PDO::PARAM_STR);
             $requete->bindValue(':demande_etat', $demande_etat, PDO::PARAM_STR);
             $requete->bindValue(':demande_id', $demande_id, PDO::PARAM_INT);
 
@@ -55,9 +185,18 @@
 
             //Libèration la connection au serveur de BDD
             $requete->closeCursor();
+            
+            echo'<div class="container-fluid alert alert-success mt-5" role="alert">
+                    <center> 
+                        <h4> Votre demande a été modifié avec succès! </h4> 
+                    </center>
+                </div>'; 
+
+            header("refresh:2; url=demandeDetail.php?demande_id=$demande_id.php");   
+            exit;
 
 
-            /*  Si un client publie sa demande on envoie un email de notification à tous les fournisseurs. 
+            /*  Si le client publie sa demande on envoie un email de notification à tous les fournisseurs. 
             Pour cela on construit la requête SELECT pour aller chercher la colonne demande_etat et demande_notification dans la table "demande":     */
             $req="SELECT demande_etat, demande_notification FROM demande WHERE demande_etat='publié' AND demande_notification='non envoyé'";
 
@@ -104,125 +243,28 @@
         }
         else
         {
-            echo "<h4> Veuillez remplir tous les champs ! </h4>";
+            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=demandeNew.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page demandeNew.php
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez remplir tous les champs ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
         header("refresh:2; url=demandeNew.php");  
         exit;
     }       
     
 
-    /* Lorsque le formulaire (page demandeNew.php) est soumis, on récupère les informations sur le fichier téléchargé via la variable 
-    superglobale $_FILES, qui se comporte comme un tableau associatif PHP.
-    Le problème principal de l'upload d'un fichier est la sécurité. On doit tout d'abord vérifier 2 points basiques :
-    1. Le fichier a-t-il bien été téléchargé (upload) ?
-    2. La taille du fichier ne dépasse-t-elle pas la taille autorisée? ?
-    3. Le type du fichier envoyé par l'utilisateur est-il celui attendu (image, document Word, PDF etc...) ?        */
-
-    if(isset($_FILES['fichier']))
-    { 
-        // D'abord on vérifie la taille (en octets) du fichier. Ici la maximale taille autorisée est 5 000 000 octets (soit 5Mo) :
-        $taille_maxi = 5000000;
-        $taille_fichier = filesize($_FILES['fichier']['tmp_name']);  // La fonction filesize() retourne la taille d'un fichier.
-
-        if($taille_fichier > $taille_maxi)
-        {
-            echo "<h4> La taille du fichier ne peut pas dépasser 5Mo ! </h4>";
-            header("refresh:2; url=demandeNew.php");  
-            exit;
-        }
-        
-        // Maintenant on vérifie le type du fichier. Pour cela on met les types autorisés dans un tableau nommé $extensions_valide :  
-        $extensions_valide = array(".pdf", ".doc", ".docx", ".txt");
-        
-        /* Ensuite on récupére l'extension du fichier téléchargé par l'utilisateur à l'aide de la fonction strrchr() qui nous renvoie 
-        le string à partir de '.' qui correspond à l'extension du fichier    */
-        $extension_fichier = strtolower(strrchr($_FILES['fichier']['name'], '.'));   // strtolower() transforme tous les caractères en minuscules
-
-        if (in_array($extension_fichier, $extensions_valide))
-        {
-            /* Si le type du fichier est parmi ceux autorisés, donc OK, on va pouvoir déplacer et renommer le fichier.
-            Par défaut, le fichier téléchargé est stocké dans le répertoire tmp (temporary) de notre serveur Wamp dans C:/wamp/tmp 
-            Mais ce fichier devra se trouver dans un répertoire de notre projet, il faut donc le déplacer.
-            Donc, via la méthode "move_uploded_file()" on va déplacer notre fichier vers le répertoire "fichiers" de notre projet */   
-            
-            $nom_fichier = basename($_FILES['fichier']['name']);  // fonction basename() renvoie le nom de fichier à partir du chemin spécifié
-            
-            /* Le nom du fichier peut lui aussi poser problème. Nous devons donc nous occuper de lui car s'il contient des accents, 
-            caractères spéciaux, espaces, ça peut poser problème. Nous allons donc "formater" le nom du fichier avant de l'uploader.    
-            Ici on remplace les lettres accentutées par les non accentuées dans $nom_fichier:    */
-            $nom_fichier = strtr($nom_fichier, 'ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ', 'AAAAAACEEEEIIIIOOOOOUUUUYaaaaaaceeeeiiiioooooouuuuyy'); 
-            
-            // On déplace le fichier de répertoire C:/wamp/tmp vers un répertoire nommé fichiers/ :
-            move_uploaded_file($_FILES["fichier"]["tmp_name"], "fichiers/".$nom_fichier);   
-            
-            echo '<h4> Votre fichier a été téléchargé avec succès! </h4> ';
-            header("refresh:2; url=demandeSaved.php");   
-            exit;
-
-            // GOOGLE DRIVE API
-            // require_once 'google-api-php-client/src/Google_Client.php';
-            // require_once 'google-api-php-client/src/contrib/Google_DriveService.php';
-            // // this is google client library and you got to include it in order to use it.
-            
-            // $client = new Google_Client();
-            
-            // // Get your credentials from the APIs Console
-            // // add your client id and client secret(you got it when you created your account)
-            // $client->setClientId('502716320845-kcro1rqgqd346olb2ak1794rf9v3ge7a.apps.googleusercontent.com');
-            // $client->setClientSecret('6oNP9d3FxjbklN3WRQNuB6g1');
-            
-            // //This is standard Uri for installed applications,may change in web applications.
-            // $client->setRedirectUri('urn:ietf:wg:oauth:2.0:oob');
-            
-            // $client->setScopes(array('https://www.googleapis.com/auth/drive'));
-            
-            // $service = new Google_DriveService($client);
-
-            // $authUrl = $client->createAuthUrl();
-            // //Request authorization
-            // print "Please visit:\n$authUrl\n\n";
-            // print "Please enter the auth code:\n";
-            // $authCode = trim(fgets(STDIN));
-            // // Exchange authorization code for access token
-            // $accessToken = $client->authenticate($authCode);
-            // $client->setAccessToken($accessToken);
-            // //Insert a file
-            // $file = new Google_DriveFile();
-            // $file->setTitle('My document');
-            // $file->setDescription('A test document');
-            // $file->setMimeType('text/plain');
-            
-            // $data = file_get_contents('document.txt');
-            
-            // $createdFile = $service->files->insert($file, array(
-            //     'data' => $data,
-            //     'mimeType' => 'text/plain',
-            //     ));
-            
-            // print_r($createdFile);
-        }
-        else 
-        {
-            // Le type n'est pas autorisé, donc ERREUR
-            echo "<h4> Vous devez télécharger un fichier de type pdf, doc, docx ou txt'; </h4>"; 
-            header("refresh:2; url=demandeNew.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page demandeNew.php
-            exit;
-        }     
-    } 
-    else
-    {
-        echo "<h4> Veuillez télécharger un fichier </h4>"; 
-        header("refresh:2; url=demandeNew.php");   
-        exit;
-    }
-    
-    
+   
 
 
 ?>

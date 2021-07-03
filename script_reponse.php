@@ -1,3 +1,10 @@
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
 <?php
     // Pour utiliser la variable superglobale "$_SESSION" il faut ajouter le fonction session_start() tout au début de la page:
     session_start();  
@@ -61,21 +68,33 @@
 
             // Avec la méthode mail() on envoie un email de notification au client pour lui dire que le fournisseur a répondu à sa demande. 
             mail($user_email, "Nouvelle réponse", "Bonjour, Une nouvelle réponse a été publié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
-        
-            echo '<h4> Votre réponse a été publié avec succès! </h4> ';
+            
+            echo'<div class="container-fluid alert alert-success mt-5" role="alert">
+                    <center> 
+                        <h4> Votre réponse a été publié avec succès! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=fournisseur.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page fournisseur.php
             exit;
         }
         else
         {
-            echo "<h4> Veuillez remplir tous les champs ! </h4>";
+            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=detail.php");  
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez remplir tous les champs ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
         header("refresh:2; url=detail.php");  
         exit;
     }

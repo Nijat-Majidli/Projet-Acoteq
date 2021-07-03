@@ -51,7 +51,7 @@
         ?>
 
         <!-- PAGE CONTENT -->
-        <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
+        <div class="container-fluid p-4 mb-3 mt-3 col-7 bg-light text-dark">
             <h3> Veuillez modifier votre réponse </h3>
             <br>
 <?php

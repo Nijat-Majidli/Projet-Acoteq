@@ -51,41 +51,34 @@
         ?>
 
         <!-- PAGE CONTENT -->
-        <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
+        <div class="container-fluid p-4 mb-3 mt-3 col-11 col-sm-9 col-lg-8 bg-light text-dark">
             <h3> Veuillez créer votre demande </h3>
             <br>
             <!--  Pour que le téléchargement soit possible, il faut ajouter l'attribut "enctype" à la balise <form>. 
             La valeur de l'attribut "enctype" doit être "multipart/form"-data  -->
             <form action="script_demandeNew.php"  method="POST" enctype="multipart/form-data" autocomplete="off">   
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="title"> Titre <sup>*</sup> </label> 
                     <input id="title" type="text" class="form-control" name="titre" required>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="desc"> Description <sup>*</sup> </label>
                     <textarea id="desc" class="form-control text-left" name="description" rows="10" style="resize:none" required></textarea>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="budgetDemande"> Budget prévu <sup>*</sup> </label>
                     <input id="budgetDemande" type="number" class="form-control" name="budget" placeholder="en euro" required>
                 </div>
 
                 <div class="form-group mb-4">
-                    <!--  Vous aurez sûrement besoin de limiter la taille du fichier. Il ne faudrait pas que quelqu'un s'amuse à uploader 
-                    des fichiers de plusieurs Mo...  Pour limiter la taille du fichier uploadé, avant le champ de type file il faut 
-                    ajouter un champ caché "hidden", lui donner le nom "MAX_FILE_SIZE" et lui donner en valeur, la taille maximum 
-                    du fichier à uploader en octets(1Mo = 1000000 octets, 1Ko = 1000 octets). 
-                    Ici on limite la taille du fichier à 5Mo :     -->
-                    <input type="hidden" name="MAX_FILE_SIZE" value="5000000">
-
                     <label for="telecharger"> Télécharger votre demande <sup>*</sup> </label>
-                    <input id="telecharger" type="file" class="form-control-file" name="clientFile" required>
+                    <input id="telecharger" type="file" class="form-control-file" name="clientFile" required>  
                 </div>
 
                 <!-- Ajouter une équipe dans une demande est facultative, n'est pas obligatoire. -->
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="myInput"> Ajouter une équipe : </label> 
                     <input id="myInput" type="search" class="form-control">
 
@@ -121,17 +114,17 @@
                     </select>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="team"> Votre équipe : </label> <br>
                     <input id="team" type="text" name="equipe" style="width:100%; border:none; border-bottom:solid 1px #D5DBDB; outline:none"> 
                 </div>
 
                 <p>  Vous voulez : </p>
-                <div class="form-check form-check-inline ml-3"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">  
+                <div class="form-check form-check-inline ml-3">  
                     <input class="form-check-input" type="radio" name="etat" id="save" value="sauvegardé" checked>
                     <label class="form-check-label" for="save"> Sauvegarder demande </label>
                 </div>
-                <div class="form-check form-check-inline"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="etat" id="publish" value="publié">
                     <label class="form-check-label" for="publish"> Publier demande </label>
                 </div>

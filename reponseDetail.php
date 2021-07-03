@@ -12,6 +12,7 @@
         exit;
     }
 
+    
     /* Nous récupérons les informations passées dans le fichier "demandeDetail.php" dans la balise <a> et l'attribut "href"  
     Les informations sont récupéré avec variable superglobale $_GET   */
     if(isset($_GET['reponse_id']) && !empty($_GET['reponse_id']))
@@ -88,7 +89,7 @@
 
 
         <!-- PAGE CONTENT -->
-        <div class="container p-4 mt-3 col-7 bg-light text-dark">
+        <div class="container-fluid p-4 mt-3 col-7 bg-light text-dark">
             <form action="#"  method="#">   
 <?php 
                 // Connéxion à la base de données 
@@ -296,23 +297,27 @@
             }
 
             
+
             // JQuery code 
             $(document).ready(function()
             {
                 $('.hide').hide();
             });
 
-            function show(){
+            function show()
+            {
                 $('.hide').show(),
                 $('.respond').hide(),
                 $('#buttons').hide()
             };
-
-            function hide(){
+            
+            function hide()
+            {
                 $('.hide').hide(),
                 $('.respond').show(),
                 $('#buttons').show()
             }
+            
         </script>
 
 

@@ -68,7 +68,7 @@
 
 
         <!-- PAGE MAIN CONTENT -->
-        <div class="container">
+        <div class="container-fluid">
             <br><br>
             <center> <h3> Demandes publiées </h3> </center> 
             <br><br><br>

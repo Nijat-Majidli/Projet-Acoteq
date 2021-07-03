@@ -68,7 +68,7 @@
 
 
         <!-- PAGE CONTENT -->
-        <div class="container">
+        <div class="container-fluid col-11 col-sm-10">
             <br><br>
             <center> <h3> Demandes publiées </h3> </center> 
             <br><br><br>
@@ -100,6 +100,7 @@
                                 <tr>
                                     <th scope="col"> Titre </th>
                                     <th scope="col"> Budget </th>
+                                    <th scope="col"> Equipe </th>
                                     <th scope="col"> Publiée </th>
                                     <th scope="col"> Détail </th>
                                 </tr>
@@ -109,6 +110,7 @@
                                 <tr>
                                     <td>  <?php echo $row->demande_titre;?>  </td>
                                     <td>  <?php echo $row->demande_budget;?>  </td>
+                                    <td>  <?php echo $row->demande_equipe;?>  </td>
 
                                     <!-- Ici on a besoin d'afficher une date qui provient de la base de données et 
                                     qui est dans un format MySql: 2018-11-16.
@@ -116,8 +118,8 @@
                                     <?php $datePublication = new DateTime($row->demande_publication);?>
                                     <td> <?php echo $datePublication->format("d/m/Y H:\hi");?> </td>
 
-                                    <!-- On envoie en URL (méthode GET) le paramètre demande_id vers la page demandeDetail.php :   -->
-                                    <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a> </td>
+                                    <!-- On envoie en URL (méthode GET) le paramètre demande_id et demande_etat vers la page demandeDetail.php :   -->
+                                    <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?> &amp; demande_etat=<?php echo $row->demande_etat ?>"> Afficher </a> </td>
                                 </tr>    
                             </tbody>
                         </table>     
@@ -127,7 +129,7 @@
             }
             else
             {
-                echo "<center> <h5 style='color:red'> Pour l'instant vous avez aucune demande publiées ! </h5> </center> <br>";
+                echo "<br> <center> <h5 style='color:red'> Pour l'instant vous avez aucune demande publiées ! </h5> </center> <br>";
                 echo '<center> 
                         Pour créer une demande veuillez cliquer : <a href="demandeNew.php"> Nouvelle demande </a>
                       <center>';

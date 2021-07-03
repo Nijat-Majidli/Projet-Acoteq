@@ -49,32 +49,32 @@
         ?>
 
         <!-- PAGE CONTENT -->
-        <div class="container">
+        <div class="container-fluid mt-5 col-12 col-sm-11 col-md-10 col-lg-9 col-xl-8">
             <br>
             <h3> Créer une équipe </h3>
             <hr> <br>
 
             <form action="script_equipeNew.php" method="POST" autocomplete="off">
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="team"> Nom d'équipe : </label> 
                     <input id="team" type="text" class="form-control" name="equipe_nom" required>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="myInput"> Choisir les membres : </label> 
                     <input id="myInput" type="search" class="form-control">
 
                     <select id="liste" class="custom-select" style="display:none;" size="5">
-                        <!-- Code Php -->
 <?php 
                         // Connéxion à la base de données
                         require ("connection_bdd.php");
 
-                        // On construit la requête SELECT via la méthode prepare() pour éviter injection SQL : 
+                        /* On construit la requête SELECT via la méthode prepare() pour éviter injection SQL.
+                        Comme on veux sélectionner que les utilisateurs qui travaillent dans la même société on utilise user_siren, 
+                        car les utilisateurs travaillant dans la même société possede le même numéro de siren.  */ 
                         $requete = $db->prepare("SELECT * FROM users WHERE user_siren = :user_siren");
 
-                        /* Comme on veux choisir les utilisateurs qui travaillent dans la même société on utuilise user_siren, 
-                        car les utilisateurs travaillant dans la même société possede le même numéro de siren.       */ 
+                        // Association de valeur au marqueur via méthode "bindValue()"
                         $requete->bindValue(':user_siren', $_SESSION['user_siren'], PDO::PARAM_INT);
 
                         // On exécute la requête
@@ -86,26 +86,27 @@
                         if ($nbLigne >= 1)
                         {
                             while ($row = $requete->fetch(PDO::FETCH_OBJ))   
-                            {                       
+                            {      
 ?>
                                 <option> 
-                                    <?php echo $row->user_nom;?> <?php echo $row->user_prenom;?> (<?php echo $row->user_email;?>) 
+                                    <?php echo $row->user_prenom;?> <?php echo $row->user_nom;?>, <?php echo $row->user_email;?>  
                                 </option>
 <?php
                             }
                         } 
+                        
 ?>      
                     </select>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label for="member"> Membres d'équipe : </label> <br>
-                    <input id="member" type="text" name="equipe_membres" style="width:100%; border:none; border-bottom:solid 1px #D5DBDB; outline:none"> 
+                    <input id="member" class="member" type="text" name="equipe_membres" value="<?php echo $_SESSION['fullName'].", ".$_SESSION['email']?>" required> 
                 </div>
 
                  <!-- Les boutons <Valider> et <Annuler> -->
                  <div style="text-align: center; margin-top: 40px;">
-                    <button type="submit" class="btn btn-success mr-3" id="bouton_valider"> Valider </button>
+                    <button type="submit" class="btn btn-success mr-2" id="bouton_valider"> Valider </button>
                     <a href="client.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
                 </div>
             </form>   
@@ -127,9 +128,12 @@
                         $(this).toggle($(this).text().toLowerCase().indexOf(inputValue) > -1);
                     })
                 });
-                
-                // On crée un tableau (array) vide: allMembers
-                var allMembers=[];  
+
+                // Dans la variable "content" on récupére le contenu (valeur) de l'input <Membres d'équipe>
+                var content = $('#member').val();
+
+                // On crée un tableau (array) allMembers et on mets dedans la variable content
+                var allMembers=[content];  
 
                 $('select').change(function()
                 {    
@@ -137,11 +141,11 @@
                     var member = $("option:selected").text();  
                    
                     // Puis avec la méthode push() on insére la variable "member" dans l'array allMembers:
-                    allMembers.push($.trim(member));   // La méthode $.trim() est utilisée pour supprimer l'espace blanc du début et de la fin d'une chaîne
+                    allMembers.push($.trim(member));   // La méthode $.trim() est utilisée pour supprimer l'espace blanc du début et de la fin d'une chaîne de caractères(string)
 
                     $("option:selected").click(function() 
                     {
-                        $('#member').val((allMembers.join(", ")));  // La méthode join() convertit les éléments d'un tableau (array) sous forme d'une chaîne.
+                        $('#member').val((allMembers.join(", ")));  // La méthode join() convertit les éléments d'un tableau (array) à une chaîne de caractères(string).
                                                                     // Le paramètre ", " insére l'éspace aprés les virgules entre les éléments. 
                     })
                 });

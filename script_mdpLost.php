@@ -1,5 +1,11 @@
-<?php
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
+<?php
     /* Nous récupérons les informations passées dans le fichier "mdpLost.php" dans la balise <form> et l'attribut action="script_mdpLost.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
 
@@ -13,14 +19,22 @@
         }
         else
         {
-            echo "<h4> Veuillez entrer votre adresse mail ! </h4>";
+            echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez entrer votre adresse mail ! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=mdpLost.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé sur la page mdpLost.php
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez entrer votre adresse mail ! </h4>";
+        echo '<div class="container-fluid alert alert-warning mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez entrer votre adresse mail ! </h4> 
+                    </center>
+                </div>';
         header("refresh:2; url=mdpLost.php");  
         exit;
     }        
@@ -30,7 +44,11 @@
     la fonction <<preg_match()>> qui renvoie True or False:         */
     if (!preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $user_email))
     {
-        echo "<h4> L'adresse mail n'a pas bon format! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> L\'adresse mail n\'a pas le bon format! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=mdpLost.php");
         exit;
     }
@@ -72,20 +90,32 @@
 
             mail($destinataire, $objet, $message, array('MIME-Version'=>'1.0', 'Content-Type'=>$content, "From"=>$expediteur, "X-Mailer"=>"PHP/".phpversion()));
 
-            echo "<h4> Un mail vient de vous être envoyé avec un lien. Veuillez consulter votre adresse mail. </h4>";
+            echo'<div class="container-fluid alert alert-primary mt-5" role="alert">
+                    <center> 
+                        <h4> Un mail vient de vous être envoyé avec un lien. Veuillez consulter votre adresse mail. </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=mdpLost.php");
             exit;   
         } 
         else
         {
-            echo "<h4> Cet utilisateur n'existe pas! <br> Veuillez saisir une bonne adresse mail. </h4>";
+            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Cet utilisateur n\'existe pas! <br> Veuillez saisir une bonne adresse mail. </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=mdpLost.php");
             exit;
         }
     }
     else
     {
-        echo "Aucune adresse mail trouvée";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Aucune adresse mail trouvée! </h4> 
+                </center>
+            </div>'; 
     } 
     
     $result->closeCursor();

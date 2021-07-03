@@ -4,66 +4,60 @@ h3 {
 
 
 
-/* header.php */
-#nav {
-    margin: 25px 20px;
-}
+/* Page header_accueil.php */
+/* #nav {
+    margin: 20px 20px;
+} */
 
-#web_site {
-    margin-right: 850px;
-}
+/* #web_site {
+    margin-right: 350px;
+} */
 
 
 
 /* Page accueil*/
 .maison {
     float: left;
-    margin: 70px 70px 0 90px ;
+    margin-top: 100px;
+    padding-left: 100px;
 }
 
-#slogan_1 {
+.slogan {
     float: left;
-    margin-top: 220px;
+    margin: 110px 0 20px 0;
     color: hsl(214, 100%, 50%);
+    text-align: center;
+}
+
+#carouselExampleInterval {
+    clear: both;
 }
 
 
 
 /* Page connexion.php */
-.maison {
-    float: left;
-    margin: 70px 70px 0 80px ;
-}
-
-.aside {
-    float: left;
-    margin: 120px 0 0 50px;
-    width: 40%;
-}
-
-.slogan_2 {
-    float: left;
-    margin-bottom: 40px;
-    margin-left: 100px;
-    color: hsl(214, 100%, 50%);
-    text-align: center;
-}
-
 .form_connect {
     clear: both;
 }
 
 #eyeIcon {  
     cursor:pointer;
+    float: left;
+}
+
+
+
+/* Page mdpLost.php */
+.slogan_1 {
+    float: left;
+    margin: 50px 0 20px 40px;
+    color: hsl(214, 100%, 50%);
+    text-align: center;
 }
 
 
 
 /* Page inscription.php */
-#form_inscription {
-    width: 50%;
-}
-
 #liste_CP {
     list-style: none;
     margin: 0;
@@ -85,15 +79,15 @@ h3 {
 background: #dfdfdf;
 }
 
-.boutons {
-    margin: 30px 0 30px 265px;
-}
 
 
 
-/* Page infoPerso.php */
-#form_infoPerso {
-    width: 50%;
+/* Page equipeNew */
+.member {
+    width:100%; 
+    border: none; 
+    border-bottom: solid 1px #D5DBDB; 
+    outline: none;
 }
 
 

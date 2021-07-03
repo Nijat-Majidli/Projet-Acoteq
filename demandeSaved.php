@@ -50,80 +50,78 @@
         ?>
 
         <!-- PAGE CONTENT -->
-        <div class="container">
+        <div class="container-fluid col-11 col-sm-9 col-lg-8">
             <br><br>
             <center> <h3> Demandes sauvegardées </h3> </center> 
             <br><br><br>
 <?php
-                    // Connéxion à la base de données 
-                    require "connection_bdd.php";
-                    
-                    // On construit la requête SELECT : 
-                    $requete = $db->prepare ("SELECT * FROM demande WHERE user_email=:user_email AND demande_etat=:demande_etat");
+            // Connéxion à la base de données 
+            require "connection_bdd.php";
+            
+            // On construit la requête SELECT : 
+            $requete = $db->prepare ("SELECT * FROM demande WHERE user_email=:user_email AND demande_etat=:demande_etat");
 
-                    // Association valeurs aux marqueurs via méthode "bindValue()" :
-                    $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
-                    $requete->bindValue(':demande_etat', "sauvegardé", PDO::PARAM_STR);
+            // Association valeurs aux marqueurs via méthode "bindValue()" :
+            $requete->bindValue(':user_email', $_SESSION['email'], PDO::PARAM_STR);
+            $requete->bindValue(':demande_etat', "sauvegardé", PDO::PARAM_STR);
 
-                    //On exécute la requête
-	                $requete->execute();
+            //On exécute la requête
+            $requete->execute();
 
-                    // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête
-                    $nbLigne = $requete->rowCount(); 
-                    
-                    if($nbLigne >= 1)
-                    {
-                        while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
-                        {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
+            // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête
+            $nbLigne = $requete->rowCount(); 
+            
+            if($nbLigne >= 1)
+            {
+                while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
+                {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col"> Titre </th>
-                                            <th scope="col"> Budget </th>
-                                            <th scope="col"> Crée </th>
-                                            <th scope="col"> Détail </>
-                                        </tr>
-                                    </thead>
-                    
-                                    <tbody>
-                                        <tr>
-                                            <td>  <?php echo $row->demande_titre;?>  </td>
-                                            <td>  <?php echo $row->demande_budget;?>  </td>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col"> Titre </th>
+                                    <th scope="col"> Budget </th>
+                                    <th scope="col"> Crée </th>
+                                    <th scope="col"> Détail </>
+                                </tr>
+                            </thead>
+            
+                            <tbody>
+                                <tr>
+                                    <td>  <?php echo $row->demande_titre;?>  </td>
+                                    <td>  <?php echo $row->demande_budget;?>  </td>
 
-                                            <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est 
-                                            dans un format MySql: 2018-11-16
-                                            Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:   -->
-                                            <?php $dateCreation = new DateTime($row->demande_creation);?>
-                                            <td> <?php echo $dateCreation->format("d/m/Y H:\hi");?> </td>          
+                                    <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est 
+                                    dans un format MySql: 2018-11-16
+                                    Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:   -->
+                                    <?php $dateCreation = new DateTime($row->demande_creation);?>
+                                    <td> <?php echo $dateCreation->format("d/m/Y H:\hi");?> </td>          
 
-                                            <!-- On envoie en URL (méthode GET) le paramètre demande_id vers la page demandeDetail.php :   -->
-                                            <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?>"> Afficher </a> </td>                   
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    <!-- On envoie en URL (méthode GET) le paramètre demande_id et demande_etat vers la page demandeDetail.php :   -->
+                                    <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?> &amp; demande_etat=<?php echo $row->demande_etat ?>"> Afficher </a> </td>                   
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 <?php
-                        }
-                    }
-                    else
-                    {
-                        echo "<center> <h5 style='color:red'> Pour l'instant vous avez aucune demande sauvegardées ! </h5> </center> <br>"; 
-                        echo '<center> 
-                                Pour créer une demande veuillez cliquer : <a href="demandeNew.php"> Nouvelle demande </a>
-                              <center>';
-                    }
+                }
+            }
+            else
+            {
+                echo "<br> <center> <h5 style='color:red'> Pour l'instant vous avez aucune demande sauvegardées ! </h5> </center> <br>"; 
+                echo '<center> 
+                        Pour créer une demande veuillez cliquer : <a href="demandeNew.php"> Nouvelle demande </a>
+                        <center>';
+            }
 
-                    //Libèration la connection au serveur de BDD
-                    $requete->closeCursor();
+            //Libèration la connection au serveur de BDD
+            $requete->closeCursor();
 ?>    
-                    
-
-                <div style="text-align:center; margin-top:200px">
-                    <a href="script_deconnexion.php"> <button class="btn btn-warning mr-3"> Déconnexion </button> </a> 
-                    <a href="client.php"> <button class="btn btn-primary"> Retour </button> </a> 
-                </div>
+            <div style="text-align:center; margin-top:100px">
+                <a href="script_deconnexion.php"> <button class="btn btn-warning mr-2"> Déconnexion </button> </a> 
+                <a href="client.php"> <button class="btn btn-primary"> Retour </button> </a> 
+            </div>
         </div>
 
 

@@ -1,3 +1,10 @@
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
 <?php
     /* ATTENTION
     Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction tout au début de chaque 
@@ -46,42 +53,36 @@
 
             //Libèration la connection au serveur de BDD
             $requete->closeCursor();
-
-
-            /*  Si un fournisseur modifie sa reponse on envoie un email de notification à tous les clients. 
-            Pour cela on construit la requête SELECT pour aller chercher la colonne user_email dans la table "commentaire":     */
-            $result=$db->prepare("SELECT user_email FROM commentaire WHERE reponse_id=:reponse_id");
-
-            // Association des valeurs aux marqueurs via méthode "bindValue()"
-            $result->bindValue(':reponse_id', $reponse_id, PDO::PARAM_INT);
-
-            // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
-            $nbLigne = $result->rowCount(); 
-            
-            if ($nbLigne >= 1)
-            {
-                while ($row = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne et on les mets dans l'objet $row                                            
-                {                                               // Ensuite avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes et on les mets dans l'objet $row  
-                    // Avec la méthode mail() on envoie un email de notification aux clients concernés:
-                    mail($row->user_email, "Nouvelle modification", "Bonjour, La réponse du fournisseur a été modifié!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
-                }
-            }
             
             //Libèration la connection au serveur de BDD
             $result->closeCursor();
 
-           
+            echo'<div class="container-fluid alert alert-success mt-5" role="alert">
+                    <center> 
+                        <h4> Votre réponse a été modifié avec success! </h4> 
+                    </center>
+                </div>'; 
+            header("refresh:2; url=reponseDetail.php?reponse_id=<?php echo '$reponse_id';?>"); 
+            exit;
         }
         else
         {
-            echo "<h4> Veuillez remplir tous les champs ! </h4>";
+            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=reponseModifier.php?reponse_id=<?php echo '$reponse_id';?>"); 
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez remplir tous les champs ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
         header("refresh:2; url=reponseModifier.php?reponse_id=<?php echo '$reponse_id';?>");  
         exit;
     }       

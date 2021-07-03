@@ -37,7 +37,7 @@
             ?>
 
             <!-- PAGE CONTENT -->
-            <div class="container-fluid">
+            <div class="container-fluid-fluid">
                 <section class="maison">
                     <img src="../Acoteq/image/logo.png" alt="logo" title="logo">
                 </section>

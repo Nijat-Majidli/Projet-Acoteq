@@ -1,3 +1,10 @@
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
 <?php
     // Pour utiliser la variable superglobale "$_SESSION" il faut ajouter le fonction session_start() tout au début de la page:
     session_start();  
@@ -109,20 +116,33 @@
                 $page = "fournisseur.php";   
             }
 
-            echo '<h4> Votre commentaire a été publié avec succès! </h4> ';  
+            echo'<div class="container-fluid alert alert-success mt-5" role="alert">
+                    <center> 
+                        <h4> Votre commentaire a été publié avec succès! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url='reponseDetail.php?reponse_id=$reponse_id'");   
             exit;
         }
         else
         {
-            echo "<h4> Veuillez remplir tous les champs ! </h4>";
+            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
+
             header("refresh:2; url='reponseDetail.php?reponse_id=$reponse_id'"); 
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez remplir tous les champs ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
         header("refresh:2; url='reponseDetail.php?reponse_id=$reponse_id'");  
         exit;
     }

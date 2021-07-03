@@ -1,5 +1,11 @@
-<?php
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
+<?php
     /* On va enregistrer la date et l'heure d'inscription et dernier connexion de nouvel utilisateur. 
     Pour obtenir la bonne date et l'heure, il faut configurer la valeur de l'option <datetime_zone> sur la valeur Europe/Paris. 
     Donc, il faut ajouter l'instruction <date_default_timezone_set("Europe/Paris");> dans nos scripts avant toute manipulation de dates et heures.  */
@@ -8,9 +14,9 @@
     /* Nous récupérons les informations passées dans le fichier "inscription.php" dans la balise <form> et l'attribut action="script_inscription.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
 
-    if(isset($_POST['userNom']) && isset($_POST['userPrenom']) && isset($_POST['societe']) && isset($_POST['numSiren']) && isset($_POST['adr']) && isset($_POST['codePostal']) && isset($_POST['ville']) && isset($_POST['pays']) && isset($_POST['mail']) && isset($_POST['mdp']) && isset($_POST['mdp2']))
+    if(isset($_POST['userNom']) && isset($_POST['userPrenom']) && isset($_POST['societe']) && isset($_POST['numSiren']) && isset($_POST['adresse']) && isset($_POST['codePostal']) && isset($_POST['ville']) && isset($_POST['pays']) && isset($_POST['mail']) && isset($_POST['mdp']) && isset($_POST['mdp2']))
     {
-        if (!empty($_POST['userNom'] && $_POST['userPrenom'] && $_POST['societe'] && $_POST['numSiren'] && $_POST['adr'] && $_POST['codePostal'] && $_POST['ville'] && $_POST['pays'] && $_POST['mail'] && $_POST['mdp'] && $_POST['mdp2']))
+        if (!empty($_POST['userNom'] && $_POST['userPrenom'] && $_POST['societe'] && $_POST['numSiren'] && $_POST['adresse'] && $_POST['codePostal'] && $_POST['ville'] && $_POST['pays'] && $_POST['mail'] && $_POST['mdp'] && $_POST['mdp2']))
         {
             // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             // La fonction "htmlspecialchars()" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
@@ -19,7 +25,7 @@
             $user_societe = trim(htmlspecialchars($_POST['societe']));         
             $user_siren = trim(htmlspecialchars($_POST['numSiren']));
             $user_role = trim(htmlspecialchars($_POST['userRole']));
-            $user_adresse = trim(htmlspecialchars($_POST['adr']));
+            $user_adresse = trim(htmlspecialchars($_POST['adresse']));
             $user_codePostal = trim(htmlspecialchars($_POST['codePostal']));
             $user_ville = trim(htmlspecialchars($_POST['ville']));
             $user_pays = trim(htmlspecialchars($_POST['pays']));
@@ -29,14 +35,22 @@
         }
         else
         {
-            echo "<h4> Veuillez remplir tous les champs ! </h4>";
+            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
             header("refresh:2; url=inscription.php");  // refresh:2 signifie qu'après 2 secondes utilisateur sera redirigé sur la page inscription.php 
             exit;
         }
     }
     else
     {
-        echo "<h4> Veuillez remplir tous les champs ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
         header("refresh:2; url=inscription.php");  
         exit;
     }       
@@ -46,55 +60,91 @@
     preg_match() qui renvoie True or False:      */
     if (!preg_match("#^[A-Za-z ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+$#", $user_nom))  // aprés a-z on a ajouté un espace pour autoriser la saisi de l'espace blanc entre les mots
     {
-        echo "<h4> Entrez un nom valide ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez un nom valide ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }  
     else if (!preg_match("#^[A-Za-z ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+$#", $user_prenom))
     {
-        echo "<h4> Entrez un prénom valide ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez un prénom valide ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }  
     else if (!preg_match("#^[A-Za-z0-9 ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ_&!§£@*',.$;-]+$#", $user_societe))  
     {
-        echo "<h4> Entrez un nom correct de la Raison Sociale ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez un nom correct de la Raison Sociale ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }  
     else if (!preg_match("#^[0-9]{9}$#", $user_siren))
     {
-        echo "<h4> Entrez un numéro Siren valide ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez un numéro Siren valide ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }  
     else if (!preg_match("#^[A-Za-z0-9 ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ_&!§£@*',.$;-]+$#", $user_adresse))
     {
-        echo "<h4> Entrez une adresse valide ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez une adresse valide ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }  
     else if (!preg_match("#^[0-9]{5}$#", $user_codePostal))
     {
-        echo "<h4> Entrez un code postal correct ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez un code postal valide ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }  
     else if (!preg_match("#^[A-Za-z0-9 ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+$#", $user_ville))
     {
-        echo "<h4> Entrez une ville correcte ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez un nom de la ville correct ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }
     else if (!preg_match("#^[A-Za-z ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+$#", $user_pays))
     {
-        echo "<h4> Entrez un pays correct ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> Entrez un nom du pays correct ! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }
     else if (!preg_match("#^[a-z0-9._ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìíîïðòóôõöùúûüýÿ-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $user_email))
     {
-        echo "<h4> L'adresse mail n'a pas le bon format! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                <center> 
+                    <h4> L\'adresse mail n\'a pas le bon format! </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }
@@ -113,7 +163,11 @@
     }
     else
     {
-        echo "<h4> Le mot de passe n'est pas identique. </h4>";
+        echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                <center> 
+                    <h4> Le mot de passe n\'est pas identique. </h4> 
+                </center>
+            </div>'; 
         header("refresh:2; url=inscription.php");
         exit;
     }
@@ -141,7 +195,11 @@
             Puis avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes de la colonne user_email et on la mets dans l'objet $row   */                               
             if ($row->user_email == $user_email)
             {
-                echo "<h4> Cette adresse mail déjà existe. Choisissez une autre! </h4>";
+                echo'<div class="container-fluid alert alert-warning mt-5" role="alert">
+                        <center> 
+                            <h4> Cette adresse mail déjà existe. <br> Veuillez choisir une autre ! </h4> 
+                        </center>
+                    </div>'; 
                 header("refresh:2; url=inscription.php");
                 exit;
             }   
@@ -151,13 +209,15 @@
 
     /*  Avant d'insérer en base de données on convertit tout les caractères en minuscules pour certaines variables. 
     Comme la fonction strtolower() ne convertit pas les lettres accentuées et les caractères spéciaux en minuscules, ici on utilise la fonction 
-    mb_strtolower() qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.   */
-    $user_nom = mb_strtolower($user_nom);
-    $user_prenom = mb_strtolower($user_prenom);
-    $user_societe = mb_strtolower($user_societe);         
-    $user_adresse = mb_strtolower($user_adresse);
-    $user_ville = mb_strtolower($user_ville);
-    $user_pays = mb_strtolower($user_pays);
+    mb_strtolower() qui passe tout les caractères majuscules (lettres normales, lettres accentuées, caractères spéciaux) en minuscules.   
+    Ensuite on utilise la fonction strtoupper() pour convertir tous les lettres d'un mot en majusculeet et 
+    on applique aussi la fonction ucfirst() pour convertir que la 1ere lettre d'un mot en majuscule.      */
+    $user_nom = strtoupper(mb_strtolower($user_nom));
+    $user_prenom = ucfirst(mb_strtolower($user_prenom));
+    $user_societe = ucfirst(mb_strtolower($user_societe));         
+    $user_adresse = ucfirst(mb_strtolower($user_adresse));
+    $user_ville = ucfirst(mb_strtolower($user_ville));
+    $user_pays = ucfirst(mb_strtolower($user_pays));
     $user_email = mb_strtolower( $user_email);
 
 
@@ -195,8 +255,13 @@
     // Libèration la connection au serveur de BDD
     $requete->closeCursor();
 
-    // Redirection vers la page acceuil.php 
-    header("Location: connexion.php");
+    // Redirection vers la page connexion.php 
+    echo'<div class="container-fluid alert alert-success mt-5" role="alert">
+            <center> 
+                <h4> Votre inscription a réussi. <br> Veuillez vous connecter ! </h4> 
+            </center>
+        </div>'; 
+    header("refresh:2; url=connexion.php");  
     exit;   
 
     

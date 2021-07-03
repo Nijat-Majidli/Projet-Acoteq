@@ -51,7 +51,7 @@
         ?>
 
         <!-- PAGE CONTENT -->
-        <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
+        <div class="container-fluid p-4 mb-3 mt-3 col-11 col-sm-9 col-lg-8 bg-light text-dark">
             <h3> Veuillez modifier votre demande </h3>
             <br>
             <!-- Code PHP -->
@@ -82,37 +82,30 @@
                     <form action="script_demandeModifier.php"  method="POST" enctype="multipart/form-data" autocomplete="off">   
                         <input type="hidden" name="demande_id" value="<?php echo $demande_id?>">  
 
-                        <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                        <div class="form-group">
                             <label for="title"> Titre <sup>*</sup> </label> 
                             <input type="text" class="form-control" id="title" name="titre" value="<?php echo $row->demande_titre?>"  required>
                         </div>
 
-                        <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                        <div class="form-group">
                             <label for="desc"> Description <sup>*</sup> </label>
                             <textarea id="desc" class="form-control text-left" name="description" rows="10" style="resize:none" required> 
                                 <?php echo $row->demande_description?> 
                             </textarea>
                         </div>
 
-                        <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                        <div class="form-group">
                             <label for="budgetDemande"> Budget prévu <sup>*</sup> </label>
                             <input type="number" class="form-control" id="budgetDemande" name="budget" value=<?php echo $row->demande_budget?> placeholder="en euro" required>
                         </div>
 
                         <div class="form-group mb-4">
-                            <!--  Vous aurez sûrement besoin de limiter la taille du fichier. Il ne faudrait pas que quelqu'un s'amuse 
-                            à uploader des fichiers de plusieurs Mo...  
-                            Pour limiter la taille du fichier uploadé, avant le champ de type file il faut ajouter un champ caché "hidden", 
-                            lui donner le nom "MAX_FILE_SIZE" et lui donner en valeur la taille maximum du fichier à uploader en octets.
-                            (1Mo =1 000 000 octets,  1Ko = 1000 octets etc..).  Ici on limite la taille du fichier à 5Mo :     -->
-                            <input type="hidden" name="MAX_FILE_SIZE" value="5000000">
-
                             <label for="telecharger"> Télécharger votre demande <sup>*</sup> </label>
-                            <input type="file" class="form-control-file" id="telecharger" name="fichier" required>
+                            <input type="file" class="form-control-file" id="telecharger" name="clientFile" required>
                         </div>
 
                         <!-- Ajouter une équipe dans une demande est facultative, n'est pas obligatoire. -->
-                        <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                        <div class="form-group">
                             <label for="myInput"> Ajouter une équipe : </label> 
                             <input id="myInput" type="search" class="form-control">
 
@@ -148,23 +141,23 @@
                             </select>
                         </div>
 
-                        <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                        <div class="form-group">
                             <label for="team"> Votre équipe : </label> <br>
                             <input id="team" type="text" name="equipe" style="width:100%; border:none; border-bottom:solid 1px #D5DBDB; outline:none"> 
                         </div>
 
                         <p>  Vous voulez : </p>
-                        <div class="form-check form-check-inline ml-3"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">  
+                        <div class="form-check form-check-inline ml-3">  
                             <input class="form-check-input" type="radio" name="etat" id="save" value="sauvegardé" checked>
                             <label class="form-check-label" for="save"> Sauvegarder demande </label>
                         </div>
-                        <div class="form-check form-check-inline"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="etat" id="publish" value="publié">
                             <label class="form-check-label" for="publish"> Publier demande </label>
                         </div>
 
                         <div style="text-align:center; margin-top:40px;">
-                            <input type="submit" class="btn btn-success mr-3" value="Valider"> </input>  
+                            <input type="submit" class="btn btn-success mr-2" value="Valider"> </input>  
                             <a href="demandeSaved.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
                         </div>
                     </form>

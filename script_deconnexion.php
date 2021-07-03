@@ -1,5 +1,11 @@
-<?php
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
+<?php
     session_start();
 
     $_SESSION['email'] = "";
@@ -21,7 +27,26 @@
     session_destroy();
     
 
-    echo "<h4> Vous êtes déconnecté ! </h4>";
+
+    echo'<div class="container-fluid alert alert-primary mt-5" role="alert">
+            <center> 
+                <h4> <br> Vous êtes déconnecté! </h4> 
+            </center>
+        </div> 
+
+        <div class="container-fluid-fluid ml-5">
+            <section class="maison" style="margin-left: 200px">
+                <img src="../Acoteq/image/logo.png" alt="logo" title="logo">
+            </section>
+
+            <aside>
+                <div class="slogan_1" style="margin: 200px 0 0 100px">
+                    <center> <h2> À Bientôt! </h2>  </center> 
+                </div>
+            </aside>
+        </div>';
+
+
     header("refresh:2; url=accueil.php");  
     exit;
    
@@ -39,3 +64,5 @@
     */
 
 ?>
+
+

@@ -35,26 +35,29 @@
         // Si la requête renvoit un seul et unique résultat, on ne fait pas de boucle, ici c'est le cas: 
         $row = $requete->fetch(PDO::FETCH_OBJ);
 
-        // $membrePrenom = mb_strtolower($_SESSION['prenom']);
-        // $membreNom = mb_strtolower($_SESSION['nom']);
-        // $membreName = $membrePrenom." ".$membreNom;
-
-        $membreName = mb_strtolower($_SESSION['fullName']);
-        
+        $membrePrenom = mb_strtolower($_SESSION['prenom']);
+        $membreNom = mb_strtolower($_SESSION['nom']);
+        $membreName = $membrePrenom." ".$membreNom;
         $removeName = "";
 
         // La fonction strpos(param1, param2) cherche la string param2 dans la string param1 et retourne sa position
         if(strpos($row->equipe_membres, $membreName)) 
         {
+            echo "Hello ".$row->equipe_membres."<br>";
+            
             $removeName = str_replace($membreName, '', $row->equipe_membres); 
+            
+            echo $removeName."<br>";
         }
 
-        $membreEmail = $_SESSION['email'];
         $removeEmail = "";
-
-        if(strpos($row->member_mails, $membreEmail)) 
+        if(strpos($row->member_mails, $_SESSION['email'])) 
         { 
-            $removeEmail = str_replace($membreEmail, '', $row->member_mails); 
+            echo "Hello ".$row->member_mails."<br>";
+
+            $removeEmail = str_replace($_SESSION['email'], '', $row->member_mails); 
+
+            echo $removeEmail."<br>";
         }
 
         // Construction de la requête UPDATE avec la méthode prepare() sans injection SQL

@@ -38,27 +38,36 @@
 
             <!-- PAGE CONTENT -->
             <div class="container-fluid">
-                <section class="maison">
-                    <img src="../Acoteq/image/logo.png" alt="logo" title="logo">
-                </section>
+                <div class="row justify-content-center no-gutters">
+                <!-- LOGO -->
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-5">   
+                    <center>
+                    <section class="maison">
+                        <img src="../Acoteq/image/logo.png" alt="logo" title="logo" class="col-12">
+                    </section>
+                    </center>  
+                </div>
 
-                <aside class="aside">
-                    <div class="slogan_2">
-                        <h3> Veuillez saisir votre adresse mail <br> pour recevoir votre mot de passe : </h3> 
-                    </div>
-
-                    <form  action="script_mdpLost.php"  method="POST" autocomplete="off" class="form_connect">
-                        <div class="form-group" class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                            <label for="mail"> E-mail <sup>*</sup> </label>
-                            <input id="mail" type="text" class="form-control" name="email" required>
+                 <!-- Aside  -->
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-7"> 
+                    <aside>
+                        <div class="slogan">
+                            <h5> Veuillez saisir votre adresse mail pour recevoir votre mot de passe </h5> 
                         </div>
 
-                        <div class="boutons">
-                            <button type="submit" class="btn btn-success"> Valider </button>
-                            <a href="connexion.php"> <input type="button" class="btn btn-danger ml-3" value="Annuler"> </a>  
-                        </div>
-                    </form>
-                </aside>
+                        <form  action="script_mdpLost.php"  method="POST" autocomplete="off" class="form_connect">
+                            <div class="form-group">
+                                <label for="mail"> E-mail <sup>*</sup> </label>
+                                <input id="mail" type="text" class="form-control col-xl-10" name="email" required>
+                            </div>
+
+                            <div style="text-align: center;">
+                                <button type="submit" class="btn btn-success mr-2"> Valider </button>
+                                <a href="connexion.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>  
+                            </div>
+                        </form>
+                    </aside>
+                </div>
             </div>
         </main>
 

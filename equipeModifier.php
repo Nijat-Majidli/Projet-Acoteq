@@ -1,9 +1,9 @@
 <?php 
     session_start();  
     /* ATTENTION
-    Il est impératif d'utiliser la fonction session_start() au début de chaque fichier PHP dans lequel on manipulera cette 
-    variable et avant tout envoi de requêtes HTTP, c'est-à-dire avant tout echo ou quoi que ce soit d'autre : rien ne doit 
-    avoir encore été écrit/envoyé à la page web.  */
+    Le fonction session_start() démarre le système de sessions. Il est impératif d'utiliser cette fonction au début de chaque 
+    fichier PHP dans lequel on utilisera la variable superglobale $_SESSION et avant tout envoi de requêtes HTTP, c'est-à-dire 
+    avant tout code HTML (donc avant la balise <!DOCTYPE> ).  */  
 
     if (!isset($_SESSION['email']) && !isset($_SESSION['user_siren']) && !isset($_SESSION['role'])=="client")
     {
@@ -11,6 +11,26 @@
         header("refresh:2; url=connexion.php");  // refresh:2 signifie que après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
     }
+
+
+    // Nous récupérons le paramétre equipe_id transmit en GET par la page "equipeCreated.php" et on le met dans la variable $equipe_id :
+    if(isset($_GET['equipe_id']) && !empty($_GET['equipe_id']))
+    {
+        // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
+        // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
+        $equipe_id = trim(htmlspecialchars((int)$_GET['equipe_id']));   // Pour vérifier que $_GET['demande_id'] contient bien un nombre entier, on utilise (int) pour convertir la variable GET en type entier. 
+    }
+    else
+    {
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
+        header("refresh:2; url=equipeCreated.php");  
+        exit;
+    }   
+
 ?>
 
 
@@ -49,113 +69,102 @@
             }
         ?>
 
+
         <!-- PAGE CONTENT -->
-        <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
-            <h2> Veuillez modifier votre équipe </h2>
-            <br>
-            <form action="script_equipeModifier.php" method="POST" autocomplete="off">
-                <!-- Code PHP -->
 <?php
-                // On récupérer le paramétre equipe_id transmit en GET par la page "equipeCreated.php" et on le met dans la variable $equipe_id :
-                if(isset($_GET['equipe_id']) && !empty($_GET['equipe_id']))
-                {
-                    // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
-                    // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
-                    $equipe_id = trim(htmlspecialchars((int)$_GET['equipe_id']));   // Pour vérifier que $_GET['demande_id'] contient bien un nombre entier, on utilise (int) pour convertir la variable GET en type entier. 
+        // Connéxion à la base de données 
+        require "connection_bdd.php";
+            
+        // On construit la requête SELECT : 
+        $requete = $db->prepare ("SELECT * FROM equipe WHERE equipe_id=:equipe_id");
 
-                    // Connéxion à la base de données 
-                    require "connection_bdd.php";
+        // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
+        $requete->bindValue(':equipe_id', $equipe_id, PDO::PARAM_INT);
+
+        // On exécute la requête
+        $requete->execute();
+
+        // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête:
+        $nbLigne = $requete->rowCount(); 
+
+        if($nbLigne >= 1)
+        {
+            while ($row = $requete->fetch(PDO::FETCH_OBJ))  
+            {                                           
+?>   
+                <div class="container-fluid mt-5 col-12 col-sm-11 col-md-10 col-lg-9 col-xl-8">
+                    <h3> Veuillez modifier votre équipe </h3>
+                    <br>
+                    <form action="script_equipeModifier.php" method="POST" autocomplete="off">
+                        <input type="hidden" name="equipe_id" value="<?php echo $equipe_id?>">
+                        <input type="hidden" name="equipe_proprietaire" value="<?php echo $row->equipe_proprietaire?>">
                         
-                    // On construit la requête SELECT : 
-                    $requete = $db->prepare ("SELECT * FROM equipe WHERE equipe_id=:equipe_id");
+                        <div class="form-group">
+                            <label for="team"> Nom d'équipe : </label> 
+                            <input id="team" type="text" class="form-control" name="equipe_nom" value="<?php echo $row->equipe_nom?>" required>
+                        </div>
 
-                    // Association valeur de $_SESSION['email'] au marqueur :email via méthode "bindValue()"
-                    $requete->bindValue(':equipe_id', $equipe_id, PDO::PARAM_INT);
+                        <div class="form-group">
+                            <label for="member"> Membres d'équipe : </label> <br>
+                            <input id="member" class="member" type="text" name="equipe_membres" value="<?php echo $_SESSION['fullName'].", ".$_SESSION['email']?>" required> 
+                        </div>
 
-                    // On exécute la requête
-                    $requete->execute();
+                        <div class="form-group">
+                            <label for="myInput"> Choisir les membres : </label> 
+                            <input id="myInput" type="search" class="form-control">
 
-                    // Grace à la méthode "rowCount()" on peut compter le nombre de lignes retournées par la requête:
-                    $nbLigne = $requete->rowCount(); 
-
-                    if($nbLigne >= 1)
-                    {
-                        while ($row = $requete->fetch(PDO::FETCH_OBJ))  
-                        {                                           
-?>     
-                            <input type="hidden" name="equipe_id" value="<?php echo $equipe_id?>">
-                            <input type="hidden" name="equipe_proprietaire" value="<?php echo $row->equipe_proprietaire?>">
-                            
-                            <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                                <label for="team"> Nom d'équipe : </label> 
-                                <input id="team" type="text" class="form-control" name="equipe_nom" value="<?php echo $row->equipe_nom?>" required>
-                            </div>
-
-                            <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                                <label for="member"> Membres d'équipe : </label> <br>
-                                <input id="member" type="text" name="equipe_membres" value="<?php echo $row->equipe_membres?>" style="width:100%; border:none; border-bottom:solid 1px #D5DBDB; outline:none" required> 
-                            </div>
-
-                            <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                                <label for="myInput"> Choisir les membres : </label> 
-                                <input id="myInput" type="search" class="form-control">
-
-                                <select id="liste" class="custom-select" style="display:none;" size="5">
-                                    <!-- Code Php -->
+                            <select id="liste" class="custom-select" style="display:none;" size="5">
 <?php 
-                                    // Connéxion à la base de données
-                                    require ("connection_bdd.php");
+                                // On construit la requête SELECT via la méthode prepare() pour éviter injection SQL : 
+                                $requete = $db->prepare ("SELECT * FROM users WHERE user_siren = :user_siren");
 
-                                    // On construit la requête SELECT via la méthode prepare() pour éviter injection SQL : 
-                                    $requete = $db->prepare ("SELECT * FROM users WHERE user_siren = :user_siren");
+                                /* Association valeur au marqueur et execution de la requete.
+                                L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement". */
+                                $requete->execute(array(':user_siren' => $_SESSION['user_siren']));   
 
-                                    /* Association valeur au marqueur et execution de la requete.
-                                    L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement". */
-                                    $requete->execute(array(':user_siren' => $_SESSION['user_siren']));   
+                                // Grace à la méthode "rowCount()" nous pouvons connaitre le nombre de lignes retournées par la requête
+                                $nbLigne = $requete->rowCount(); 
 
-                                    // Grace à la méthode "rowCount()" nous pouvons connaitre le nombre de lignes retournées par la requête
-                                    $nbLigne = $requete->rowCount(); 
-
-                                    if ($nbLigne >= 1)
-                                    {
-                                        while ($row = $requete->fetch(PDO::FETCH_OBJ))   
-                                        {                       
+                                if ($nbLigne >= 1)
+                                {
+                                    while ($row = $requete->fetch(PDO::FETCH_OBJ))   
+                                    {                       
 ?>
-                                            <option> 
-                                                <?php echo $row->user_nom;?> <?php echo $row->user_prenom;?> (<?php echo $row->user_email;?>) 
-                                            </option>
+                                        <option> 
+                                            <?php echo $row->user_prenom;?> <?php echo $row->user_nom;?>, <?php echo $row->user_email;?> 
+                                        </option>
 <?php
-                                        }
-                                    } 
-
-                                    // Libèration la connection au serveur de BDD
-                                    $requete->closeCursor();
+                                    }
+                                } 
 ?>
-                                </select>
-                            </div>
-<?php
-                        }
-                    } 
+                            </select>
+                        </div>
 
-                    // Libèration la connection au serveur de BDD
-                    $requete->closeCursor();
-                                          
-                }
-                else
-                {
-                    echo "<h4> Veuillez remplir tous les champs ! </h4>";
-                    header("refresh:2; url=equipeCreated.php");  
-                    exit;
-                }   
+                        <!-- Les boutons <Valider> et <Annuler> -->
+                        <div style="text-align: center; margin-top:40px;">
+                            <button type="submit" class="btn btn-success mr-2" id="bouton_valider"> Valider </button>
+                            <a href="equipeCreated.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
+                        </div>
+                    </form>
+                </div>   
+<?php
+            }
+        } 
+        else
+        {
+            echo '<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Il y a aucune équipe avec ce numéro ! </h4> 
+                    </center>
+                </div>'; 
+        
+            header("refresh:2; url=equipeCreated.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page equipeCreated.php
+            exit;
+        }
+
+        // Libèration la connection au serveur de BDD
+        $requete->closeCursor();
 ?>        
-                <!-- Les boutons <Valider> et <Annuler> -->
-                <div style="text-align: center; margin-top: 40px;">
-                    <button type="submit" class="btn btn-success" id="bouton_valider"> Valider </button>
-                    <a href="equipeCreated.php"> <input type="button" class="btn btn-danger" value="Annuler"> </a>
-                </div>
-            </form>   
-        </div>
-
 
   
         <!-- JQuery Code pour aller chercher et ajouter les membres d'équipe depuis base de données -->
@@ -175,11 +184,14 @@
                 });
 
 
+                // Dans la variable "content" on récupére le contenu (valeur) de l'input <Membres d'équipe>
+                var content = $('#member').val();
+
+                // On crée un tableau (array) allMembers et on mets dedans la variable content
+                var allMembers=[content];  
+
                 $('select').change(function()
                 {    
-                     // On crée un tableau (array) vide: allMembers
-                     var allMembers=[];  
-
                     // Dans la variable "newMembers" avec la méthode text() on récupére le contenu de la balise <option> cliquée (selected):
                     var newMembers = $("option:selected").text();  // newMembers contient la liste des nouvels membres
                    
@@ -187,10 +199,10 @@
                     allMembers.push($.trim(newMembers));   // La méthode trim() est utilisée pour supprimer l'espace blanc du début et de la fin d'une chaîne
 
                     // Dans la variable "currentMembers" avec la méthode val() on récupére le contenu de la balise <input> avec ID="member" :
-                    var currentMembers = $('#member').val();  // currentMembers contient la liste des membres actuels
+                   // var currentMembers = $('#member').val();  // currentMembers contient la liste des membres actuels
 
                     // Puis avec la méthode push() on ajoute la variable "curentMembers" dans l'array allMembers:
-                    allMembers.push(currentMembers);
+                    // allMembers.push(currentMembers);
 
                     $("option:selected").click(function() 
                     {

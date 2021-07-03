@@ -18,7 +18,7 @@
     {
         // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
         // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS
-        $demande_id = trim(htmlspecialchars((int)$_GET['demande_id']));  // Pour vérifier que $_GET['demande_id'] contient bien un nombre entier, on utilise (int) pour convertir la variable GET en type entier. 
+        $demande_id = trim(htmlspecialchars((int)$_GET['demande_id']));  // Pour vérifier que $_GET['demande_id'] contient bien un nombre entier, on utilise (int) pour convertir la variable GET en type entier.
     }
     else
     {
@@ -31,11 +31,23 @@
             $page='fournisseur.php';
         }
 
-        echo "<h4> Veuillez indiquer le numéro de demande ! </h4>";
+        echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
+                <center> 
+                    <h4> Veuillez indiquer le numéro de demande ! </h4> 
+                </center>
+            </div>";  
+
         header("refresh:2; url=$page"); 
         exit;
     }  
+
+
+    if(isset($_GET['demande_etat']))
+    {
+        $demande_etat = trim(htmlspecialchars($_GET['demande_etat']));
+    }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -88,36 +100,41 @@
 
 
         <!-- PAGE CONTENT -->
-        <div class="container p-4 mb-3 mt-3 col-7 bg-light text-dark">
-            <form action="#"  method="#">   
 <?php 
-                // Connéxion à la base de données 
-                require "connection_bdd.php";
-                                    
-                // On construit la requête SELECT : 
-                $result = $db->prepare("SELECT * FROM demande WHERE demande_id=:demande_id");
-                
-                // Association des valeurs aux marqueurs via la méthode "bindValue()" :
-                $result->bindValue(':demande_id', $demande_id);
+        // Connéxion à la base de données 
+        require "connection_bdd.php";
+                            
+        // On construit la requête SELECT : 
+        $result = $db->prepare("SELECT * FROM demande WHERE demande_id=:demande_id");
+        
+        // Association des valeurs aux marqueurs via la méthode "bindValue()" :
+        $result->bindValue(':demande_id', $demande_id);
 
-                // On exécute la requête :
-                $result->execute();
+        // On exécute la requête :
+        $result->execute();
 
-                // Si la requête renvoit un seul et unique résultat, on ne fait pas de boucle, ici c'est le cas: 
-                $row = $result->fetch(PDO::FETCH_OBJ);
+        // Si la requête renvoit un seul et unique résultat, on ne fait pas de boucle, ici c'est le cas: 
+        $row = $result->fetch(PDO::FETCH_OBJ);
 ?>
-                <center> <h4> <?php echo $row->demande_titre;?> </h4> </center>  
-                <br>
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+        <div class="container-fluid p-4 mb-3 mt-3 col-11 col-sm-9 col-lg-8 bg-light text-dark">
+            <center> <h4> <?php echo $row->demande_titre;?> </h4> </center>  
+            <br>
+            <form action="#"  method="#">   
+                <div class="form-group">
                     <label> Description </label>
                     <textarea class="form-control text-left" rows="10" style="resize:none; " readonly>
                         <?php echo $row->demande_description;?>
                     </textarea>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label> Budget prévu </label>
                     <input type="number" class="form-control" value="<?php echo $row->demande_budget;?>" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label> État </label>
+                    <input type="text" class="form-control" name="etat" value="<?php echo $row->demande_etat;?>" readonly>
                 </div>
 <?php
             /* Si l'utilisateur est un client (pas fournisseur) on lui montre certain informations supplémantaires :
@@ -127,12 +144,12 @@
             if($_SESSION['role']=="client")
             {
 ?>
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label> Équipe </label>
                     <input type="text" class="form-control" name="budget" value="<?php echo $row->demande_equipe;?>" readonly>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label> Date création </label>
                     <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
                     Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:      -->
@@ -140,7 +157,7 @@
                     <input type="text" class="form-control" value="<?php echo $dateCreation->format("d/m/Y H:\hi");?>" readonly>
                 </div>
 
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label> Date modification </label>
                     <?php $dateModification = new DateTime($row->demande_modification);?>
                     <input type="text" class="form-control" name="budget" value="<?php echo $dateModification->format("d/m/Y H:\hi");?>" readonly>
@@ -148,16 +165,22 @@
 <?php
             }
 ?>
-                <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                <div class="form-group">
                     <label> Date publication </label>
                     <?php $datePublication = new DateTime($row->demande_publication);?>
                     <input type="text" class="form-control" name="budget" value="<?php echo $datePublication->format("d/m/Y H:\hi");?>" readonly>
                 </div>
+
+                <div class="form-group">
+                    <label> Détail demande </label> <br>
+                    <a href="<?php echo "fichiers/"; echo "demande_".$demande_id." "; echo $row->demande_file_name;?>" download>
+                        <button class="btn btn-info" type="button"> Télécharger </button> 
+                    </a>
+                </div>
             </form>
             <br>
-
 <?php
-            /* Les boutons Modifier, Publier et Supprimer  
+            /* Boutons Modifier, Publier et Supprimer  
             Seul la proprietaire de la demande (client qui a crée la demande) peut la modifier, publier ou supprimer :  */
             if($_SESSION['role']=="client" && $row->user_email==$_SESSION['email'])
             {
@@ -166,11 +189,16 @@
                     <a href="demandeModifier.php?demande_id=<?php echo $row->demande_id;?>"> 
                         <button class="btn btn-primary mr-3" type="button" onclick="modifier()"> Modifier </button> 
                     </a> 
-                    
-                    <a href="script_demandePublier.php?demande_id=<?php echo $row->demande_id;?>"> 
-                        <button class="btn btn-success mr-3" type="button" onclick="publier()"> Publier </button> 
-                    </a>  
-                    
+<?php
+                    if($demande_etat=="sauvegardé")
+                    {
+?>
+                        <a href="script_demandePublier.php?demande_id=<?php echo $row->demande_id;?>"> 
+                            <button class="btn btn-success mr-3" type="button" onclick="publier()"> Publier </button> 
+                         </a>  
+<?php
+                    }
+?>                  
                     <a href="script_demandeSupprimer.php?demande_id=<?php echo $row->demande_id ?>"> 
                         <input class="btn btn-danger" type="button" onclick="supprimer()" value="Supprimer"> 
                     </a> 
@@ -188,19 +216,19 @@
                     <input type="hidden" name="demande_id" value="<?php echo $demande_id?>"> 
                     
                     <h5> Votre réponse </h5>
-                    <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <div class="form-group">
                         <label for="title"> Titre <sup>*</sup> </label> 
                         <input type="text" class="form-control" id="title" name="reponse_titre" style="width:90%" required>
                     </div>
 
-                    <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <div class="form-group">
                         <label for="desc"> Description <sup>*</sup> </label>
                         <textarea id="desc" class="form-control text-left" name="reponse_description" rows="10" style="width:90%; resize:none" required> 
                             <?php echo $row->reponse_description?> 
                         </textarea>
                     </div>
 
-                    <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
+                    <div class="form-group">
                         <label for="prix"> Votre tarif proposé : <sup>*</sup> </label> 
                         <input type="number" class="form-control" id="prix" name="reponse_budget" style="width:15%" required>
                     </div>
@@ -298,13 +326,13 @@
             function modifier()
             { 
                 //Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
-                var resultat = confirm("Etes-vous certain de vouloir modifier cette demande ?");
+                var resultat = window.confirm("Etes-vous certain de vouloir modifier cette demande ?");
 
                 // alert("retour :" + resultat);
 
                 if (resultat==false)
                 {
-                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette demande!");
+                    window.alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette demande!");
 
                     //annule l'évènement par défaut ... SUBMIT vers "demandeModifier.php"
                     event.preventDefault();    
@@ -318,7 +346,7 @@
 
                 if (resultat==false)
                 {
-                    alert("Vous avez annulé publication!");
+                    window.alert("Vous avez annulé publication!");
 
                     //annule l'évènement par défaut ... SUBMIT vers "script_demandePublier.php"
                     event.preventDefault();    
@@ -332,7 +360,7 @@
 
                 if (resultat==false)
                 {
-                    alert("Vous avez annulé suppression!");
+                    window.alert("Vous avez annulé suppression!");
 
                     //annule l'évènement par défaut ... SUBMIT vers "script_demandeSupprimer.php"
                     event.preventDefault();    

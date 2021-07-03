@@ -47,41 +47,50 @@
 
       <!-- PAGE CONTENT -->
       <div class="container-fluid">
-        <section class="maison">
-          <img src="../Acoteq/image/logo.png" alt="logo" title="logo">
-        </section>
-
-        <!-- Connexion  -->
-        <aside class="aside">
-          <div class="slogan_2">
-            <h3> Connecter vous pour accéder <br> à l’ensemble de nos services </h3> 
+        <div class="row justify-content-center no-gutters">
+          <!-- LOGO -->
+          <div class="col-12 col-sm-12 col-md-7 col-lg-6 col-xl-5">   
+            <center>
+              <section class="maison">
+                <img src="../Acoteq/image/logo.png" alt="logo" title="logo" class="col-12">
+              </section>
+            </center>  
           </div>
-          
-          <form action="script_connexion.php" method="POST" autocomplete="off" class="form_connect">
-              <div class="form-group" class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                <label for="mail"> E-mail <sup>*</sup> </label>
-                <input id="mail" type="text" class="form-control col-11" name="email" value='<?php echo $login;?>' required>
+
+          <!-- Aside  -->
+          <div class="col-12 col-sm-12 col-md-5 col-lg-6 col-xl-7"> 
+            <aside>
+              <div class="slogan">
+                <h5> Connecter vous pour accéder à tous nos services </h5> 
               </div>
               
-              <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
-                <label for="code" style="display: block;"> Mot de passe <sup>*</sup> </label> 
-                <input id="code" type="password" class="form-control col-11 mr-2 float-left" name="mdp" value='<?php echo $password;?>' required> 
-                <img src="image/eye_closed.png" alt="eyePicture" id="eyeIcon">  
-              </div>         
+              <form action="script_connexion.php" method="POST" autocomplete="off" class="form_connect">
+                  <div class="form-group">
+                    <label for="mail"> E-mail <sup>*</sup> </label>
+                    <input id="mail" type="text" class="form-control col-11 col-xl-9" name="email" value='<?php echo $login;?>' required>
+                  </div>
+                  
+                  <div class="form-group clearfix">
+                    <label for="code" style="display: block;"> Mot de passe <sup>*</sup> </label> 
+                    <input id="code" type="password" class="form-control col-11 col-xl-9 float-left" name="mdp" value='<?php echo $password;?>' required> 
+                    <img src="image/eye_closed.png" alt="eyePicture" id="eyeIcon">  
+                  </div>         
 
-              <div class="form-group form-check">
-                <input class="form-check-input" id="exampleCheck1" type="checkbox" name="cookie" value="rememberMe">
-                <label class="form-check-label" for="exampleCheck1"> Se souvenir de moi </label>
-              </div>
+                  <div class="form-group form-check">
+                    <input class="form-check-input" id="exampleCheck1" type="checkbox" name="cookie" value="rememberMe">
+                    <label class="form-check-label" for="exampleCheck1"> Se souvenir de moi </label>
+                  </div>
 
-              <a href="mdpLost.php"> Mot de passe oublié ? </a>
-              <br><br>
+                  <a href="mdpLost.php"> Mot de passe oublié ? </a>
+                  <br><br>
 
-              <div style="text-align: center;">
-                <button type="submit" class="btn btn-primary"> Connexion </button>
-              </div>
-          </form>
-        </aside>
+                  <div style="text-align: center;">
+                    <button type="submit" class="btn btn-primary"> Connexion </button>
+                  </div>
+              </form>
+            </aside>
+          </div>
+        </div>
       </div>
     </main>
       

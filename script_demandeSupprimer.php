@@ -1,3 +1,10 @@
+<!-- Bootstrap CDN link --> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- Fichier CSS -->
+<link rel="stylesheet" href="css/style.css">
+
+
 <?php
      
     // On récupérer le paramétre demande_id transmit en GET par la page "demandeDetail.php" et on le met dans la variable $demande_id :
@@ -22,13 +29,22 @@
         // Libèration la connection au serveur de BDD
         $requete->closeCursor();
 
-        echo '<h4> Votre demande a été supprimé avec succès! </h4> ';
+        echo'<div class="container-fluid alert alert-success mt-5" role="alert">
+            <center> 
+                <h4> Votre demande a été supprimé avec succès! </h4> 
+            </center>
+        </div>'; 
+
         header("refresh:2; url=client.php");   // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé vers la page client.php
         exit;
     }
     else
     {
-        echo "<h4> Veuillez remplir tous les champs ! </h4>";
+        echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
+                    <center> 
+                        <h4> Veuillez remplir tous les champs ! </h4> 
+                    </center>
+                </div>'; 
         header("refresh:2; url=client.php");  
         exit;
     }
