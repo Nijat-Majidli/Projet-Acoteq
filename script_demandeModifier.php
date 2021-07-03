@@ -192,7 +192,7 @@
                     </center>
                 </div>'; 
 
-            header("refresh:2; url=demandeDetail.php?demande_id=$demande_id.php");   
+            header("refresh:2; url=client.php");   
             exit;
 
 

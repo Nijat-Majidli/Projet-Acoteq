@@ -73,46 +73,47 @@
             
             if($nbLigne >= 1)
             {
-                while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
-                {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
 ?>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th scope="col"> Titre </th>
-                                    <th scope="col"> Budget </th>
-                                    <th scope="col"> Crée </th>
-                                    <th scope="col"> Détail </>
-                                </tr>
-                            </thead>
-            
-                            <tbody>
-                                <tr>
-                                    <td>  <?php echo $row->demande_titre;?>  </td>
-                                    <td>  <?php echo $row->demande_budget;?>  </td>
-
-                                    <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est 
-                                    dans un format MySql: 2018-11-16
-                                    Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:   -->
-                                    <?php $dateCreation = new DateTime($row->demande_creation);?>
-                                    <td> <?php echo $dateCreation->format("d/m/Y H:\hi");?> </td>          
-
-                                    <!-- On envoie en URL (méthode GET) le paramètre demande_id et demande_etat vers la page demandeDetail.php :   -->
-                                    <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?> &amp; demande_etat=<?php echo $row->demande_etat ?>"> Afficher </a> </td>                   
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col"> Titre </th>
+                                <th scope="col"> Budget </th>
+                                <th scope="col"> Crée </th>
+                                <th scope="col"> Détail </>
+                            </tr>
+                        </thead>
 <?php
-                }
+                    while ($row = $requete->fetch(PDO::FETCH_OBJ))  // Grace à méthode fetch() on choisit le 1er ligne de chaque colonne et la mets dans l'objet $row
+                    {                                              // Avec la boucle "while" on choisit 2eme, 3eme, etc... lignes de chaque colonne et les mets dans l'objet $row
+?>
+                        <tbody>
+                            <tr>
+                                <td>  <?php echo $row->demande_titre;?>  </td>
+                                <td>  <?php echo $row->demande_budget;?>  </td>
+
+                                <!-- Ici on a besoin d'afficher une date qui provient de la base de données et qui est 
+                                dans un format MySql: 2018-11-16
+                                Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format:   -->
+                                <?php $dateCreation = new DateTime($row->demande_creation);?>
+                                <td> <?php echo $dateCreation->format("d/m/Y H:\hi");?> </td>          
+
+                                <!-- On envoie en URL (méthode GET) le paramètre demande_id et demande_etat vers la page demandeDetail.php :   -->
+                                <td> <a href="demandeDetail.php?demande_id=<?php echo $row->demande_id ?> &amp; demande_etat=<?php echo $row->demande_etat ?>"> Afficher </a> </td>                   
+                            </tr>
+                        </tbody>
+<?php
+                    }
+?>
+                    </table>
+                </div>
+<?php
             }
             else
             {
                 echo "<br> <center> <h5 style='color:red'> Pour l'instant vous avez aucune demande sauvegardées ! </h5> </center> <br>"; 
-                echo '<center> 
-                        Pour créer une demande veuillez cliquer : <a href="demandeNew.php"> Nouvelle demande </a>
-                        <center>';
+                echo '<center> Pour créer une demande veuillez cliquer : <a href="demandeNew.php"> Nouvelle demande </a> <center>';
             }
 
             //Libèration la connection au serveur de BDD

@@ -110,16 +110,20 @@
                                         
                                 if ($nbLigne >= 1)
                                 {
-                                    while ($ligne = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $ligne                                            
-                                    {                                             
 ?>
-                                        <td> 
+                                    <td> 
+<?php
+                                        while ($ligne = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $ligne                                            
+                                        {                                             
+?>
                                             <a href="demandeDetail.php?demande_id=<?php echo $ligne->demande_id ?>"> 
-                                                <?php echo $ligne->demande_titre;?> 
-                                            </a> 
-                                        </td>
+                                                <?php echo $ligne->demande_titre."<br>";?> 
+                                            </a>                     
 <?php                                     
-                                    }
+                                        }
+?>
+                                    </td>
+<?php
                                 }
                                 else
                                 {

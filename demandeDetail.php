@@ -46,6 +46,7 @@
     {
         $demande_etat = trim(htmlspecialchars($_GET['demande_etat']));
     }
+   
 ?>
 
 
@@ -190,7 +191,7 @@
                         <button class="btn btn-primary mr-3" type="button" onclick="modifier()"> Modifier </button> 
                     </a> 
 <?php
-                    if($demande_etat=="sauvegardé")
+                    if(isset($demande_etat) && $demande_etat=="sauvegardé")
                     {
 ?>
                         <a href="script_demandePublier.php?demande_id=<?php echo $row->demande_id;?>"> 

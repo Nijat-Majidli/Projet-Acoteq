@@ -82,7 +82,7 @@
                                 <th scope="col"> Email </th>
                                 <th scope="col"> Crée </th>
                                 <th scope="col"> Modifiée </th>
-                                <th scope="col" colspan="2"> <center> Action </center> </th> 
+                                <th scope="col"> <center> Action </center> </th> 
                             </tr>
                         </thead>
 <?php
@@ -98,14 +98,15 @@
                                 <td>  <?php echo $row->equipe_creation;?>  </td>
                                 <td>  <?php echo $row->equipe_modification;?>  </td>
                                 <td> 
-                                    <a href="equipeModifier.php?equipe_id=<?php echo $row->equipe_id;?>"> 
-                                        <button class="btn btn-secondary" type="button" onclick="Modifier()"> Modifier </button> 
-                                    </a> 
-                                </td>
-                                <td>   
-                                    <a href="script_equipeSupprimer.php?equipe_id=<?php echo $row->equipe_id;?>"> 
-                                        <button class="btn btn-danger" type="button" onclick="Supprimer()"> Supprimer </button> 
-                                    </a>  
+                                    <center>
+                                        <a href="equipeModifier.php?equipe_id=<?php echo $row->equipe_id;?>"> 
+                                            <button class="btn btn-secondary mr-1" type="button" onclick="Modifier()"> Modifier </button> 
+                                        </a> 
+                                    
+                                        <a href="script_equipeSupprimer.php?equipe_id=<?php echo $row->equipe_id;?>"> 
+                                            <button class="btn btn-danger" type="button" onclick="Supprimer()"> Supprimer </button> 
+                                        </a>  
+                                    </center>
                                 </td>
                             </tr>
                         </tbody>

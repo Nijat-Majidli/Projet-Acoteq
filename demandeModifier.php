@@ -56,7 +56,7 @@
             <br>
             <!-- Code PHP -->
 <?php
-            // On récupérer le paramétre demande_id transmit par la page "demandeSaved.php" et on le met dans la variable $demande_id :
+            // On récupérer le paramétre demande_id transmit par la page "demandeDetail.php" et on le met dans la variable $demande_id :
             $demande_id = $_GET['demande_id'];
 
             // Connéxion à la base de données 
