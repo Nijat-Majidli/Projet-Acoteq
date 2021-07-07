@@ -112,9 +112,7 @@
                 <br>
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
                     <label> Description </label>
-                    <textarea class="form-control" rows="10" style="resize:none" readonly>
-                        <?php echo $row->reponse_description;?>
-                    </textarea>
+                    <textarea class="form-control" rows="5" style="resize:none" readonly> <?php echo $row->reponse_description;?> </textarea>
                 </div>
 
                 <div class="form-group"  class="col-1 col-sm-8 col-md-9 col-lg-10 col-xl-11">
@@ -143,7 +141,7 @@
             <br>
 <?php
             /* Les boutons Modifier, Supprimer et Déconnexion  
-            Seul la proprietaire de la demande (client qui a crée la demande) peut la modifier, publier ou supprimer :  */
+            Seul la proprietaire de la demande (fournisseur qui a crée la demande) peut la modifier, publier ou supprimer :  */
             if($_SESSION['role']=="fournisseur" && $row->user_email==$_SESSION['email'])
             {
 ?>
@@ -196,17 +194,62 @@
 
                 while ($ligne = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $ligne                                            
                 {    
+                    if(!in_array($ligne->user_email, $liste_emailClient))
+                    {
+                        array_push($liste_emailClient, $ligne->user_email);   // Avec la méthode array_push on enregistre les emails clients dans l'array $liste_emailClient
+                    }
+
                     /* Ici on a besoin d'afficher une date qui provient de la base de données et qui est dans un format MySql: 2018-11-16
                     Pour formater cette date, on va utiliser l'objet de la classe DateTime() et la méthode format():        */
                     $date = new DateTime($ligne->comment_publication);
-                    
-                    echo "Le ".$date->format("d/m/Y H:\hi")."<br>".$ligne->comment_proprietaire." de la société ".$ligne->comment_societe." a écrit: <br> <h6>".$ligne->comment_description."</h6> <br>";
-                    
-                    if(!in_array($ligne->user_email, $liste_emailClient))
-                    {
-                        array_push($liste_emailClient, $ligne->user_email);
-                    }
+?>
+                    <!-- Text de commentaire -->
+                    <form action="script_commentModifier.php" method="POST">
+                        <input type="hidden" name="comment_id" value="<?php echo $ligne->comment_id?>">
+                        <input type="hidden" name="reponse_id" value="<?php echo $reponse_id?>">
+                        <br>
+                        Le <?php echo $date->format("d/m/Y H:\hi")?> 
+                        <?php echo "\n".$ligne->comment_proprietaire?> de la société <?php echo $ligne->comment_societe?> a écrit:
+                        <textarea id='<?php echo $ligne->comment_id?>' name='comment_description' class='form-control text-left' style='resize:none;' readonly> <?php echo $ligne->comment_description?> </textarea>
+<?php
+                        // bouton Supprimer ou Modifier
+                        if($_SESSION['role']=='client')
+                        {
+                            if($_SESSION['fullName']==$ligne->comment_proprietaire && $_SESSION['id']==$ligne->user_id)
+                            {
+?>
+                                <center class="buttons"> 
+                                    <a onclick='supprimer()' href='script_commentSupprimer.php?comment_id=<?php echo $ligne->comment_id?> &amp; reponse_id=<?php echo $reponse_id?>'> Supprimer </a>  
+                                    <a onClick='change(<?php echo $ligne->comment_id?>)' href='#confirmer' style="margin-left:10px"> Modifier </a> 
+                                </center> <br>
+                                <center id="confirmer" style="display:none"> 
+                                    <input onClick='valider()' type="submit" value="Valider" class="btn btn-success mr-2">
+                                    <input onClick='annuler(<?php echo $ligne->comment_id?>)' type="button" value="Annuler" class="btn btn-danger">
+                                </center> <br>
+<?php
+                            }
+                        }
+                        elseif($_SESSION['role']=='fournisseur')
+                        {
+                            if($_SESSION['fullName']==$ligne->comment_proprietaire && $_SESSION['id']==$ligne->user_id_1)
+                            {
+?>
+                                <center class="buttons"> 
+                                    <a onclick='supprimer()' href='script_commentSupprimer.php?comment_id=<?php echo $ligne->comment_id?> &amp; reponse_id=<?php echo $reponse_id?>'> Supprimer </a>  
+                                    <a onClick='change(<?php echo $ligne->comment_id?>)' href='#confirmer' style="margin-left:10px"> Modifier </a> 
+                                </center> <br>
+                                <center id="confirmer" style="display:none"> 
+                                    <input onClick='valider()' type="submit" value="Valider" class="btn btn-success mr-2"> 
+                                    <input onClick='annuler(<?php echo $ligne->comment_id?>)' type="button" value="Annuler" class="btn btn-danger">
+                                </center> <br>
+<?php
+                            }   
+                        }
+?>
+                    </form> 
+<?php
                 }
+
 
                 $mail="";
 
@@ -221,21 +264,22 @@
             // Libèration la connection au serveur de BDD:
             $result->closeCursor();
 ?>
-                
+            <br>
+            <b onclick='afficher()' style='color:darkblue; cursor:pointer' class='comment'> COMMENTER </b>
+            <br>
+  
             <form action="script_comment.php" method="POST">
                 <input type="hidden" name="reponse_id"  value="<?php echo $row->reponse_id;?>">
                 <input type="hidden" name="fournisseur_email"  value="<?php echo $row->user_email;?>">
-
 <?php
-                if(isset($mail))
+                if(isset($mail) && !empty($mail))
                 {
-                  echo '<input type="hidden" name="client_email"  value="<?php echo $mail;?>">';
-                }
 ?>
-
-                <b onclick="show()" style='color:darkblue; cursor:pointer' class='respond'> COMMENTER </b>  
-        
-                <div style="margin-bottom:5%;"  class="hide">  
+                  <input type="hidden" name="client_email"  value=<?php echo $mail?>>
+<?php
+                }
+?>      
+                <div style="margin-bottom:5%;"  class="commentaire">  
                     <h5> Votre commentaire : </h5>
                     <textarea class="form-control text-left" name="comment" rows="10" cols="70" style="resize:none" required> </textarea>
 <?php                
@@ -254,7 +298,7 @@
                         <div>
                             <button class="btn btn-success mr-3" type="submit"> Valider </button>
                             <input class="btn btn-warning mr-3" type="reset" value="Effacer"> 
-                            <input class="btn btn-danger" type="button" onclick="hide()" value="Annuler"> 
+                            <input class="btn btn-danger" type="button" onclick="cacher()" value="Annuler"> 
                         </div>
                     </center>
                 </div>
@@ -269,13 +313,13 @@
             function modifier()
             { 
                 //Rappel : confirm() -> Bouton OK et Annuler, renvoie true ou false
-                var resultat = confirm("Etes-vous certain de vouloir modifier cette réponse ?");
+                var resultat = confirm("Etes-vous certain de vouloir modifier ?");
 
                 // alert("retour :" + resultat);
 
                 if (resultat==false)
                 {
-                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée à cette réponse !");
+                    alert("Vous avez annulé les modifications \n Aucune modification ne sera apportée !");
 
                     //annule l'évènement par défaut ... SUBMIT vers "reponseModifier.php"
                     event.preventDefault();    
@@ -285,7 +329,7 @@
 
             function supprimer()
             {
-                var resultat = window.confirm("Êtes-vous sûr de vouloir supprimer votre réponse?")
+                var resultat = window.confirm("Êtes-vous sûr de vouloir supprimer ?");
 
                 if (resultat==false)
                 {
@@ -301,23 +345,43 @@
             // JQuery code 
             $(document).ready(function()
             {
-                $('.hide').hide();
+                $('.commentaire').hide()
             });
 
-            function show()
+            function afficher()
             {
-                $('.hide').show(),
-                $('.respond').hide(),
+                $('.commentaire').show(),
+                $('.comment').hide(),
                 $('#buttons').hide()
             };
             
-            function hide()
+            function cacher()
             {
-                $('.hide').hide(),
-                $('.respond').show(),
+                $('.commentaire').hide(),
+                $('.comment').show(),
                 $('#buttons').show()
-            }
+            };
             
+            function change(par)
+            {
+                $('#'+par).attr("readonly", false),
+                $('.buttons').hide(),
+                $('#confirmer').show()
+            };
+
+            function valider()
+            {
+                $('.buttons').show(),
+                $('#confirmer').hide()
+            };
+
+
+            function annuler(par)
+            {
+                $('#'+par).attr("readonly", true),
+                $('.buttons').show(),
+                $('#confirmer').hide()
+            }
         </script>
 
 

@@ -155,7 +155,8 @@
             // Construction de la requête UPDATE avec la méthode prepare() sans injection SQL
             $requete = $db->prepare("UPDATE demande SET demande_titre=:demande_titre, demande_description=:demande_description, 
             demande_budget=:demande_budget, demande_file_name=:demande_file_name, demande_etat=:demande_etat, 
-            demande_modification=:demande_modification, demande_publication=:demande_publication WHERE demande_id=:demande_id");
+            demande_modification=:demande_modification, demande_publication=:demande_publication, demande_equipe=:demande_equipe 
+            WHERE demande_id=:demande_id");
 
             // Association des valeurs aux marqueurs via méthode "bindValue()"
             $requete->bindValue(':demande_titre', $demande_titre, PDO::PARAM_STR);
@@ -164,6 +165,15 @@
             $requete->bindValue(':demande_file_name', $nom_fichier, PDO::PARAM_STR);
             $requete->bindValue(':demande_etat', $demande_etat, PDO::PARAM_STR);
             $requete->bindValue(':demande_id', $demande_id, PDO::PARAM_INT);
+
+            if(isset($demande_equipe))
+            {
+                $requete->bindValue(':demande_equipe', $demande_equipe, PDO::PARAM_STR);
+            }
+            else
+            {
+                $requete->bindValue(':demande_equipe', NULL, PDO::PARAM_STR);
+            }
 
             // On utilise l'objet DateTime() pour enregistrer la date et l'heure de creation et publication de demande dans la base de données
             $time = new DateTime();   

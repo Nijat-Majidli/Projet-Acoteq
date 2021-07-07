@@ -13,44 +13,29 @@
 
     /* Nous récupérons les informations passées dans le fichier "connexion.php" dans la balise <form> et l'attribut action="script_connexion.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['email']) && isset($_POST['mdp']))
+    if(isset($_POST['email']) && isset($_POST['mdp']) && !empty($_POST['email'] && $_POST['mdp']))
     {
-        if (!empty($_POST['email'] && $_POST['mdp']))
-        {
-            // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
-            // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
-            $user_email = trim(htmlspecialchars($_POST['email']));
-            $user_mdp = trim(htmlspecialchars($_POST['mdp']));
-        }
-        else
-        {
-            echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
-                    <center> 
-                        <h4> Veuillez remplir tous les champs ! </h4> 
-                    </center>
-                </div>'; 
-            header("refresh:2; url=connexion.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
-            exit;
-        }
+        // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
+        // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
+        $user_email = trim(htmlspecialchars($_POST['email']));
+        $user_mdp = trim(htmlspecialchars($_POST['mdp']));
     }
     else
     {
         echo'<div class="container-fluid alert alert-danger mt-5" role="alert">
-                    <center> 
-                        <h4> Veuillez remplir tous les champs ! </h4> 
-                    </center>
-                </div>'; 
-        header("refresh:2; url=connexion.php");  
+                <center> 
+                    <h4> Veuillez remplir tous les champs ! </h4> 
+                </center>
+            </div>'; 
+        header("refresh:2; url=connexion.php");  // refresh:2 signifie qu'après 2 secondes l'utilisateur sera redirigé sur la page connexion.php
         exit;
-    }      
-    
+    }
     
 
     if(isset($_POST['cookie'])=="rememberMe")
     {
         $remember = $_POST['cookie'];
     }
-
 
 
     /* Vérification avec l'expréssion RegExp la validité de format d'adresse mail saisi par utilisateur en utilisant 
@@ -72,37 +57,33 @@
     Pour cela d'abord on va se connecter à la base de données:     */
     require ("connection_bdd.php");
 
-    // Ensuite on construit la requête SELECT pour aller chercher la colonne user_email qui se trouvent dans la table "users" :
-    $req = "SELECT user_email FROM users" ;
-    
-    // Grace à méthode query() on exécute notre requête et on ramene la colonne user_email et on les mets dans l'objet $result.
-    $result = $db->query($req)  or  die(print_r($db->errorInfo()));  // Pour repérer l'erreur SQL en PHP on utilise le code die(print_r($db->errorInfo())) 
+    // Ensuite on construit la requête SELECT :
+    $req = "SELECT * FROM users WHERE user_email=:user_email" ;
+                            
+    // On utilise la méthode prepare() pour eviter les injection SQL :
+    $result = $db->prepare($req);
 
-    // Grace à la méthode "rowCount()" on peut connaitre le nombre de lignes retournées par la requête
-    $nbLigne = $result->rowCount(); 
+    /* Association de valeur au marqueur et execution de la reqûete.
+    L'écriture raccourcie: ici la méthode bindValue sera appellée "automatiquement". */
+    $result->execute(array(':user_email' => $user_email));
+
+    // Si la requête renvoit un seul et unique résultat, on ne fait pas de boucle, ici c'est le cas: 
+    $row = $result->fetch(PDO::FETCH_OBJ);
+
+    $email = $row->user_email; 
     
-    if ($nbLigne >= 1)
+    if ($email != $user_email)
     {
-        $listeEmail = array();  // On crée un tableau (array) $listeEmail dans laquelle on va garder tous les adresses mail
+        echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
+                <center> 
+                    <h4> Cette utilisateur n'existe pas! </h4> 
+                </center>
+            </div>"; 
 
-        while ($row = $result->fetch(PDO::FETCH_OBJ))   // Grace à la méthode fetch() on choisit 1er ligne de la colonne user_email et on la mets dans l'objet $row                                            
-        {                                               // Ensuite avec la boucle "while" on choisit 2eme, 3eme, etc.. lignes de la colonne user_email et on les mets dans l'objet $row  
-            array_push($listeEmail, $row->user_email);  // Avec la méthode array_push on ajoute un par un tous les adresses mail dans tableau $listeEmail 
-        }
-
-        if (!in_array($user_email, $listeEmail))
-        {
-            echo"<div class='container-fluid alert alert-danger mt-5' role='alert'>
-                    <center> 
-                        <h4> Cette utilisateur n'existe pas! </h4> 
-                    </center>
-                </div>"; 
-
-            header("refresh:2; url=connexion.php");
-            exit;
-        } 
+        header("refresh:2; url=connexion.php");
+        exit;
     } 
-    
+     
     
     /* Vérification: Est-ce que le mot de passe saisi par utilisateur déjà existe dans la base de données ou non ?
     D'abord on doit récupérer le mot de passe hashé de l'utilisateur qui se trouve dans la base de données. 
@@ -143,6 +124,7 @@
         session_start();
         
         // On va créer plusieurs variables de SESSION que l'on aura besoin dans les autres pages:  
+        $_SESSION['id'] = $row->user_id; 
         $_SESSION['email'] = $user_email;
         $_SESSION['mdp'] = $user_mdp;
 

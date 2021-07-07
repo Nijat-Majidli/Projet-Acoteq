@@ -16,24 +16,29 @@
 
     /* Nous récupérons les informations passées dans le fichier "reponseDetail.php" dans la balise <form> et l'attribut action="script_comment.php".  
     Les informations sont récupéré avec variable superglobale $_POST  */
-    if(isset($_POST['reponse_id']) && isset($_POST['fournisseur_email']) && isset($_POST['client_email']) && isset($_POST['comment']))
+    if(isset($_POST['reponse_id']) && isset($_POST['fournisseur_email']) && isset($_POST['comment']))
     {
-        if (!empty($_POST['reponse_id'] && $_POST['fournisseur_email'] && isset($_POST['client_email']) && $_POST['comment']))
+        if (!empty($_POST['reponse_id'] && $_POST['fournisseur_email'] && $_POST['comment']))
         {
             
             // La fonction "htmlspecialchars" rend inoffensives les balises HTML que le visiteur peux rentrer et nous aide d'éviter la faille XSS  
             $reponse_id = htmlspecialchars($_POST['reponse_id']);  
             $fournisseur_email = htmlspecialchars($_POST['fournisseur_email']);
-            $client_email = htmlspecialchars($_POST['client_email']);
             $comment_description = trim(htmlspecialchars($_POST['comment']));  // La fonction "trim()" efface les espaces blancs au début et à la fin d'une chaîne.
             
-            // On crée un tableau (array) dans lequel on va enregistrer liste des emails clients:
-            $liste_email=array();
 
-            // Avec la fonction explose() on mets les éléments du string $client_email dans le tableau $liste_email :
-            $liste_email = explode(",", $client_email);    // La fonction explose() transforme une chaîne de caractères (string) au tableau (array).
-
+            if(isset($_POST['client_email']))
+            {
+                $client_email = htmlspecialchars($_POST['client_email']);
             
+                // On crée un tableau (array) dans lequel on va enregistrer liste des emails clients:
+                $liste_email=array();
+
+                // Avec la fonction explose() on mets les éléments du string $client_email dans le tableau $liste_email :
+                $liste_email = explode(",", $client_email);   // La fonction explose() transforme une chaîne de caractères (string) au tableau (array).
+            }
+            
+
             if(isset($_POST['visibilite'])=='visible')
             {
                 $comment_visibilite = $_POST['visibilite'];
@@ -57,7 +62,7 @@
             {
                 $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
                 comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
-                VALUES((SELECT CONCAT(user_nom, ' ', user_prenom) AS comment_proprietaire FROM users WHERE user_email=:client_email), 
+                VALUES((SELECT CONCAT(user_prenom, ' ', user_nom) AS comment_proprietaire FROM users WHERE user_email=:client_email), 
                 (SELECT user_societe FROM users AS comment_societe WHERE user_email=:client_email), :comment_description, 
                 :comment_publication, :comment_visibilite, (SELECT user_id FROM users WHERE user_email=:client_email), 
                 (SELECT user_email FROM users WHERE user_email=:client_email), 
@@ -71,7 +76,7 @@
             {
                 $requete = $db->prepare("INSERT INTO commentaire (comment_proprietaire, comment_societe, comment_description, 
                 comment_publication, comment_visibilite, user_id, user_email, user_id_1, user_email_1, reponse_id) 
-                VALUES((SELECT CONCAT(user_nom, ' ', user_prenom) AS comment_proprietaire FROM users WHERE user_email=:fournisseur_email), 
+                VALUES((SELECT CONCAT(user_prenom, ' ', user_nom) AS comment_proprietaire FROM users WHERE user_email=:fournisseur_email), 
                 (SELECT user_societe FROM users AS comment_societe WHERE user_email=:fournisseur_email), :comment_description, 
                 :comment_publication, :comment_visibilite, (SELECT user_id FROM users WHERE user_email=:client_email), 
                 (SELECT user_email FROM users WHERE user_email=:client_email), 
@@ -108,7 +113,7 @@
 
                 $page = "client.php";
             }
-            else if($_SESSION['role']=="fournisseur")
+            else if($_SESSION['role']=="fournisseur" && isset($client_email))
             {
                 // Si le fournisseur répond au commentaire du client on envoie un email de notification à ce client avec la méthode mail() : 
                 mail($client_email, "Nouvelle reponse", "Bonjour, le fournisseur a commenté!", array('MIME-Version' => '1.0', 'Content-Type' => 'text/html; charset=utf-8', "From"=>"contact@gmail.com", "X-Mailer" => "PHP/".phpversion()));
@@ -132,7 +137,7 @@
                     </center>
                 </div>'; 
 
-            header("refresh:2; url='reponseDetail.php?reponse_id=$reponse_id'"); 
+            header("refresh:2; url=reponseDetail.php?reponse_id=$reponse_id"); 
             exit;
         }
     }

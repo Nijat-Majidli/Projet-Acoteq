@@ -215,7 +215,7 @@
     $user_nom = strtoupper(mb_strtolower($user_nom));
     $user_prenom = ucfirst(mb_strtolower($user_prenom));
     $user_societe = ucfirst(mb_strtolower($user_societe));         
-    $user_adresse = ucfirst(mb_strtolower($user_adresse));
+    $user_adresse = mb_strtolower($user_adresse);
     $user_ville = ucfirst(mb_strtolower($user_ville));
     $user_pays = ucfirst(mb_strtolower($user_pays));
     $user_email = mb_strtolower( $user_email);

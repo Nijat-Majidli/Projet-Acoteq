@@ -123,9 +123,7 @@
             <form action="#"  method="#">   
                 <div class="form-group">
                     <label> Description </label>
-                    <textarea class="form-control text-left" rows="10" style="resize:none; " readonly>
-                        <?php echo $row->demande_description;?>
-                    </textarea>
+                    <textarea class="form-control text-left" rows="5" style="resize:none;" readonly> <?php echo $row->demande_description;?> </textarea>
                 </div>
 
                 <div class="form-group">
@@ -179,7 +177,6 @@
                     </a>
                 </div>
             </form>
-            <br>
 <?php
             /* Boutons Modifier, Publier et Supprimer  
             Seul la proprietaire de la demande (client qui a crée la demande) peut la modifier, publier ou supprimer :  */
@@ -215,7 +212,7 @@
                 <form action="script_reponse.php" method="POST" style="display:none; margin-top:20px;" id="answer">
                     <input type="hidden" name="user_email" value="<?php echo $row->user_email?>">   
                     <input type="hidden" name="demande_id" value="<?php echo $demande_id?>"> 
-                    
+                    <br>
                     <h5> Votre réponse </h5>
                     <div class="form-group">
                         <label for="title"> Titre <sup>*</sup> </label> 
@@ -224,9 +221,7 @@
 
                     <div class="form-group">
                         <label for="desc"> Description <sup>*</sup> </label>
-                        <textarea id="desc" class="form-control text-left" name="reponse_description" rows="10" style="width:90%; resize:none" required> 
-                            <?php echo $row->reponse_description?> 
-                        </textarea>
+                        <textarea id="desc" class="form-control text-left" name="reponse_description" rows="10" style="width:90%; resize:none" required> </textarea>
                     </div>
 
                     <div class="form-group">
@@ -243,8 +238,8 @@
 <?php
             }
 ?>
-            <br>
-            <h5> Réponses : </h5> 
+            <br><br>
+            <h5> Réponses des fournisseurs : </h5> 
 <?php
             // Connéxion à la base de données :
             require "connection_bdd.php";
@@ -275,43 +270,46 @@
             
             if ($nbLigne >= 1)
             {
-                while ($row = $result->fetch(PDO::FETCH_OBJ))  // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $row                                            
-                { 
-?>                          
-                    <div class="table-responsive">
-                        <table class="table table-striped" style="margin-bottom:2%;">
-                            <thead>
-                                <tr>
-                                    <th scope="col"> Titre </th>
-                                    <th scope="col"> Société </th>
-                                    <th scope="col"> Publiée </th>
-                                    <th scope="col"> Détail </th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <tr>
-                                    <td> <?php echo $row->reponse_titre;?> </td>
-                                    <td> <?php echo $row->reponse_societe;?> </td>
-
-                                    <!-- Ici on a besoin d'afficher une date qui provient de la base de données et 
-                                    qui est dans un format MySql: 2018-11-16.
-                                    Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format :   -->
-                                    <?php $date = new DateTime($row->reponse_publication);?>
-                                    <td> <?php echo $date->format("d/m/Y H:\hi");?> </td>
-
-                                    <!-- On envoie en URL (méthode GET) le paramètre reponse_id vers la page reponseDetail.php :  -->
-                                    <td> <a href="reponseDetail.php?reponse_id=<?php echo $row->reponse_id;?>"> Afficher </a> </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+?>
+                <div class="table-responsive">
+                    <table class="table table-striped" style="margin-bottom:2%;">
+                        <thead>
+                            <tr>
+                                <th scope="col"> Titre </th>
+                                <th scope="col"> Société </th>
+                                <th scope="col"> Publiée </th>
+                                <th scope="col"> Détail </th>
+                            </tr>
+                        </thead>
 <?php
-                }
+                    while ($row = $result->fetch(PDO::FETCH_OBJ))  // Grace à la méthode fetch() on choisit 1er ligne de chaque colonne et on les mets dans l'objet $row                                            
+                    { 
+?>                          
+                        <tbody>
+                            <tr>
+                                <td> <?php echo $row->reponse_titre;?> </td>
+                                <td> <?php echo $row->reponse_societe;?> </td>
+
+                                <!-- Ici on a besoin d'afficher une date qui provient de la base de données et 
+                                qui est dans un format MySql: 2018-11-16.
+                                Pour formater cette date, on va utiliser l'objet de la classe DateTime et la méthode format :   -->
+                                <?php $date = new DateTime($row->reponse_publication);?>
+                                <td> <?php echo $date->format("d/m/Y H:\hi");?> </td>
+
+                                <!-- On envoie en URL (méthode GET) le paramètre reponse_id vers la page reponseDetail.php :  -->
+                                <td> <a href="reponseDetail.php?reponse_id=<?php echo $row->reponse_id;?>"> Afficher </a> </td>
+                            </tr>
+                        </tbody>
+<?php
+                    }
+?>
+                    </table>
+                </div>
+<?php
             }
             else
             {
-                echo "<h6 style='color:red'> Il n'y a aucunes réponses pour cette demande! </h6>";   
+                echo "<h6 style='color:red'> Vous avez publié aucune réponse pour cette demande! </h6>";   
             }
 
             // Libèration la connection au serveur de BDD:
